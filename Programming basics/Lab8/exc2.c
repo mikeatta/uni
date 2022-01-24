@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+void within_range(float x, float x_center, float y, float y_center, float r, char *name);
+
 void initialisation ();
 
 struct Circle
@@ -9,8 +11,6 @@ struct Circle
     float a, b;
     float r1;
 };
-
-// void is_within(float p1, float p2, float input_p1, float input_p2);
 
 int main()
 {
@@ -39,41 +39,26 @@ int main()
 
     void initialisation ();
 
-    puts("Enter a:");
+    puts("Enter a");
     scanf("%f", &input_a);
-    puts("Enter b:");
+    puts("Enter b");
     scanf("%f", &input_b);
     puts("\n------------------");
 
-    float circle_center = (input_a - One.a) + (input_b - One.b);
-    if(circle_center<=One.r1)
-    {
-        fputs(One.name, stdout);
-        puts("\n[Within range]");
-        printf("Distance to center: %.2f\n", circle_center);
-    }
-
-    circle_center = (input_a - Two.a) + (input_b - Two.b);
-    if(circle_center<=Two.r1)
-    {
-        fputs(Two.name, stdout);
-        puts("\n[Within range]");
-        printf("Distance to center: %.2f\n", circle_center);
-    }
-
-    circle_center = (input_a - Three.a) + (input_b - Three.b);
-    if(circle_center<=Three.r1)
-    {
-        fputs(Three.name, stdout);
-        puts("\n[Within range]");
-        printf("Distance to center: %.2f\n", circle_center);
-    }
+    within_range(input_a, One.a, input_b, One.b, One.r1, One.name);
+    within_range(input_a, Two.a, input_b, Two.b, Two.r1, Two.name);
+    within_range(input_a, Three.a, input_b, Three.b, Three.r1, Three.name);
     return 0;
 }
 
-// void is_within(float p1, float p2, float input_p1, float input_p2)
-// {
-//     float circle_center = (p1 - input_p1) + (p2 - input_p2);
-//     if(circle_center>=0)
-//         printf("Distance from center: %.2f", circle_center);
-// }
+void within_range(float x, float x_center, float y, float y_center, float r, char *name)
+{
+    float center = (x - x_center) + (y - y_center);
+    double P = 3.14 * (r*r);
+    if(center<=r)
+    {
+        printf("%s\n", name);
+        printf("[Within range]\n");
+        printf("%.2f\n", P);
+    }
+}
