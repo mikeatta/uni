@@ -1,4 +1,5 @@
 #include <stdio.h>
+#define PI 3.14
 
 void within_range(float x, float x_center, float y, float y_center, float r, char *name);
 
@@ -19,21 +20,21 @@ int main()
     struct Circle One = {
         1,
         "Circle one",
-        12.0, 13.1,
-        30.0
+        4, 7,
+        11.6
     };
 
     struct Circle Two = {
         2,
         "Circle two",
-        38.1, 19.7,
-        72
+        12, 19,
+        25
     };
 
     struct Circle Three = {
         3,
         "Circle three",
-        12.5, 17.8,
+        72, 48,
         16.8
     };
 
@@ -54,7 +55,7 @@ int main()
 void within_range(float x, float x_center, float y, float y_center, float r, char *name)
 {
     float center = (x - x_center) + (y - y_center);
-    double P = 3.14 * (r*r);
+    double P = PI*(r*r);
     if(center<=r)
     {
         printf("%s\n", name);
