@@ -14,7 +14,7 @@ Example: johndoe@mail.com
 
     ^[0-9]{2}-[0-9]{3}$
 
-Example: acbdsa3212-123
+Example: 12-123
 
 ## Phone number
 
