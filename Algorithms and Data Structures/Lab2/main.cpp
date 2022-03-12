@@ -4,11 +4,6 @@ void hello_world() {
     std::cout << "Hello world!\n";
 }
 
-int nww(int first_number, int second_number) {
-    int nww = first_number * second_number;
-    return nww;
-}
-
 int greatest_common_divisor(int first_number, int second_number) {
     int gcd, division_remainder;
 
@@ -25,6 +20,13 @@ int greatest_common_divisor(int first_number, int second_number) {
     return greatest_common_divisor(second_number, division_remainder);
 }
 
+int least_common_multiple(int first_number, int second_number) {
+    int lcm;
+
+    lcm = (first_number * second_number) / greatest_common_divisor(first_number, second_number);
+    return lcm;
+}
+
 int factorial_iteration(int number) {
     int factorial = 1;
     for(int i=number; i>0; i--) {
@@ -39,22 +41,21 @@ int factorial_recursion(int number) {
 }
 
 int main() {
-    int number;
 
     // Exc 1 - Hello world
     hello_world();
 
-    // Exc 2 - & GCD
-    std::cout << greatest_common_divisor(270, 192);
+    // Exc 2 - LCM & GCD
+    std::cout << "LCM: " << least_common_multiple(120, 3);
+    std::cout << '\n';
+
+    std::cout << "GCM: " << greatest_common_divisor(270, 192);
     std::cout << "\n";
 
 
-    // // Exc 3 - Factorial
-    std::cout << "Enter the number: ";
-    std::cin >> number;
-
-    std::cout << "Factorial by iteration: " << factorial_iteration(number) << "\n";
-    std::cout << "Factorial by recursion: " << factorial_recursion(number) << "\n";
+    // // Exc 3 - Factorials
+    std::cout << "Factorial by iteration: " << factorial_iteration(4) << "\n";
+    std::cout << "Factorial by recursion: " << factorial_recursion(7) << "\n";
 
     return 0;
 }
