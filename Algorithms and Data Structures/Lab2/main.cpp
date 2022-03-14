@@ -49,13 +49,29 @@ int power_of_number(int base, int exponent) {
 
     int i;
     int power = 0;
-    // std::cout << "Enter power base: ";
-    // std::cout << "Enter power exponent: ";
 
+    if(exponent==0) {
+        return 1;
+    }
+    else if(exponent==1) {
+        return base;
+    }
+    else
     for(i=0; i<exponent; i++) {
         power += base * base;
     }
     return power;
+}
+
+int sum_all_below(int number) {
+
+    int i;
+    int sum = 0;
+
+    for(i=number-1; i>0; i--) {
+        sum += i;
+    }
+    return sum;
 }
 
 int main() {
@@ -75,7 +91,21 @@ int main() {
     std::cout << "Factorial by recursion: " << factorial_recursion(7) << "\n";
 
     // Exc 4 - Power of a
-    std::cout << "Power equals to: " << power_of_number(5, 5) << "\n";
+    int base, exponent;
+
+    std::cout << "Enter the base: ";
+    std::cin >> base;
+    std:: cout << "Enter the exponent: ";
+    std::cin >> exponent;
+    std::cout << "Power equals to: " << power_of_number(base, exponent) << "\n";
+
+    // Exc 5 - Sum all numbers below sum_all_below
+    int sum_numbers_below;
+
+    std::cout << "Enter your number: ";
+    std::cin >> sum_numbers_below;
+
+    std::cout << "Sum of all numbers below " << sum_numbers_below << ": " << sum_all_below(sum_numbers_below);
 
     return 0;
 }
