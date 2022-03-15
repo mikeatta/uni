@@ -48,23 +48,36 @@ int factorial_recursion(int number) {
 int power_of_number(int base, int exponent) {
 
     int i;
-    int power = 0;
 
-    if(exponent==0) {
-        return 1;
+    switch(exponent) {
+        case 0:
+            return 1;
+            break;
+        case 1:
+            return base;
+            break;
+        default:
+            for(i=0; i<exponent-1; i++) {
+                base *= base;
+                return base;
+            }
     }
-    else if(exponent==1) {
-        return base;
-    }
-    else
-    power = base * base;
-    // exponent-1 since base has already been raised to the power of 2 above
-    // exponent-2 since loop has to run one time less than value of exponent
-    for(i=0; i<exponent-2; i++) {
-        power *= base;
-    }
-    return power;
 }
+
+//     if(exponent==0) {
+//         return 1;
+//     }
+//     else if(exponent==1) {
+//         return base;
+//     }
+//     else
+//     power = base * base;
+//     // exponent-1 since base has already been raised to the power of 2 above
+//     // exponent-2 since loop has to run one time less than value of exponent
+//     for(i=0; i<exponent-2; i++) {
+//         power *= base;
+//     }
+//     return power;
 
 int sum_all_below_number(int number) {
 
