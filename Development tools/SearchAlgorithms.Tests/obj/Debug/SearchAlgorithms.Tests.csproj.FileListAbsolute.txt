@@ -1,9 +1,0 @@
-C:\Users\micha\Documents\git\uni\Development tools\SearchAlgorithms.Tests\bin\Debug\SearchAlgorithms.Tests.dll
-C:\Users\micha\Documents\git\uni\Development tools\SearchAlgorithms.Tests\bin\Debug\SearchAlgorithms.Tests.pdb
-C:\Users\micha\Documents\git\uni\Development tools\SearchAlgorithms.Tests\bin\Debug\nunit.framework.dll
-C:\Users\micha\Documents\git\uni\Development tools\SearchAlgorithms.Tests\bin\Debug\nunit.framework.xml
-C:\Users\micha\Documents\git\uni\Development tools\SearchAlgorithms.Tests\obj\Debug\SearchAlgorithms.Tests.csproj.AssemblyReference.cache
-C:\Users\micha\Documents\git\uni\Development tools\SearchAlgorithms.Tests\obj\Debug\SearchAlgorithms.Tests.csproj.CoreCompileInputs.cache
-C:\Users\micha\Documents\git\uni\Development tools\SearchAlgorithms.Tests\obj\Debug\SearchAlgorithms.Tests.csproj.CopyComplete
-C:\Users\micha\Documents\git\uni\Development tools\SearchAlgorithms.Tests\obj\Debug\SearchAlgorithms.Tests.dll
-C:\Users\micha\Documents\git\uni\Development tools\SearchAlgorithms.Tests\obj\Debug\SearchAlgorithms.Tests.pdb
