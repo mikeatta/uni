@@ -96,6 +96,12 @@ int sum_all_below_number(int number) {
     return sum;
 }
 
+void table_values(int *arr) {
+
+    std::cout << arr[9]; // 9th elem -> #10
+}
+
+
 void linear_equation(float a, float b, float c, float d) {
     
     float x;
@@ -109,6 +115,27 @@ void linear_equation(float a, float b, float c, float d) {
     else {
         x = (d-b) / (a-c);
         std::cout << "Solution: x = " << x << "\n";    
+    }
+}
+
+void quadratic_equation(float a, float b, float c) {
+
+    float delta, x1, x2;
+
+    std::cout << "Solving for equation: " << a << "x² + " << b << "x + " << c << " = 0\n";
+
+    delta = (b*b) - (4*(a*c));
+
+    if(delta<0)
+        std::cout << "No x's\n";
+    else if(delta==0) {
+        x1 = -b / (2*a);
+        std::cout << "Solution: x = " << x1 << "\n";
+    } else {
+        x1 = (-b + sqrt(delta)) / (2*a);
+        x2 = (-b - sqrt(delta)) / (2*a);
+
+        std::cout << "Solution: \n" << "x1 = " << x1 << "\nx2 = " << x2 << "\n";
     }
 }
 
@@ -171,6 +198,12 @@ int main() {
     std::cin >> a >> b >> c >> d;
 
     linear_equation(a, b, c, d);
+    std::cout << "\n";
+
+    std::cout << "Enter a, b, c:\n";
+    std::cin >> a >> b >> c;
+
+    quadratic_equation(a, b, c);
     std::cout << "\n";
 
     return 0;
