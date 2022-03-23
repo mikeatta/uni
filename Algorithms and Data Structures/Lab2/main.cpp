@@ -1,4 +1,7 @@
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <math.h>
 
 void hello_world() {
 
@@ -62,7 +65,10 @@ int power_of_number(int base, int exponent) {
                 return base;
             }
     }
+    return 0;
+    // main.cpp:65:1: warning: control reaches end of non-void function [-Wreturn-type]
 }
+
 
 //     if(exponent==0) {
 //         return 1;
@@ -88,6 +94,22 @@ int sum_all_below_number(int number) {
         sum += i;
     }
     return sum;
+}
+
+void linear_equation(float a, float b, float c, float d) {
+    
+    float x;
+
+    std::cout << "Solving for equation: " << a << "x + " << b << " = " << c << "x + " << d << "\n";
+
+    if(a==c)
+        std::cout << "The equation is incorrect\n";
+    else if(a==c && b==d)
+        std::cout << "There are infinite solutions\n";
+    else {
+        x = (d-b) / (a-c);
+        std::cout << "Solution: x = " << x << "\n";    
+    }
 }
 
 int main() {
@@ -121,7 +143,35 @@ int main() {
     std::cout << "Enter your number: ";
     std::cin >> sum_numbers_below;
 
-    std::cout << "Sum of all numbers below " << sum_numbers_below << ": " << sum_all_below_number(sum_numbers_below);
+    std::cout << "Sum of all numbers below " << sum_numbers_below << ": " << sum_all_below_number(sum_numbers_below) << "\n";
+
+    // Exc 6 - Tables
+    // int arr[10] = {};
+    // int i;
+
+    // int *ptr;
+    // ptr = arr;
+
+    // std::srand(time(0));
+
+    // for(i=0; i<10; i++) {
+    //     arr[i] = 1 + (std::rand() % 1000);
+    // }
+
+    // for(i=0; i<10; i++) {
+    //     std::cout << i+1 << ": " << arr[i] << "\n";
+    // }
+
+    // table_values(ptr);
+
+    // Exc 7 - Linear equation & Quadratic equation
+    float a, b, c, d; // Linear equation variables
+
+    std::cout << "Enter a, b, c, d:\n";
+    std::cin >> a >> b >> c >> d;
+
+    linear_equation(a, b, c, d);
+    std::cout << "\n";
 
     return 0;
 }
