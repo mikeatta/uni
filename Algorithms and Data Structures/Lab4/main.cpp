@@ -1,12 +1,18 @@
 #include <iostream>
+#include <math.h> // For pow function [Exc2]
 
 int main() 
 {
     int i;
 
     // Exc 2
+    // Dec -> bin
     int dec_tab[99];
     int decimal_number_to_convert;
+
+    // Bin -> dec
+    int binary_number;
+    int dec = 0, rem;
 
     std::cout << "Decimal number (to bin): ";
     std::cin >> decimal_number_to_convert;
@@ -25,6 +31,20 @@ int main()
     }
 
     std::cout << "\n";
+
+    i = 0;
+    std::cout << "Binary number (to dec): ";
+    std::cin >> binary_number;
+    
+    while(binary_number!=0)
+    {
+        rem = binary_number % 10;
+        binary_number /= 10;
+        dec += rem * pow(2, i);
+        ++i;
+    }
+
+    std::cout << "Binary: " << dec << "\n";
 
     return 0;
 }
