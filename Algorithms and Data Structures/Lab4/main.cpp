@@ -89,5 +89,29 @@ int main()
     }
     std::cout << "\n";
 
+    // Hex -> dec
+    char hexadecimal_number_to_decimal[] = {};
+    int len = strlen(hexadecimal_number_to_decimal);
+    int base = 1;
+    int temp = 0;
+
+    std::cout << "Hexadecimal number (to decimal): ";
+    std::cin >> hexadecimal_number_to_decimal;
+
+    for(i=len-1; i>=0; i--)
+    {
+        if(hexadecimal_number_to_decimal[i]>='0' && hexadecimal_number_to_decimal[i]<='9') // For range 0-9
+        {
+            temp += (hexadecimal_number_to_decimal[i] - 48)*base;
+            base = base * 16;
+        }
+        else if (hexadecimal_number_to_decimal[i]>='A' && hexadecimal_number_to_decimal[i]<='F') // For range A(10)-F(15)
+        {
+            temp += (hexadecimal_number_to_decimal[i] - 55)*base;
+            base = base * 16;
+        }
+    }
+    std::cout << "Decimal number: " << temp << "\n";
+
     return 0;
 }
