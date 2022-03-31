@@ -24,16 +24,41 @@ void bubble_sort(int *arr, int arr_size)
     }
 }
 
+void insertion_sort(int *arr, int arr_size)
+{
+    int i;
+
+    for(i=0; i<arr_size; i++)
+    {
+        int check = arr[i];
+        int j = i - 1;
+
+        while(check<arr[j] && j >= 0)
+        {
+            arr[j+1] = arr[j];
+            --j;
+        }
+        arr[j+1] = check;
+    }
+}
+
 void display(int *arr, int size)
 {
-    bubble_sort(arr, size);
+    insertion_sort(arr, size);
     print_array(arr, size);
+    std::cout << std::endl;
 }
 
 int main()
 {
-    int arr[] = {9, 13, -32, 3, 0, 123, -78};
-    int size = sizeof(arr) / sizeof(arr[0]);
-    display(arr, size);
+    int arr_bubble[] = {9, 13, -32, 3, 0, 123, -78};
+    int size = sizeof(arr_bubble) / sizeof(arr_bubble[0]);
+    std::cout << "Bubble sort\n";
+    display(arr_bubble, size);
+
+    int arr_insertion[] = {123, 9, -654, -3, 14, 14478, 102, 1, 3, -86};
+    size = sizeof(arr_insertion) / sizeof(arr_insertion[0]);
+    std::cout << "Insertion sort\n";
+    display(arr_insertion, size);
     return 0;
 }
