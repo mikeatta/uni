@@ -42,23 +42,31 @@ void insertion_sort(int *arr, int arr_size)
     }
 }
 
-void display(int *arr, int size)
+void display(int *arr, int size, std::string sort_type)
 {
-    insertion_sort(arr, size);
+    if(sort_type=="bubble")
+        bubble_sort(arr, size);
+    else if(sort_type=="insertion")
+        insertion_sort(arr, size);
+
     print_array(arr, size);
     std::cout << std::endl;
 }
 
 int main()
 {
+    std::string sort_type;
+
     int arr_bubble[] = {9, 13, -32, 3, 0, 123, -78};
     int size = sizeof(arr_bubble) / sizeof(arr_bubble[0]);
+    sort_type = "bubble";
     std::cout << "Bubble sort\n";
-    display(arr_bubble, size);
+    display(arr_bubble, size, sort_type);
 
     int arr_insertion[] = {123, 9, -654, -3, 14, 14478, 102, 1, 3, -86};
     size = sizeof(arr_insertion) / sizeof(arr_insertion[0]);
+    sort_type = "insertion";
     std::cout << "Insertion sort\n";
-    display(arr_insertion, size);
+    display(arr_insertion, size, sort_type);
     return 0;
 }
