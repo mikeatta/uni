@@ -24,19 +24,18 @@ void bubble_sort(int *arr, int arr_size)
     }
 }
 
-void insertion_sort(int *arr, int arr_size)
+void insertion_sort(int *arr, int arr_length)
 {
-    int i;
 
-    for(i=0; i<arr_size; i++)
+    for(int i=1; i<arr_length; i++)
     {
         int temp = arr[i];
-        int j = i - 1;
+        int j = i-1;
 
-        while(temp<arr[j] && j >= 0)
+        while(arr[j] > temp && j >= 0)
         {
             arr[j+1] = arr[j];
-            --j;
+            j--;
         }
         arr[j+1] = temp;
     }
