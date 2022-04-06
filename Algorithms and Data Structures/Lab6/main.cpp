@@ -2,7 +2,6 @@
 
 void selection_sort(int arr[], int array_size)
 {
-
     int i, j, min, temp;
 
     for(i=0; i<array_size; i++)
@@ -25,6 +24,37 @@ void selection_sort(int arr[], int array_size)
     }
 }
 
+int split_array(int arr[], int start, int end)
+{
+    int pivot = arr[end];
+    int i = start - 1;
+
+    for(int j = start; j <= end - 1; j++)
+    {
+        if(arr[j] < pivot)
+        {
+            i++;
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+    }
+    i++;
+    int temp = arr[i];
+    arr[i] = arr[end];
+    arr[end] = temp;
+
+    return i;
+}
+
+void quick_sort(int arr[], int start, int end)
+{
+    if(end <= start) return;
+
+    int pivot = split_array(arr, start, end);
+    quick_sort(arr, start, pivot - 1);
+    quick_sort(arr, pivot + 1, end);
+}
 
 int main()
 {
@@ -34,5 +64,13 @@ int main()
     std::cout << "Selection sort: ";
     selection_sort(array, array_size);
 
+    std::cout << "\nQuick sort: ";
+    quick_sort(array, 0, array_size-1);
+
+    for(int i=0; i<array_size; i++)
+    {
+        if(i==9) std::cout << array[i];
+        else std::cout << array[i] << ", ";
+    }
     return 0;
 }
