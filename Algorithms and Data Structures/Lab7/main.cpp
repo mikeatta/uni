@@ -6,7 +6,7 @@ void merge(int arr[], int left, int middle, int right)
     int j = middle + 1; // starting index of right subarray
     int k = left; // starting index of temp array
 
-    int temp[10];
+    int temp[right+1];
 
     while(i<=middle && j<=right)
     {
@@ -54,20 +54,22 @@ void merge_sort(int arr[], int left, int right)
 
 int main()
 {
-    int arr[10] = {19, 7, -33, 0, 34, 77, 103, -67, 88, 49};
+    int arr[] = {19, 7, -33, 0, 34, 77, 103, -67, 88, 49};
+    int arr_len = sizeof(arr) / sizeof(arr[0]);
+    std::cout << "Length " << arr_len <<std::endl;
 
     // Displaying array elements
-    std::cout << "Before merge sort: ";
-    for(int i = 0; i < 10; i++)
+    std::cout << "Before merge sort: " << std::endl;
+    for(int i = 0; i < arr_len; i++)
     {
         std::cout << arr[i] << " ";
-        if(i == 9) std::cout << std::endl;
+        if(i == arr_len-1) std::cout << std::endl;
     }
 
     // Sorting the array
-    merge_sort(arr, 0, 9);
-    std::cout << "After merge sort: ";
-    for(int i = 0; i < 10; i++)
+    merge_sort(arr, 0, arr_len-1);
+    std::cout << "After merge sort: " << std::endl;
+    for(int i = 0; i < arr_len; i++)
     {
         std::cout << arr[i] << " ";
     }
