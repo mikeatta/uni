@@ -6,19 +6,17 @@
 
 int number_gen()
 {
-    return rand() % (10000+1-0) + 0;
+    return rand() % ((1000+1-0) + 0); // Rand range 0 to 1,000
 }
 
 void make_file(int amount_of_files)
 {
-
     int i = 0, j = 0;
     int set_number_amount;
     while(i<amount_of_files) // How many files to make
     {
         std::cout << "How many sets of numbers for set " << i+1 << "?" <<std::endl;
         std::cin >> set_number_amount;
-
 
         std::string set_name;
         set_name = std::to_string(set_number_amount);
@@ -28,7 +26,8 @@ void make_file(int amount_of_files)
         write_file.open(set_name);
         for(;j<set_number_amount;j++)
         {
-            write_file << number_gen() << "\n";
+            if(j==set_number_amount-1) write_file << number_gen(); // Skip newline on last number
+            else write_file << number_gen() << "\n";
         }
         write_file.close();
         i++;
