@@ -6,7 +6,7 @@
 
 int number_gen()
 {
-    return rand() % ((1000+1-0) + 0); // Rand range 0 to 1,000
+    return rand() % ((1000+1-0) + 0) - 500; // Rand up to 1,000 with negative numbers
 }
 
 void make_file(int amount_of_files)
