@@ -25,7 +25,7 @@ void make_file(int amount_of_files, const std::string& data_type)
             selected_data_type = "_o";
             std::string set_name;
             set_name = std::to_string(set_number_amount);
-            set_name = "..\\" + set_name + selected_data_type + ".txt"; // Setting path and filename
+            set_name = "..\\data\\" + set_name + selected_data_type + ".txt"; // Setting path and filename
 
             std::ofstream write_file; // Creating files
             write_file.open(set_name);
@@ -40,13 +40,13 @@ void make_file(int amount_of_files, const std::string& data_type)
             i++;
         }
 
-        // Random Data
+            // Random Data
         else if(data_type=="R" || data_type=="r") // Randomly generated numbers
         {
             selected_data_type = "_r";
             std::string set_name;
             set_name = std::to_string(set_number_amount);
-            set_name = "..\\" + set_name + selected_data_type + ".txt"; // Setting path and filename
+            set_name = "..\\data\\" + set_name + selected_data_type + ".txt"; // Setting path and filename
 
             std::ofstream write_file; // Creating files
             write_file.open(set_name);
@@ -59,13 +59,13 @@ void make_file(int amount_of_files, const std::string& data_type)
             i++;
         }
 
-        // Pessimistic Data
+            // Pessimistic Data
         else if(data_type=="P" || data_type=="p") // File sorted in wrong order
         {
             selected_data_type = "_p";
             std::string set_name;
             set_name = std::to_string(set_number_amount);
-            set_name = "..\\" + set_name + selected_data_type + ".txt"; // Setting path and filename
+            set_name = "..\\data\\" + set_name + selected_data_type + ".txt"; // Setting path and filename
 
             std::ofstream write_file; // Creating files
             write_file.open(set_name);
