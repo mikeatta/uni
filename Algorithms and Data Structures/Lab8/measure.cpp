@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <chrono>
 
 void selection_sort(int arr[], int array_size) // Selection sort algorithm
 {
@@ -261,26 +262,40 @@ int main()
     write_to_array("O", arr_10, arr_20, arr_30, arr_50, arr_75,
                    arr_100, arr_200, arr_300, arr_400, arr_500); // Reading from files of selected data type
 
-    selection_sort(arr_10, 10); // Enter (arr, size)
-    for(int i = 0; i < 10; i++)
-    {
-        std::cout << arr_10[i] << " ";
-    }
-    std::cout << "\n";
+//    selection_sort(arr_10, 10); // Enter (arr, size)
+//    for(int i = 0; i < 10; i++)
+//    {
+//        std::cout << arr_10[i] << " ";
+//    }
+//    std::cout << "\n";
+//
+//    quick_sort(arr_10, 0, 9); // Enter (arr, firstIndex, lastIndex)
+//    for(int i = 0; i < 10; i++)
+//    {
+//        std::cout << arr_10[i] << " ";
+//    }
+//    std::cout << "\n";
+//
+//    merge_sort(arr_10, 0, 9); // Enter (arr, leftIndex, rightIndex)
+//    for(int i = 0; i < 10; i++)
+//    {
+//        std::cout << arr_10[i] << " ";
+//    }
+//    std::cout << "\n";
 
-    quick_sort(arr_10, 0, 9); // Enter (arr, firstIndex, lastIndex)
-    for(int i = 0; i < 10; i++)
-    {
-        std::cout << arr_10[i] << " ";
-    }
-    std::cout << "\n";
+    std::cout << "Selection sort 10:\n";
+    auto start = std::chrono::high_resolution_clock::now();
+    selection_sort(arr_10, 10);
+    auto stop = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> duration = stop - start;
+    std::cout << duration.count() << "s \n";
 
-    merge_sort(arr_10, 0, 9); // Enter (arr, leftIndex, rightIndex)
-    for(int i = 0; i < 10; i++)
-    {
-        std::cout << arr_10[i] << " ";
-    }
-    std::cout << "\n";
+    std::cout << "Selection sort 500:\n";
+    start = std::chrono::high_resolution_clock::now();
+    selection_sort(arr_500, 500);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() << "s \n";
 
     return 0;
 }
