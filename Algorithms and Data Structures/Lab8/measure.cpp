@@ -2,6 +2,106 @@
 #include <fstream>
 #include <string>
 
+void selection_sort(int arr[], int array_size) // Selection sort algorithm
+{
+    int i, j, min, temp;
+
+    for(i=0; i<array_size; i++)
+    {
+        min = i;
+        for(j= i+1; j<array_size; j++)
+            if(arr[min] > arr[j]) min = j;
+
+        temp = arr[i];
+        arr[i] = arr[min];
+        arr[min] = temp;
+    }
+}
+
+int split_array(int arr[], int start, int end) // Quick sort splitting array
+{
+    int pivot = arr[end];
+    int i = start - 1;
+
+    for(int j = start; j <= end - 1; j++)
+    {
+        if(arr[j] < pivot)
+        {
+            i++;
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+    }
+    i++;
+    int temp = arr[i];
+    arr[i] = arr[end];
+    arr[end] = temp;
+
+    return i;
+}
+
+void quick_sort(int arr[], int start, int end) // Quick sort algorithm
+{
+    if(end <= start) return;
+
+    int pivot = split_array(arr, start, end);
+    quick_sort(arr, start, pivot - 1);
+    quick_sort(arr, pivot + 1, end);
+}
+
+void merge(int arr[], int left, int middle, int right)
+{
+    int i = left; // staring index of left subarray
+    int j = middle + 1; // starting index of right subarray
+    int k = left; // starting index of temp array
+
+    int temp[right+1];
+
+    while(i<=middle && j<=right)
+    {
+        if(arr[i]<=arr[j])
+        {
+            temp[k] = arr[i];
+            i++;
+            k++;
+        }
+        else
+        {
+            temp[k] = arr[j];
+            j++;
+            k++;
+        }
+    }
+    while(i<=middle) // copying all elements from left arr to temp
+    {
+        temp[k] = arr[i];
+        i++;
+        k++;
+    }
+    while(j<=right) // copying all elements from right arr to temp
+    {
+        temp[k] = arr[j];
+        j++;
+        k++;
+    }
+    for(int s = left; s <= right; s++)
+    {
+        arr[s] = temp[s]; // copying elements from temp array
+    }
+}
+
+void merge_sort(int arr[], int left, int right) // Merge sort algorithm
+{
+    if(left<right)
+    {
+        int middle = (left + right) / 2;
+        merge_sort(arr, left, middle);
+        merge_sort(arr, middle+1, right);
+        merge(arr, left, middle, right);
+    }
+}
+
 void write_to_array(std::string data_type, int arr10[], int arr20[], int arr30[], int arr50[], int arr75[],
                     int arr100[], int arr200[], int arr300[], int arr400[], int arr500[])
 {
@@ -161,45 +261,26 @@ int main()
     write_to_array("O", arr_10, arr_20, arr_30, arr_50, arr_75,
                    arr_100, arr_200, arr_300, arr_400, arr_500); // Reading from files of selected data type
 
-    std::cout << "Arr 10\n";
+    selection_sort(arr_10, 10); // Enter (arr, size)
     for(int i = 0; i < 10; i++)
-        std::cout << arr_10[i] << " "; // Testing file to array output
+    {
+        std::cout << arr_10[i] << " ";
+    }
+    std::cout << "\n";
 
-    std::cout << "\nArr 20\n";
-    for(int i = 0; i < 20; i++)
-        std::cout << arr_20[i] << " ";
+    quick_sort(arr_10, 0, 9); // Enter (arr, firstIndex, lastIndex)
+    for(int i = 0; i < 10; i++)
+    {
+        std::cout << arr_10[i] << " ";
+    }
+    std::cout << "\n";
 
-    std::cout << "\nArr 30\n";
-    for(int i = 0; i < 30; i++)
-        std::cout << arr_30[i] << " ";
-
-    std::cout << "\nArr 50\n";
-    for(int i = 0; i < 50; i++)
-        std::cout << arr_50[i] << " ";
-
-    std::cout << "\nArr 75\n";
-    for(int i = 0; i < 75; i++)
-        std::cout << arr_75[i] << " ";
-
-    std::cout << "\nArr 100\n";
-    for(int i = 0; i < 100; i++)
-        std::cout << arr_100[i] << " ";
-
-    std::cout << "\nArr 200\n";
-    for(int i = 0; i < 200; i++)
-        std::cout << arr_200[i] << " ";
-
-    std::cout << "\nArr 300\n";
-    for(int i = 0; i < 300; i++)
-        std::cout << arr_300[i] << " ";
-
-    std::cout << "\nArr 400\n";
-    for(int i = 0; i < 400; i++)
-        std::cout << arr_400[i] << " ";
-
-    std::cout << "\nArr 500\n";
-    for(int i = 0; i < 500; i++)
-        std::cout << arr_500[i] << " ";
+    merge_sort(arr_10, 0, 9); // Enter (arr, leftIndex, rightIndex)
+    for(int i = 0; i < 10; i++)
+    {
+        std::cout << arr_10[i] << " ";
+    }
+    std::cout << "\n";
 
     return 0;
 }
