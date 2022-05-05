@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <chrono>
+#define space "\n\n"
 
 void selection_sort(int arr[], int array_size) // Selection sort algorithm
 {
@@ -267,14 +268,69 @@ int main()
     selection_sort(arr_10, 10); // Selecting algorithms and data files
     auto stop = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> duration = stop - start;
-    std::cout << duration.count() * 1000.0f << "ms \n";
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Selection sort 20:\n";
+    start = std::chrono::high_resolution_clock::now();
+    selection_sort(arr_30, 30);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Selection sort 30:\n";
+    start = std::chrono::high_resolution_clock::now();
+    selection_sort(arr_30, 30);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Selection sort 50:\n";
+    start = std::chrono::high_resolution_clock::now();
+    selection_sort(arr_50, 50);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Selection sort 75:\n";
+    start = std::chrono::high_resolution_clock::now();
+    selection_sort(arr_75, 75);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Selection sort 100:\n";
+    start = std::chrono::high_resolution_clock::now();
+    selection_sort(arr_100, 100);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Selection sort 200:\n";
+    start = std::chrono::high_resolution_clock::now();
+    selection_sort(arr_200, 200);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Selection sort 300:\n";
+    start = std::chrono::high_resolution_clock::now();
+    selection_sort(arr_300, 300);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Selection sort 400:\n";
+    start = std::chrono::high_resolution_clock::now();
+    selection_sort(arr_400, 400);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
 
     std::cout << "Selection sort 500:\n";
     start = std::chrono::high_resolution_clock::now();
     selection_sort(arr_500, 500);
     stop = std::chrono::high_resolution_clock::now();
     duration = stop - start;
-    std::cout << duration.count() * 1000.0f << "ms \n";
-
+    std::cout << duration.count() * 1000.0f << "ms";
     return 0;
 }
