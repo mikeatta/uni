@@ -260,77 +260,236 @@ int main()
     int arr_10[10], arr_20[20], arr_30[30], arr_50[50], arr_75[75],
             arr_100[100], arr_200[200], arr_300[300], arr_400[400], arr_500[500];
 
-    write_to_array("O", arr_10, arr_20, arr_30, arr_50, arr_75,
+    write_to_array("p", arr_10, arr_20, arr_30, arr_50, arr_75,
                    arr_100, arr_200, arr_300, arr_400, arr_500); // Reading from files of selected data type
 
-    std::cout << "Selection sort 10:\n";
+    // 10 element data sets
+    std::cout << "Selection sort (10):\n";
     auto start = std::chrono::high_resolution_clock::now();
     selection_sort(arr_10, 10); // Selecting algorithms and data files
     auto stop = std::chrono::high_resolution_clock::now();
     std::chrono::duration<float> duration = stop - start;
     std::cout << duration.count() * 1000.0f << "ms" << space;
 
-    std::cout << "Selection sort 20:\n";
+    std::cout << "Quick sort (10):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_10, 0, 9);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Merge sort (10):\n";
+    start = std::chrono::high_resolution_clock::now();
+    merge_sort(arr_10, 0, 9);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+//    // 20 element data sets
+    std::cout << "--------------------\n";
+    std::cout << "Selection sort (20):\n";
+    start = std::chrono::high_resolution_clock::now();
+    selection_sort(arr_20, 20);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Quick sort (20):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_20, 0, 19);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Merge sort (20):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_20, 0, 19);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    // 30 element data sets
+    std::cout << "--------------------\n";
+    std::cout << "Selection sort (30):\n";
     start = std::chrono::high_resolution_clock::now();
     selection_sort(arr_30, 30);
     stop = std::chrono::high_resolution_clock::now();
     duration = stop - start;
     std::cout << duration.count() * 1000.0f << "ms" << space;
 
-    std::cout << "Selection sort 30:\n";
+    std::cout << "Quick sort (30):\n";
     start = std::chrono::high_resolution_clock::now();
-    selection_sort(arr_30, 30);
+    quick_sort(arr_30, 0, 29);
     stop = std::chrono::high_resolution_clock::now();
     duration = stop - start;
     std::cout << duration.count() * 1000.0f << "ms" << space;
 
-    std::cout << "Selection sort 50:\n";
+    std::cout << "Merge sort (30):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_30, 0, 29);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    // 50 element data sets
+    std::cout << "--------------------\n";
+    std::cout << "Selection sort (50):\n";
     start = std::chrono::high_resolution_clock::now();
     selection_sort(arr_50, 50);
     stop = std::chrono::high_resolution_clock::now();
     duration = stop - start;
     std::cout << duration.count() * 1000.0f << "ms" << space;
 
-    std::cout << "Selection sort 75:\n";
+    std::cout << "Quick sort (50):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_50, 0, 49);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Merge sort (50):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_50, 0, 49);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    // 75 element data sets
+    std::cout << "--------------------\n";
+    std::cout << "Selection sort (75):\n";
     start = std::chrono::high_resolution_clock::now();
     selection_sort(arr_75, 75);
     stop = std::chrono::high_resolution_clock::now();
     duration = stop - start;
     std::cout << duration.count() * 1000.0f << "ms" << space;
 
-    std::cout << "Selection sort 100:\n";
+    std::cout << "Quick sort (75):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_75, 0, 74);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Merge sort (75):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_75, 0, 74);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    // 100 element data sets
+    std::cout << "--------------------\n";
+    std::cout << "Selection sort (100):\n";
     start = std::chrono::high_resolution_clock::now();
     selection_sort(arr_100, 100);
     stop = std::chrono::high_resolution_clock::now();
     duration = stop - start;
     std::cout << duration.count() * 1000.0f << "ms" << space;
 
-    std::cout << "Selection sort 200:\n";
+    std::cout << "Quick sort (100):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_100, 0, 99);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Merge sort (100):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_100, 0, 99);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    // 200 element data sets
+    std::cout << "--------------------\n";
+    std::cout << "Selection sort (200):\n";
     start = std::chrono::high_resolution_clock::now();
     selection_sort(arr_200, 200);
     stop = std::chrono::high_resolution_clock::now();
     duration = stop - start;
     std::cout << duration.count() * 1000.0f << "ms" << space;
 
-    std::cout << "Selection sort 300:\n";
+    std::cout << "Quick sort (200):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_200, 0, 199);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Merge sort (200):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_200, 0, 199);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    // 300 element data sets
+    std::cout << "--------------------\n";
+    std::cout << "Selection sort (300):\n";
     start = std::chrono::high_resolution_clock::now();
     selection_sort(arr_300, 300);
     stop = std::chrono::high_resolution_clock::now();
     duration = stop - start;
     std::cout << duration.count() * 1000.0f << "ms" << space;
 
-    std::cout << "Selection sort 400:\n";
+    std::cout << "Quick sort (300):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_300, 0, 299);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Merge sort (300):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_300, 0, 299);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    // 400 element data sets
+    std::cout << "--------------------\n";
+    std::cout << "Selection sort (400):\n";
     start = std::chrono::high_resolution_clock::now();
     selection_sort(arr_400, 400);
     stop = std::chrono::high_resolution_clock::now();
     duration = stop - start;
     std::cout << duration.count() * 1000.0f << "ms" << space;
 
+    std::cout << "Quick sort (400):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_400, 0, 399);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Merge sort (400):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_400, 0, 399);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    // 500 element data sets
+    std::cout << "--------------------\n";
     std::cout << "Selection sort 500:\n";
     start = std::chrono::high_resolution_clock::now();
     selection_sort(arr_500, 500);
     stop = std::chrono::high_resolution_clock::now();
     duration = stop - start;
-    std::cout << duration.count() * 1000.0f << "ms";
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Quick sort (500):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_500, 0, 499);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
+
+    std::cout << "Merge sort (500):\n";
+    start = std::chrono::high_resolution_clock::now();
+    quick_sort(arr_500, 0, 499);
+    stop = std::chrono::high_resolution_clock::now();
+    duration = stop - start;
+    std::cout << duration.count() * 1000.0f << "ms" << space;
     return 0;
 }
