@@ -1,7 +1,0 @@
-C:\Users\Admin\Documents\git\uni\Development tools\SearchAlgorithms.Tests\bin\Debug\SearchAlgorithms.Tests.exe
-C:\Users\Admin\Documents\git\uni\Development tools\SearchAlgorithms.Tests\bin\Debug\SearchAlgorithms.Tests.pdb
-C:\Users\Admin\Documents\git\uni\Development tools\SearchAlgorithms.Tests\obj\Debug\SearchAlgorithms.Tests.csproj.AssemblyReference.cache
-C:\Users\Admin\Documents\git\uni\Development tools\SearchAlgorithms.Tests\obj\Debug\SearchAlgorithms.Tests.csproj.SuggestedBindingRedirects.cache
-C:\Users\Admin\Documents\git\uni\Development tools\SearchAlgorithms.Tests\obj\Debug\SearchAlgorithms.Tests.csproj.CoreCompileInputs.cache
-C:\Users\Admin\Documents\git\uni\Development tools\SearchAlgorithms.Tests\obj\Debug\SearchAlgorithms.Tests.exe
-C:\Users\Admin\Documents\git\uni\Development tools\SearchAlgorithms.Tests\obj\Debug\SearchAlgorithms.Tests.pdb
