@@ -19,7 +19,7 @@ int main()
         "[ 4] Check for element\n"
         "[ 5] Pull front and back elements\n"
         "[ 6] Display structure size\n"
-        "[ 7} Check if empty\n"
+        "[ 7] Check if empty\n"
         "[ 8] Display menu\n"
         "[ 9] Exit\n\n";
 
@@ -44,9 +44,16 @@ int main()
             case 3: // Get nth element
                 std::cout << "Which element to pull?\nElement: ";
                 std::cin >> lookup_vector_element;
-                std::cout << "\n";
-                std::cout << lookup_vector_element << "Element at index " << lookup_vector_element << ": " << myVector[lookup_vector_element - 1] << "\n";
-                break;
+                if(lookup_vector_element <= 0 || lookup_vector_element > myVector.size())
+                {
+                    std::cout << "Element out of range\n";
+                    break;
+                }
+                else
+                {
+                    std::cout << "Element at index " << lookup_vector_element << ": " << myVector[lookup_vector_element - 1] << "\n";
+                    break;
+                }
 
             case 4: // Check if element exists within the vector
                 bool element_found;
@@ -82,7 +89,7 @@ int main()
                     "[ 4] Pull nth element\n"
                     "[ 5] Pull front and back elements\n"
                     "[ 6] Display structure size\n"
-                    "[ 7} Check if empty\n"
+                    "[ 7] Check if empty\n"
                     "[ 8] Display menu\n"
                     "[ 9] Exit\n\n";
                 break;
