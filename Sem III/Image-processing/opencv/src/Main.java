@@ -41,10 +41,8 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
+        // Loading the OpenCV library
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-
-        // Installing the library
-        Imgcodecs imgcodecs = new Imgcodecs();
 
         // Image path
         String imgPath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/IMG_2116.jpg";
@@ -53,11 +51,11 @@ public class Main {
         // Exc 2 - Loading and writing the image
         System.out.println("Exc 2 - Loading and writing images:");
         // Loading the image
-        Mat matrix = imgcodecs.imread(imgPath);
+        Mat matrix = Imgcodecs.imread(imgPath);
         System.out.println("Image successfully loaded");
 
         // Writing the image
-        imgcodecs.imwrite(imgWrite, matrix);
+        Imgcodecs.imwrite(imgWrite, matrix);
         System.out.println("Image successfully written\n");
 
         // Exc 3 - Displaying the image
