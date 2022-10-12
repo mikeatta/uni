@@ -38,6 +38,9 @@ public class Main {
         frame.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
         frame.pack();
         frame.setVisible(true);
+
+        // End program on window close
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public static void main(String[] args) throws IOException {
