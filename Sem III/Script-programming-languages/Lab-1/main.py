@@ -15,16 +15,18 @@ A = 10
 # --- Program Code ---
 # Exc 1
 def main():
-    print('Exc 1:')
-    print(HW + '\n')
-
+    printHelloWorld() # Exc 1 - Prints HW constant's content
     displayPythonVersion() # Exc 2 - Prints Py Version
     displayDateAndTime() # Exc 3 - Prints Date and time
     calculateCircAndField() # Exc 4 - Calculate based on user input
     testVariableOutput() # Exc 5 - Test global and local variable output
     reverseUserInput() # Exc 6 - Reverse user name
-
     return
+
+# Exc 1
+def printHelloWorld():
+    print('Exc 1:')
+    print(HW + '\n')
 
 # Exc 2
 def displayPythonVersion():
