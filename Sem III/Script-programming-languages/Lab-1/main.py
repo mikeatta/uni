@@ -27,6 +27,7 @@ def main():
 def printHelloWorld():
     print('Exc 1:')
     print(HW + '\n')
+    return
 
 # Exc 2
 def displayPythonVersion():
