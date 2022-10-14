@@ -30,6 +30,7 @@ def main():
 def displayPythonVersion():
     print('Exc 2:')
     print(sys.version + '\n')
+    return
 
 # Exc 3
 def displayDateAndTime():
