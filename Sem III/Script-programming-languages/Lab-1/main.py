@@ -18,7 +18,7 @@ def main():
     printHelloWorld() # Exc 1 - Prints HW constant's content
     displayPythonVersion() # Exc 2 - Prints Py Version
     displayDateAndTime() # Exc 3 - Prints Date and time
-    calculateCircAndField() # Exc 4 - Calculate based on user input
+    calculateCircAndArea() # Exc 4 - Calculate based on user input
     testVariableOutput() # Exc 5 - Test global and local variable output
     reverseUserInput() # Exc 6 - Reverse user name
     return
@@ -46,15 +46,15 @@ def displayDateAndTime():
     return
 
 # Exc 4
-def calculateCircAndField():
+def calculateCircAndArea():
     print('Exc 4:')
     r = input('Enter circle radius: ')
 
-    O = (float(2) * pi * float(r))
-    A = (pi * (float(r) * float(r)))
+    C = (float(2) * pi * float(r)) # C = 2 * pi * r
+    A = (pi * (float(r) * float(r))) # A = pi * r^2
 
-    print('Circle circumference: ' + str(O))
-    print('Circle field: ' + str(A) + '\n')
+    print('Circle circumference: ' + str(C))
+    print('Circle area: ' + str(A) + '\n')
     return
 
 # Exc 5
