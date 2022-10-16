@@ -10,7 +10,7 @@ public class Window extends JFrame implements ActionListener {
         setSize(new Dimension(400, 400)); // Setting window size
         JButton btn = new JButton("say Hello"); // Creating new button
         this.add(btn); // Show button
-        btn.addActionListener(this); // CHANGE LISTENER IN HOMEWORK PROGRAM
+        btn.addActionListener(this);
         this.setVisible(true); // Display window
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // End program on window close
     }
@@ -20,8 +20,3 @@ public class Window extends JFrame implements ActionListener {
     }
 
 }
-
-// DO DOMU: Stworzyć inną klasę odpowiadającą na kliknięcie przycisku
-// Get and print out user input from input field
-
-// SPRAWOZDANIE Z ZADANIA
