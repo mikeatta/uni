@@ -10,15 +10,15 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../../uni/software/opencv/build/bin/opencv-460.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../../../uni-misc/software/opencv/build/bin/opencv-460.jar!/" />
         </CLASSES>
         <JAVADOC />
         <NATIVE>
-          <root url="file://$MODULE_DIR$/../../../../../uni/software/opencv/build/lib" />
+          <root url="file://$MODULE_DIR$/../../../../../uni-misc/software/opencv/build/lib" />
         </NATIVE>
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/../../../../../uni/software/opencv/build/bin/opencv-460.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../../../uni/software/opencv/build/bin/opencv-460.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../../../uni-misc/software/opencv/build/bin/opencv-460.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../../../uni-misc/software/opencv/build/bin/opencv-460.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
