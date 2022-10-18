@@ -2,6 +2,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -66,6 +67,26 @@ public class Lab1 {
         System.out.println("Displaying image with JFrame...\n");
 
         // End program on window close
+        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    }
+
+    // Exc 4 - Display the image in grayscale
+    public void displayGrayscaleImage() throws IOException {
+        System.out.println("Exc 4 - Display the image in grayscale");
+
+        Mat image = Imgcodecs.imread(imgPath);
+        Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2GRAY); // Turning image to grayscale
+        MatOfByte matOfByte = new MatOfByte();
+        Imgcodecs.imencode(".jpg", image, matOfByte);
+        byte[] byteArray = matOfByte.toArray();
+        InputStream in = new ByteArrayInputStream(byteArray);
+        BufferedImage bufferedImage = ImageIO.read(in);
+
+        JFrame jFrame = new JFrame();
+        jFrame.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
+        jFrame.pack();
+        jFrame.setVisible(true);
+
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
