@@ -9,12 +9,13 @@ public class Main {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         // Lab 1
-        // Creating class object
         Lab1 lab1 = new Lab1(); // Creating class object
-//        lab1.runTestCode(); // Running method from class object
-//        lab1.readAndWriteImage(); // Reading and writing an image
-//        lab1.displayImage(); // Displaying image within JFrame window
-        lab1.displayGrayscaleImage(); // Displaying image in grayscale
+        lab1.runTestCode(); // Exc 1 - Running method from class object
+        lab1.readAndWriteImage(); // Exc 2 - Reading and writing an image
+        lab1.displayImage(); // Exc 3 - Displaying image within JFrame window
+        lab1.displayGrayscaleImage(); // Exc 4 - Displaying image in grayscale
+        lab1.testLoadingOtherFormats(); // Exc 5 - Loading different file formats
+        lab1.addTextToImage(); // Exc 6 - Adding text to image and displaying it in another window
     }
 
 }

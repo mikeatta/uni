@@ -1,6 +1,8 @@
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -15,6 +17,7 @@ public class Lab1 {
 
     // Image path
     String imgPath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/IMG_2116.jpg";
+    String testImgPath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/";
     String imgWritePath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/processed-imgs/output.jpg";
 
     // Exc 1 - Run OpenCV import test
@@ -88,6 +91,77 @@ public class Lab1 {
         jFrame.setVisible(true);
 
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    }
+
+    // Exc 5 - Loading .BMPs, .JPGs, .PNGs and .GIFs
+    public void testLoadingOtherFormats() throws IOException {
+        System.out.println("Exc 5 - Try loading different formats");
+
+        // Creating file paths for different formats
+        String loadBMP = testImgPath + "SAMPLE.bmp"; // .BMP Path
+        String loadJPG = testImgPath + "IMG_2116.jpg"; // .JPG Path
+        String loadPNG = testImgPath + "SAMPLE.png"; // .PNG Path
+        String loadGIF = testImgPath + "SAMPLE.gif"; // .GIF Path
+
+        Mat image = Imgcodecs.imread(loadBMP);
+        MatOfByte matOfByte = new MatOfByte();
+        Imgcodecs.imencode(".jpg", image, matOfByte);
+        byte[] byteArray = matOfByte.toArray();
+        InputStream in = new ByteArrayInputStream(byteArray);
+        BufferedImage bufferedImage = ImageIO.read(in);
+
+        JFrame jFrame = new JFrame();
+        jFrame.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
+        jFrame.pack();
+        jFrame.setVisible(true);
+
+        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    }
+
+    // Exc 6 - Add text to image and display in new window
+    public void addTextToImage() throws IOException {
+        System.out.println("Exc 6 - Add text to image and display it");
+
+        // Loading first image
+        Mat image = Imgcodecs.imread(imgPath);
+        MatOfByte matOfByte = new MatOfByte();
+        Imgcodecs.imencode(".jpg", image, matOfByte);
+        byte[] byteArray = matOfByte.toArray();
+        InputStream in = new ByteArrayInputStream(byteArray);
+        BufferedImage bufferedImage = ImageIO.read(in);
+        System.out.println("Displaying fist image...");
+
+        JFrame jFrame = new JFrame();
+        jFrame.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
+        jFrame.pack();
+        jFrame.setVisible(true);
+
+        // Adding text parameters
+        String textToInsert = "Hello World!";
+        Point point = new Point(100, 100);
+        Scalar color = new Scalar(255,255,255);
+        int font = Imgproc.FONT_HERSHEY_PLAIN;
+        double scale = 1.5;
+        int thickness = 3;
+
+        // Loading second image
+        image = Imgcodecs.imread(imgPath);
+        Imgproc.putText(image, textToInsert, point, font, scale, color, thickness);
+        matOfByte = new MatOfByte();
+        Imgcodecs.imencode(".jpg", image, matOfByte);
+        byteArray = matOfByte.toArray();
+        in = new ByteArrayInputStream(byteArray);
+        bufferedImage = ImageIO.read(in);
+        System.out.println("Displaying second image...");
+
+        JFrame jFrameNew = new JFrame();
+        jFrameNew.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
+        jFrameNew.pack();
+        jFrameNew.setVisible(true);
+
+        // Closing program on window exit
+        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        jFrameNew.setDefaultCloseOperation((WindowConstants.EXIT_ON_CLOSE));
     }
 
 }
