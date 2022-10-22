@@ -10,7 +10,10 @@ public class WindowApp extends JFrame {
     JLabel jLabel = new JLabel("Sample text");
     JTextArea jTextArea = new JTextArea();
 
-    public WindowApp() {
+    public WindowApp(String userName) {
+        // Setting window title
+        this.setTitle("Hello, " + userName);
+
         // Setting window dimensions
         setSize(new Dimension(600, 600));
         setLayout(new GridLayout(2, 2, 15, 15));
