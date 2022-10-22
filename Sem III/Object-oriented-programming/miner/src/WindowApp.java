@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.Random;
 
 public class WindowApp extends JFrame {
 
@@ -9,6 +8,11 @@ public class WindowApp extends JFrame {
     JButton btnTwo = new JButton("Button two");
     JLabel jLabel = new JLabel("Sample text");
     JTextArea jTextArea = new JTextArea();
+    Random random = new Random();
+
+    // Counter variables
+    int gameAttempts = 0;
+    int diamondsGotten = 0;
 
     public WindowApp(String userName) {
         // Setting window title
@@ -25,18 +29,22 @@ public class WindowApp extends JFrame {
         this.add(jTextArea);
 
         // Game logic
-        btnOne.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Clicked button one");
-            }
+        btnOne.addActionListener(actionEvent -> {
+            boolean isDiamond = random.nextBoolean(); // Create boolean
+            if (isDiamond) diamondsGotten++; // Increment count if a diamond was gotten
+            gameAttempts++; // Increment game attempts with every guess
+
+            // Changing labels based on attempt & diamond count
+            jLabel.setText("Attempts: " + gameAttempts + " Diamonds: " + diamondsGotten);
         });
 
-        btnTwo.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Clicked button two");
-            }
+        btnTwo.addActionListener(actionEvent -> {
+            boolean isDiamond = !(random.nextBoolean()); // Invert btnOne boolean
+            if (isDiamond) diamondsGotten++; // Increment count if a diamond was gotten
+            gameAttempts++; // Increment game attempts with every guess
+
+            // Changing labels based on attempt & diamond count
+            jLabel.setText("Attempts: " + gameAttempts + " Diamonds: " + diamondsGotten);
         });
 
         // Window settings
