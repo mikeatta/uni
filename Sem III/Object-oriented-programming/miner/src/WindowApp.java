@@ -31,20 +31,26 @@ public class WindowApp extends JFrame {
         // Game logic
         btnOne.addActionListener(actionEvent -> {
             boolean isDiamond = random.nextBoolean(); // Create boolean
-            if (isDiamond) diamondsGotten++; // Increment count if a diamond was gotten
+            if (isDiamond) {
+                this.jTextArea.setText("Bravo! You got a diamond!"); // Display message on jTextArea
+                diamondsGotten++; // Increment count if a diamond was gotten
+            } else this.jTextArea.setText("You've hit a bomb!");
             gameAttempts++; // Increment game attempts with every guess
 
             // Changing labels based on attempt & diamond count
-            jLabel.setText("Attempts: " + gameAttempts + " Diamonds: " + diamondsGotten);
+            this.jLabel.setText("Attempts: " + gameAttempts + " Diamonds: " + diamondsGotten);
         });
 
         btnTwo.addActionListener(actionEvent -> {
             boolean isDiamond = !(random.nextBoolean()); // Invert btnOne boolean
-            if (isDiamond) diamondsGotten++; // Increment count if a diamond was gotten
+            if (isDiamond) {
+                this.jTextArea.setText("Bravo! You got a diamond!"); // Display message on jTextArea
+                diamondsGotten++; // Increment count if a diamond was gotten
+            } else this.jTextArea.setText("You've hit a bomb!");
             gameAttempts++; // Increment game attempts with every guess
 
             // Changing labels based on attempt & diamond count
-            jLabel.setText("Attempts: " + gameAttempts + " Diamonds: " + diamondsGotten);
+            this.jLabel.setText("Attempts: " + gameAttempts + " Diamonds: " + diamondsGotten);
         });
 
         // Window settings
