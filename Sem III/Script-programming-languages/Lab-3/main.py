@@ -37,7 +37,6 @@ def displayUniqueNumbers():
     list2 = [1,4,4,6,543,-31,0,10,-65,-2]
     displayList = []
 
-
     for i in range(10):
         if (i in list and i not in list2):
             displayList.append(i)
@@ -62,7 +61,7 @@ def displayOddNumbers():
 
 # Main func
 def main():
-    getAverageFromInput() # Exc 2 - Fill list with user input 
+    getAverageFromInput() # Exc 2 - Fill list with user input, get average of non-negative numbers 
     displayUniqueNumbers() # Exc 3 - Display elements present in list1 and not present in list2
     displayOddNumbers() # Exc 4 - Display only odd numbers, print smallest number
 
