@@ -8,9 +8,9 @@ def main():
 # Exc 2
 def fillList():
     print('Exc 2 - Fill list with user input')
-    userInputList = [] # Creating the lists
-    oddNumberSum = 0 # Store sum of odd numbers from user input
-    oddNumberCount = 0 # Amount of odd numbers entered
+    userInputList = [] # Creating the list
+    numberSum = 0 # Store sum of odd numbers from user input
+    numberCount = 0 # Amount of odd numbers entered
 
     # Filling list with user input
     for i in range(10):
@@ -25,14 +25,14 @@ def fillList():
     userInputList.reverse()
     print('Largest number entered: ' + str(userInputList[0]) + '\n') # Largest number
 
-
+    # For each non-negative real number
     for i in range(len(userInputList)):
-        if (userInputList[i] % 2 != 0):
-            oddNumberSum =+ i # Add up value of all elements
-            oddNumberCount += 1 # Increment count by one for each odd number [e.g. i++ in Cpp]
+        if (userInputList[i] >= 0):
+            numberSum =+ i # Add up values of all the elements
+            numberCount += 1 # Increment count by one
 
-    average = oddNumberSum / oddNumberCount # Get element average
-    print('Average of list elements : ' + str(average) + '\n')
+    average = numberSum / numberCount # Get element average
+    print('Average : ' + str(average) + '\n')
 
 # Exc 3
 def displayUniqueNumbers():
