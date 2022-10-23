@@ -1,12 +1,7 @@
 #!/usr/bin/python3
 
-def main():
-    fillList() # Exc 2 - Fill list with user input 
-    displayUniqueNumbers() # Exc 3 - Display elements present in list1 and not present in list2
-    displayOddNumbers() # Exc 4 - Display only odd numbers, print smallest number
-
 # Exc 2
-def fillList():
+def getAverageFromInput():
     print('Exc 2 - Fill list with user input')
     userInputList = [] # Creating the list
     numberSum = 0 # Store sum of odd numbers from user input
@@ -64,6 +59,12 @@ def displayOddNumbers():
     print('Found elements: ' + str(catchElement))
     catchElement.sort()
     print('Smallest element: ' + str(catchElement[0]) + '\n')
+
+# Main func
+def main():
+    getAverageFromInput() # Exc 2 - Fill list with user input 
+    displayUniqueNumbers() # Exc 3 - Display elements present in list1 and not present in list2
+    displayOddNumbers() # Exc 4 - Display only odd numbers, print smallest number
 
 if __name__ == '__main__':
     main()
