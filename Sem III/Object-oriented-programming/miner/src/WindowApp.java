@@ -6,7 +6,7 @@ public class WindowApp extends JFrame {
 
     JButton btnOne = new JButton("Button one");
     JButton btnTwo = new JButton("Button two");
-    JLabel jLabel = new JLabel("Sample text");
+    JLabel jLabel = new JLabel("Miner Game - Click either button to start");
     JTextArea jTextArea = new JTextArea();
     Random random = new Random();
 
@@ -30,6 +30,7 @@ public class WindowApp extends JFrame {
 
         // Game logic
         btnOne.addActionListener(actionEvent -> {
+            // Counting tries and diamonds found
             boolean isDiamond = random.nextBoolean(); // Create boolean
             if (isDiamond) {
                 this.jTextArea.setText("Bravo! You got a diamond!"); // Display message on jTextArea
@@ -39,9 +40,17 @@ public class WindowApp extends JFrame {
 
             // Changing labels based on attempt & diamond count
             this.jLabel.setText("Attempts: " + gameAttempts + " Diamonds: " + diamondsGotten);
+
+            // Reset the counters at 20 plays & display message
+            if (gameAttempts >= 20) {
+                this.jTextArea.setText("The end. Click either button to play again...");
+                this.jLabel.setText("RESULT: " + diamondsGotten + " diamonds found out of " + gameAttempts + " tries");
+                gameAttempts = 0; diamondsGotten = 0;
+            }
         });
 
         btnTwo.addActionListener(actionEvent -> {
+            // Counting tries and diamonds found
             boolean isDiamond = !(random.nextBoolean()); // Invert btnOne boolean
             if (isDiamond) {
                 this.jTextArea.setText("Bravo! You got a diamond!"); // Display message on jTextArea
@@ -51,6 +60,13 @@ public class WindowApp extends JFrame {
 
             // Changing labels based on attempt & diamond count
             this.jLabel.setText("Attempts: " + gameAttempts + " Diamonds: " + diamondsGotten);
+
+            // Reset the counters at 20 plays & display message
+            if (gameAttempts >= 20) {
+                this.jTextArea.setText("The end. Click either button to play again...");
+                this.jLabel.setText("RESULT: " + diamondsGotten + " diamonds found out of " + gameAttempts + " tries");
+                gameAttempts = 0; diamondsGotten = 0;
+            }
         });
 
         // Window settings
