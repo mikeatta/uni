@@ -28,50 +28,40 @@ public class WindowApp extends JFrame {
         this.add(jLabel);
         this.add(jTextArea);
 
-        // Game logic
-        btnOne.addActionListener(actionEvent -> {
-            // Counting tries and diamonds found
-            boolean isDiamond = random.nextBoolean(); // Create boolean
-            if (isDiamond) {
-                this.jTextArea.setText("Bravo! You got a diamond!"); // Display message on jTextArea
-                diamondsGotten++; // Increment count if a diamond was gotten
-            } else this.jTextArea.setText("You've hit a bomb!");
-            gameAttempts++; // Increment game attempts with every guess
-
-            // Changing labels based on attempt & diamond count
-            this.jLabel.setText("Attempts: " + gameAttempts + " Diamonds: " + diamondsGotten);
-
-            // Reset the counters at 20 plays & display message
-            if (gameAttempts >= 20) {
-                this.jTextArea.setText("The end. Click either button to play again...");
-                this.jLabel.setText("RESULT: " + diamondsGotten + " diamonds found out of " + gameAttempts + " tries");
-                gameAttempts = 0; diamondsGotten = 0;
-            }
-        });
-
-        btnTwo.addActionListener(actionEvent -> {
-            // Counting tries and diamonds found
-            boolean isDiamond = !(random.nextBoolean()); // Invert btnOne boolean
-            if (isDiamond) {
-                this.jTextArea.setText("Bravo! You got a diamond!"); // Display message on jTextArea
-                diamondsGotten++; // Increment count if a diamond was gotten
-            } else this.jTextArea.setText("You've hit a bomb!");
-            gameAttempts++; // Increment game attempts with every guess
-
-            // Changing labels based on attempt & diamond count
-            this.jLabel.setText("Attempts: " + gameAttempts + " Diamonds: " + diamondsGotten);
-
-            // Reset the counters at 20 plays & display message
-            if (gameAttempts >= 20) {
-                this.jTextArea.setText("The end. Click either button to play again...");
-                this.jLabel.setText("RESULT: " + diamondsGotten + " diamonds found out of " + gameAttempts + " tries");
-                gameAttempts = 0; diamondsGotten = 0;
-            }
-        });
+        // Event buttons
+        btnOne.addActionListener( actionEvent -> gameLogic(getRand(false)) );
+        btnTwo.addActionListener( actionEvent -> gameLogic(getRand(true)) );
 
         // Window settings
         this.setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    // Game logic method
+    private void gameLogic(boolean isDiamond) {
+        // Counting tries and diamonds found
+        if (isDiamond) {
+            this.jTextArea.setText("Bravo! You got a diamond!"); // Display message on jTextArea
+            diamondsGotten++; // Increment count if a diamond was found
+        } else this.jTextArea.setText("You've hit a bomb!");
+        gameAttempts++; // Increment game attempts with every guess
+
+        // Changing labels based on attempt & diamond count
+        this.jLabel.setText("Attempts: " + gameAttempts + " Diamonds: " + diamondsGotten);
+
+        // Reset the counters at 20 plays & display message
+        if (gameAttempts >= 20) {
+            this.jTextArea.setText("The end. Click either button to play again...");
+            this.jLabel.setText("RESULT: " + diamondsGotten + " diamonds found out of " + gameAttempts + " tries");
+            gameAttempts = 0;
+            diamondsGotten = 0;
+        }
+    }
+
+    // Swap results, pass result to gameLogic()
+    private boolean getRand(boolean swapResults) {
+        if (!swapResults) return random.nextBoolean();
+        else return !random.nextBoolean();
     }
 
 }
