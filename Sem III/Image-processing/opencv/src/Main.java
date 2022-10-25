@@ -16,6 +16,7 @@ public class Main {
         lab1.displayGrayscaleImage(); // Exc 4 - Displaying image in grayscale
         lab1.testLoadingOtherFormats(); // Exc 5 - Loading different file formats
         lab1.addTextToImage(); // Exc 6 - Adding text to image and displaying it in another window
+        lab1.addShapeToImage(); // Exc 7 - Adding geometrical shapes and lines to the image
     }
 
 }

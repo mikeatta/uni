@@ -164,4 +164,34 @@ public class Lab1 {
         jFrameNew.setDefaultCloseOperation((WindowConstants.EXIT_ON_CLOSE));
     }
 
+    // Exc 7 - Drawing geometrical shapes & lines on the image
+    public void addShapeToImage() throws IOException {
+        System.out.println("Exc 7 - Adding shapes to the image");
+
+        // Loading the image
+        Mat image = Imgcodecs.imread(imgPath);
+
+        // Adding shapes to the image
+        Imgproc.rectangle(image, new Point(100,250), new Point(200,350), new Scalar(255,255,255)); // Drawing a rectangle
+        int thickness = Imgproc.FILLED; // Filling the circle
+        Imgproc.circle(image, new Point(50,50), 25, new Scalar(225,225,225), thickness); // Drawing a circle
+        Imgproc.line(image, new Point(200, 100), new Point(400, 225), new Scalar(255,255,255), 25); // Drawing a line
+
+        // Loading the image continued
+        MatOfByte matOfByte = new MatOfByte();
+        Imgcodecs.imencode(".jpg", image, matOfByte);
+        byte[] byteArray = matOfByte.toArray();
+        InputStream in = new ByteArrayInputStream(byteArray);
+        BufferedImage bufferedImage = ImageIO.read(in);
+        System.out.println("Displaying modified image...");
+
+        JFrame jFrame = new JFrame();
+        jFrame.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
+        jFrame.pack();
+        jFrame.setVisible(true);
+
+        // Closing program on window exit
+        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    }
+
 }
