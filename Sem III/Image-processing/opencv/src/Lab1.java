@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.Buffer;
 
 public class Lab1 {
 
@@ -122,8 +123,17 @@ public class Lab1 {
     public void addTextToImage() throws IOException {
         System.out.println("Exc 6 - Add text to image and display it");
 
+        // Adding text properties
+        String textToInsert = "Hello World!";
+        Point point = new Point(100, 100);
+        Scalar color = new Scalar(255,255,255);
+        int font = Imgproc.FONT_HERSHEY_PLAIN;
+        double scale = 1.5;
+        int thickness = 3;
+
         // Loading first image
         Mat image = Imgcodecs.imread(imgPath);
+        Imgproc.putText(image, textToInsert, point, font, scale, color, thickness);
         MatOfByte matOfByte = new MatOfByte();
         Imgcodecs.imencode(".jpg", image, matOfByte);
         byte[] byteArray = matOfByte.toArray();
@@ -131,18 +141,19 @@ public class Lab1 {
         BufferedImage bufferedImage = ImageIO.read(in);
         System.out.println("Displaying fist image...");
 
+        // Displaying first image
         JFrame jFrame = new JFrame();
         jFrame.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
         jFrame.pack();
         jFrame.setVisible(true);
 
-        // Adding text parameters
-        String textToInsert = "Hello World!";
-        Point point = new Point(100, 100);
-        Scalar color = new Scalar(255,255,255);
-        int font = Imgproc.FONT_HERSHEY_PLAIN;
-        double scale = 1.5;
-        int thickness = 3;
+        // Changing text properties
+        textToInsert = "New text!";
+        point = new Point(50,150);
+        color = new Scalar(225,225,225);
+        font = Imgproc.FONT_HERSHEY_COMPLEX;
+        scale = 2;
+        thickness = 2;
 
         // Loading second image
         image = Imgcodecs.imread(imgPath);
@@ -154,6 +165,7 @@ public class Lab1 {
         bufferedImage = ImageIO.read(in);
         System.out.println("Displaying second image...");
 
+        // Displaying second image
         JFrame jFrameNew = new JFrame();
         jFrameNew.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
         jFrameNew.pack();
