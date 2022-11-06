@@ -65,7 +65,7 @@ class car (vehicle):
             self.plate = plate
 
         # Getters
-        def getSound(slef):
+        def getSound(self):
             print("Other *skrrrr*")
 
         def getOwner(self):
@@ -99,10 +99,12 @@ def workingWithClasses():
 def workingWithInheritance():
     print("Exc 2 - Working with inheritance")
     v = vehicle()
-    c = car("me", "98P1Az")
+    c = car("me", "CB360T")
+    t = thing()
 
     print("From v : " + str(v.getSound()))
-    print("From c : " + str(c.getSound()) + "\n")
+    print("From c : " + str(c.getSound()))
+    print("From t : " + str(t.getSound()) + "\n")
 
     v.getOwner("me")
     c.getOwner("me")
