@@ -204,7 +204,7 @@ public class Lab1 {
         Imgproc.circle(image, circlePosition, circleRadius, circleColor, circleThickness); // Drawing a circle
         Imgproc.line(image, lineBegin, lineEnd, lineColor, lineThickness); // Drawing a line
 
-        // Loading the image continued
+        // Loading first image
         MatOfByte matOfByte = new MatOfByte();
         Imgcodecs.imencode(".jpg", image, matOfByte);
         byte[] byteArray = matOfByte.toArray();
@@ -212,13 +212,52 @@ public class Lab1 {
         BufferedImage bufferedImage = ImageIO.read(in);
         System.out.println("Displaying first image...");
 
-        // Displaying the image
+        // Displaying first image
         JFrame jFrame = new JFrame();
         jFrame.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
         jFrame.pack();
         jFrame.setVisible(true);
 
+        // Loading clean image
+        image = Imgcodecs.imread(imgPath);
+
+        // New rectangle parameters
+        rectangleBegin = new Point(125,200);
+        rectangleEnd = new Point(225,300);
+        rectangleColor = new Scalar(0,255,255);
+
+        // New circle parameters
+        circlePosition = new Point(50,300);
+        circleRadius = 15;
+        circleColor = new Scalar(50,255,50);
+
+        // New line parameters
+        lineBegin = new Point(150,100);
+        lineEnd = new Point(50,300);
+        lineColor = new Scalar(255,255,0);
+        lineThickness = 15;
+
+        // Adding modified shapes to the image
+        Imgproc.rectangle(image, rectangleBegin, rectangleEnd, rectangleColor);
+        Imgproc.circle(image, circlePosition, circleRadius, circleColor);
+        Imgproc.line(image, lineBegin, lineEnd, lineColor, lineThickness);
+
+        // Loading second image
+        matOfByte = new MatOfByte();
+        Imgcodecs.imencode(".jpg", image, matOfByte);
+        byteArray = matOfByte.toArray();
+        in = new ByteArrayInputStream(byteArray);
+        bufferedImage = ImageIO.read(in);
+        System.out.println("Displaying second image...");
+
+        // Displaying second image
+        JFrame jFrameNew = new JFrame();
+        jFrameNew.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
+        jFrameNew.pack();
+        jFrameNew.setVisible(true);
+
         // Closing program on window exit
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        jFrameNew.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 }
