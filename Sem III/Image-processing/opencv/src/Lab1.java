@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.Buffer;
 
 public class Lab1 {
 
@@ -183,11 +182,27 @@ public class Lab1 {
         // Loading the image
         Mat image = Imgcodecs.imread(imgPath);
 
+        // Rectangle parameters
+        Point rectangleBegin = new Point(25,275);
+        Point rectangleEnd = new Point(125,375);
+        Scalar rectangleColor = new Scalar(255,255,255);
+
+        // Circle parameters
+        Point circlePosition = new Point(50,50);
+        int circleRadius = 25;
+        Scalar circleColor = new Scalar(255,255,255);
+        int circleThickness = Imgproc.FILLED; // Making the circle filled out
+
+        // Line parameters
+        Point lineBegin = new Point(200,100);
+        Point lineEnd = new Point(400,225);
+        Scalar lineColor = new Scalar(255,255,255);
+        int lineThickness = 25;
+
         // Adding shapes to the image
-        Imgproc.rectangle(image, new Point(100,250), new Point(200,350), new Scalar(255,255,255)); // Drawing a rectangle
-        int thickness = Imgproc.FILLED; // Filling the circle
-        Imgproc.circle(image, new Point(50,50), 25, new Scalar(225,225,225), thickness); // Drawing a circle
-        Imgproc.line(image, new Point(200, 100), new Point(400, 225), new Scalar(255,255,255), 25); // Drawing a line
+        Imgproc.rectangle(image, rectangleBegin, rectangleEnd, rectangleColor); // Drawing a rectangle
+        Imgproc.circle(image, circlePosition, circleRadius, circleColor, circleThickness); // Drawing a circle
+        Imgproc.line(image, lineBegin, lineEnd, lineColor, lineThickness); // Drawing a line
 
         // Loading the image continued
         MatOfByte matOfByte = new MatOfByte();
@@ -195,8 +210,9 @@ public class Lab1 {
         byte[] byteArray = matOfByte.toArray();
         InputStream in = new ByteArrayInputStream(byteArray);
         BufferedImage bufferedImage = ImageIO.read(in);
-        System.out.println("Displaying modified image...");
+        System.out.println("Displaying first image...");
 
+        // Displaying the image
         JFrame jFrame = new JFrame();
         jFrame.getContentPane().add(new JLabel(new ImageIcon(bufferedImage)));
         jFrame.pack();
@@ -205,5 +221,4 @@ public class Lab1 {
         // Closing program on window exit
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
-
 }
