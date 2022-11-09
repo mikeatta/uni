@@ -12,11 +12,17 @@ def convertNumber():
     print("Exc 1 - Convert numbers")
     numberBase = input("Enter the number base [bin/oct/dec/hex]: ")
 
+    # Accepted input range arrays
+    binary = ["0", "1"]
+
     # Match selected system base
     match numberBase:
 
         case "bin":
             num = int(input("Enter a binary number: "), 2)
+            # Validate input
+            for i in (str(num)):
+                if i not in binary: print("Input out of range"); break
 
         case "oct":
             num = int(input("Enter an octal number: "), 8)
