@@ -14,18 +14,20 @@ def convertNumber():
 
     # Accepted input range arrays
     binary = ["0", "1"]
+    octal = ["0", "1", "2", "3", "4", "5", "6", "7"]
 
     # Match selected system base
     match numberBase:
 
         case "bin":
             num = int(input("Enter a binary number: "), 2)
-            # Validate input
-            for i in (str(num)):
-                if i not in binary: print("Input out of range"); break
+            for i in (str(num)): # For each character
+                if i not in binary: print("Input out of range"); break # Validate input
 
         case "oct":
             num = int(input("Enter an octal number: "), 8)
+            for i in (str(num)): # For each character
+                if i not in octal: print("Input out of range"); break # Validate input
 
         case "dec":
             num = int(input("Enter a decimal number: "), 10)
