@@ -58,8 +58,19 @@ def convertNumber():
     # Convert and display numbers
     displayConvertedNumbers(num)
 
+# Exc 2
+def returnBitIndex(number, index):
+    # Validate input range
+    if number > 255:
+        sys.exit("Number out of range")
+
+    else:
+        bitIndex = (number >> index) & 1
+        print("Bit at index [" + str(index) + "] : " + str(bitIndex))
+
 def main():
     convertNumber() # Exc 1 - Convert number from selected base
+    returnBitIndex(255, 7) # Exc 2 - Return bit from specified index
 
 if __name__ == "__main__":
     main()
