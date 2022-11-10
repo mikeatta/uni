@@ -2,6 +2,8 @@
 
 # Imports
 import sys
+import random
+from os import system, name
 
 # Exc 1
 # Accepted input range arrays
@@ -68,9 +70,85 @@ def returnBitIndex(number, index):
         bitIndex = (number >> index) & 1
         print("Bit at index [" + str(index) + "] : " + str(bitIndex))
 
+# Exc 4
+def clearScreen():
+    if name == "nt":
+        # Clear screen for Windows
+        _ = system("cls")
+
+    else:
+        # Clear screen for Mac & Linux
+        _ = system("clear")
+
+def convertInput(userSelection):
+    # Get and convert user input
+    if userSelection == "h" or "H": userSelection = True
+    elif userSelection == "t" or "T": userSelection = False
+    return userSelection
+
+def coinFlip():
+    # Control variables
+    endGame = False
+    userChoice = ""
+    flipResult = ""
+
+    # Counter variables
+    coinFlips = 0
+    wins = 0
+
+    print("Heads or Tails? [h/t]\nEnter 'q' to exit")
+    while endGame != True:
+
+        # Perform coin flip
+        flipResult = bool(random.getrandbits(1))
+
+        # Compate input with flip result
+        userChoice = input("\nChoice: ")
+        match userChoice:
+            case "h": 
+                userChoice = convertInput(userChoice)
+                if userChoice == flipResult: wins += 1; coinFlips += 1
+                elif userChoice != flipResult: coinFlips += 1
+
+            case "H":
+                userChoice = convertInput(userChoice)
+                if userChoice == flipResult: wins += 1; coinFlips += 1
+                elif userChoice != flipResult: coinFlips += 1
+
+            case "t":
+                userChoice = convertInput(userChoice)
+                if userChoice == flipResult: wins += 1; coinFlips += 1
+                elif userChoice != flipResult: coinFlips += 1
+
+            case "T":
+                userChoice = convertInput(userChoice)
+                if userChoice == flipResult: wins += 1; coinFlips += 1
+                elif userChoice != flipResult: coinFlips += 1
+
+            case "q":
+                clearScreen()
+                print("Bye!")
+                endGame = True
+
+            case "Q":
+                clearScreen()
+                print("Bye!")
+                endGame = True
+                sys.exit(0)
+
+            case _:
+                sys.exit("\nIncorrect input\nExiting...")
+
+        if endGame != True:
+            # Display game statistics
+            clearScreen()
+            print("----------")
+            print("Flips : " + str(coinFlips) + "\nWins : " + str(wins))
+
 def main():
     convertNumber() # Exc 1 - Convert number from selected base
     returnBitIndex(255, 7) # Exc 2 - Return bit from specified index
+    coinFlip() # Exc 4 - Coin flip game
 
 if __name__ == "__main__":
     main()
