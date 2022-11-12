@@ -63,7 +63,7 @@ def convertNumber():
 # Exc 2
 def returnBitIndex(number, index):
     # Validate input range
-    if number > 255:
+    if number < 0 or number > 255:
         sys.exit("Number out of range")
 
     else:
