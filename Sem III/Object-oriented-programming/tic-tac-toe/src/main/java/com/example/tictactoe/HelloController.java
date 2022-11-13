@@ -50,6 +50,7 @@ public class HelloController {
     protected void setNextMove() {
         if (currentMove.equals("circle")) nextMove = "cross";
         else nextMove = "circle";
+        this.currentMove = nextMove;
     }
 
     @FXML
