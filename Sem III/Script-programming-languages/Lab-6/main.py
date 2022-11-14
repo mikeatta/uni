@@ -6,16 +6,16 @@ def exceptions():
     inputString = "2,5"
 
     try:
-        theNumber = 3/0
-        # theNumber = float(inputString)
-        # print(f"The number is {theNumber}")
+        theNumber = 3/0 # Unknown error
+        # theNumber = float(inputString) # Value / Unicode error
+        # print(f"The number is {theNumber}") # Name error
     except (ValueError, UnicodeError) as ex1:
-        print("Cannot execute action [Value / Unicode error]\n")
+        print("Cannot execute action [Value / Unicode error]")
         print(ex1)
     except NameError:
-        print("Name is not known [NameError]\n")
+        print("Name is not known [NameError]")
     except:
-        print("Unknown error orrured\n")
+        print("Unknown error orrured")
 
 def main():
     exceptions() # Exc 1 - Woking with exceptions
