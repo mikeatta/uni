@@ -59,14 +59,21 @@ public class HelloController {
         if (turns == 0) {
             drawTurn();
             playerMove.setText("Player move: " + this.currentMove);
+            turns++;
         }
-        else if (turns <= 8) {
+        // While turns are under 8
+        else if (turns <= 7) {
             setNextMove();
             playerMove.setText("Player move: " + this.currentMove);
+            turns++;
         }
-        else playerMove.setText("Turn limit reached. (" + turns + ")");
+        // If turns are equal to 8
+        else if (turns == 8) {
+            playerMove.setText("The game has ended (" + turns + 1 + " turns)");
+            turns = 0;
+        }
+
         countMoves.setText("Moves: " + this.turns);
-        turns++;
     }
 
 }
