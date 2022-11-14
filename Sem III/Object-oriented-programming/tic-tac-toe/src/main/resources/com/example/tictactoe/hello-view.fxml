@@ -23,15 +23,15 @@
          <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
       </padding>
       <children>
-         <Button id="btn_R0_C0" fx:id="btn_R0_C0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" GridPane.halignment="CENTER" />
-         <Button id="btn_R0_C1" fx:id="btn_R0_C1" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
-         <Button id="btn_R0_C2" fx:id="btn_R0_C2" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
-         <Button id="btn_R1_C0" fx:id="btn_R1_C0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-         <Button id="btn_R1_C1" fx:id="btn_R1_C1" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-         <Button id="btn_R1_C2" fx:id="btn_R1_C2" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-         <Button id="btn_R2_C0" fx:id="btn_R2_C0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-         <Button id="btn_R2_C1" fx:id="btn_R2_C1" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-         <Button id="btn_R2_C2" fx:id="btn_R2_C2" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+         <Button id="btn_R0_C0" fx:id="btn_R0_C0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnAction" GridPane.halignment="CENTER" />
+         <Button id="btn_R0_C1" fx:id="btn_R0_C1" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnAction" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+         <Button id="btn_R0_C2" fx:id="btn_R0_C2" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnAction" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
+         <Button id="btn_R1_C0" fx:id="btn_R1_C0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnAction" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+         <Button id="btn_R1_C1" fx:id="btn_R1_C1" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnAction" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+         <Button id="btn_R1_C2" fx:id="btn_R1_C2" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnAction" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+         <Button id="btn_R2_C0" fx:id="btn_R2_C0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnAction" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+         <Button id="btn_R2_C1" fx:id="btn_R2_C1" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnAction" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+         <Button id="btn_R2_C2" fx:id="btn_R2_C2" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnAction" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
       </children>
    </GridPane>
    <Label fx:id="playerMove" text="Player's move shows up here..." />

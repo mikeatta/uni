@@ -1,5 +1,6 @@
 package com.example.tictactoe;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -53,6 +54,7 @@ public class HelloController {
         this.currentMove = nextMove;
     }
 
+    // Count turns and display end game message
     @FXML
     protected void setTurnPermissions() {
         // Set first player to make a move
@@ -74,6 +76,15 @@ public class HelloController {
         }
 
         countMoves.setText("Moves: " + this.turns);
+    }
+
+    // Disable button after being clicked
+    @FXML
+    void btnAction(ActionEvent event) {
+        Button b = (Button) event.getSource();
+        b.setDisable(true);
+        this.welcomeText.setText("Id : " + b);
+        this.setTurnPermissions();
     }
 
 }
