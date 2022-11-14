@@ -71,7 +71,7 @@ public class HelloController {
         }
         // If turns are equal to 8
         else if (turns == 8) {
-            playerMove.setText("The game has ended (" + turns + 1 + " turns)");
+            playerMove.setText("The game has ended (" + (turns+1) + " turns)");
             turns = 0;
         }
 
@@ -83,8 +83,9 @@ public class HelloController {
     void btnAction(ActionEvent event) {
         Button b = (Button) event.getSource();
         b.setDisable(true);
-        this.welcomeText.setText("Id : " + b);
+//        this.welcomeText.setText("Id : " + b);
         this.setTurnPermissions();
+        b.setText(currentMove);
     }
 
 }
