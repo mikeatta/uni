@@ -33,9 +33,30 @@ def exceptionsRaisePass():
 
     print("")
 
+# Exc 3
+def exceptElseFinally():
+    print("Exc 3")
+    x = 3
+    y = 0
+
+    try: x / y
+    except ZeroDivisionError: print("Error. [Zero division error]")
+    else:
+        try:
+            y / x
+            print(x / y)
+        except ValueError: print("Error [Value error]")
+    finally:
+        y = 1
+        print("Result : " + str(x / y))
+        print("No errors found")
+
+    print("")
+
 def main():
     exceptions() # Exc 1 - Woking with exceptions
     exceptionsRaisePass() # Exc 2 - Working with raise and pass
+    exceptElseFinally() # Exc 3 - Working with else and finally
 
 if __name__ == "__main__":
     main()
