@@ -16,9 +16,26 @@ def exceptions():
         print("Name is not known [NameError]")
     except:
         print("Unknown error orrured")
+    
+    print("")
+
+# Exc 2
+def exceptionsRaisePass():
+    print("Exc 2 - Testing raise & pass")
+
+    try:
+        x = -1 # Assign negative number
+        assert x > 0 # Test if true
+        pass
+        print("Variable x is greater than zero.")
+    except AssertionError:
+        print("Negative numbers not accepted")
+
+    print("")
 
 def main():
     exceptions() # Exc 1 - Woking with exceptions
+    exceptionsRaisePass() # Exc 2 - Working with raise and pass
 
 if __name__ == "__main__":
     main()
