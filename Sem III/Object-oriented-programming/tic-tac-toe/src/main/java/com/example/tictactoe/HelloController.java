@@ -96,11 +96,6 @@ public class HelloController {
         colPos= Character.getNumericValue(col);
         System.out.println("Row: " + rowPos + " Col: " + colPos);
 
-
-        // Pass user position of user selection to matrix
-        // *** NEED TO GET BUTTON ROW AND COL AND PASS TO METHOD ***
-//        playerChoiceMatrix(row, col, currentMove);
-
         // Set button content to player acronym
         if (currentMove.equals("circle")) turnName = "O";
         else if (currentMove.equals("cross")) turnName = "X";
