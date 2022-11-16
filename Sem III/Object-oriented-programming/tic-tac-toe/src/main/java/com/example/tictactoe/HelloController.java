@@ -21,15 +21,7 @@ public class HelloController {
     public Button btn_R2_C2;
 
     @FXML
-    private Label welcomeText;
-
-    @FXML
     protected Label playerMove;
-
-    @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
-    }
 
     // Program methods
     Random random = new Random();
@@ -38,6 +30,10 @@ public class HelloController {
     String currentMove = null; // Draw first player to make a move
     String nextMove = null; // Store next player's move
     int turns = 0; // Count amount of turns taken
+
+    // ID variables
+    String turnName = null; // Store player acronym
+    String buttonId = null; // Store entire button ID
 
     // Decide which player makes the first move
     protected void drawTurn() {
@@ -81,11 +77,34 @@ public class HelloController {
     // Disable button after being clicked
     @FXML
     void btnAction(ActionEvent event) {
+        // Store selection positions
+        char row, col;
+        int rowPos, colPos;
+
+        // Get ID's from clicked buttons
         Button b = (Button) event.getSource();
+        buttonId = b.getId();
         b.setDisable(true);
-//        this.welcomeText.setText("Id : " + b);
         this.setTurnPermissions();
-        b.setText(currentMove);
+
+        // Extract rows and cols from the entire button ID
+        row = buttonId.charAt(5);
+        col = buttonId.charAt(8);
+
+        // Extract value from char
+        rowPos = Character.getNumericValue(row);
+        colPos= Character.getNumericValue(col);
+        System.out.println("Row: " + rowPos + " Col: " + colPos);
+
+
+        // Pass user position of user selection to matrix
+        // *** NEED TO GET BUTTON ROW AND COL AND PASS TO METHOD ***
+//        playerChoiceMatrix(row, col, currentMove);
+
+        // Set button content to player acronym
+        if (currentMove.equals("circle")) turnName = "O";
+        else if (currentMove.equals("cross")) turnName = "X";
+        b.setText(turnName);
     }
 
 }

@@ -35,9 +35,6 @@
       </children>
    </GridPane>
    <Label fx:id="playerMove" text="Player's move shows up here..." />
-
-    <Label fx:id="welcomeText" />
    <Label fx:id="countMoves" text="Label" />
-    <Button onAction="#onHelloButtonClick" text="Hello!" />
    <Button mnemonicParsing="false" onAction="#setTurnPermissions" text="Test draw first move" />
 </VBox>
