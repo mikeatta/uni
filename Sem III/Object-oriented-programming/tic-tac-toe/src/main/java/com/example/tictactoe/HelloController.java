@@ -5,7 +5,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class HelloController {
@@ -35,9 +34,6 @@ public class HelloController {
     // ID variables
     String turnName = null; // Store player acronym
     String buttonId = null; // Store entire button ID
-
-    // Position array
-    int[][] matrix = new int[3][3];
 
     // Decide which player makes the first move
     protected void drawTurn() {
@@ -71,11 +67,11 @@ public class HelloController {
         }
         // If turns are equal to 8
         else if (turns == 8) {
-            playerMove.setText("The game has ended (" + (turns + 1) + " turns)");
+            playerMove.setText("The game has ended (" + (turns+1) + " turns)");
             turns = 0;
         }
 
-        countMoves.setText("Turns taken: " + this.turns);
+        countMoves.setText("Moves: " + this.turns);
     }
 
     // Disable button after being clicked
@@ -97,24 +93,13 @@ public class HelloController {
 
         // Extract value from char
         rowPos = Character.getNumericValue(row);
-        colPos = Character.getNumericValue(col);
+        colPos= Character.getNumericValue(col);
         System.out.println("Row: " + rowPos + " Col: " + colPos);
-
-        // Pass position to the matrix
-        playerChoiceMatrix(rowPos, colPos, currentMove);
 
         // Set button content to player acronym
         if (currentMove.equals("circle")) turnName = "O";
         else if (currentMove.equals("cross")) turnName = "X";
         b.setText(turnName);
-    }
-
-    protected void playerChoiceMatrix(int posRow, int posCol, String currentPlayerMove) {
-        // Fill matrix with corresponding turn ID's
-        if (currentPlayerMove.equals("circle")) matrix[posRow][posCol] = 0;
-        else if (currentPlayerMove.equals("cross")) matrix[posRow][posCol] = 1;
-
-        System.out.println(Arrays.deepToString(matrix));
     }
 
 }
