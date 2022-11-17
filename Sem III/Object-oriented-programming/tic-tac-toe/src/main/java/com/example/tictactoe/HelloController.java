@@ -38,7 +38,7 @@ public class HelloController {
     String buttonId = null; // Store entire button ID
 
     // Position array
-    int[][] matrix = new int[3][3];
+    char[][] matrix = new char[3][3];
 
     // Decide which player makes the first move
     protected void drawTurn() {
@@ -100,7 +100,7 @@ public class HelloController {
         // Extract value from char
         rowPos = Character.getNumericValue(row);
         colPos = Character.getNumericValue(col);
-        System.out.println("Row: " + rowPos + " Col: " + colPos);
+        System.out.println("Row: " + row + " Col: " + col);
 
         // Pass position to the matrix
         playerChoiceMatrix(rowPos, colPos, currentMove);
@@ -113,8 +113,8 @@ public class HelloController {
 
     protected void playerChoiceMatrix(int posRow, int posCol, String currentPlayerMove) {
         // Fill matrix with corresponding turn ID's
-        if (currentPlayerMove.equals("circle")) matrix[posRow][posCol] = 0;
-        else if (currentPlayerMove.equals("cross")) matrix[posRow][posCol] = 1;
+        if (currentPlayerMove.equals("circle")) matrix[posRow][posCol] = 'O';
+        else if (currentPlayerMove.equals("cross")) matrix[posRow][posCol] = 'X';
 
         System.out.println(Arrays.deepToString(matrix));
     }
