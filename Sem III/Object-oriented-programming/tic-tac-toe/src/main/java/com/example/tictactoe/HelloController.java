@@ -20,6 +20,7 @@ public class HelloController {
     public Button btn_R2_C0;
     public Button btn_R2_C1;
     public Button btn_R2_C2;
+    public Button startResetBtn;
 
     @FXML
     protected Label playerMove;
@@ -61,17 +62,18 @@ public class HelloController {
         if (turns == 0) {
             drawTurn();
             playerMove.setText("Player move: " + this.currentMove);
+            setNextMove();
             turns++;
         }
         // While turns are under 8
-        else if (turns <= 7) {
-            setNextMove();
+        else if (turns <= 8) {
             playerMove.setText("Player move: " + this.currentMove);
+            setNextMove();
             turns++;
         }
         // If turns are equal to 8
-        else if (turns == 8) {
-            playerMove.setText("The game has ended (" + (turns + 1) + " turns)");
+        else if (turns == 9) {
+            playerMove.setText("The game has ended (" + turns + " turns)");
             turns = 0;
         }
 

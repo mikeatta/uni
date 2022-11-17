@@ -36,5 +36,5 @@
    </GridPane>
    <Label fx:id="playerMove" text="Player's move shows up here..." />
    <Label fx:id="countMoves" text="Label" />
-   <Button mnemonicParsing="false" onAction="#setTurnPermissions" text="Test draw first move" />
+   <Button fx:id="startResetBtn" mnemonicParsing="false" onAction="#setTurnPermissions" text="Draw first move" />
 </VBox>
