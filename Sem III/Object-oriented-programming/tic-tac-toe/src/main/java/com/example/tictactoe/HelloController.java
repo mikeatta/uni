@@ -5,7 +5,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class HelloController {
@@ -32,6 +33,8 @@ public class HelloController {
     String currentMove = null; // Draw first player to make a move
     String nextMove = null; // Store next player's move
     int turns = 0; // Count amount of turns taken
+    char checkLastTurn;
+    String winningLine = null;
 
     // ID variables
     String turnName = null; // Store player acronym
@@ -115,21 +118,50 @@ public class HelloController {
     protected void playerChoiceMatrix(int posRow, int posCol, String currentPlayerMove) {
         if (currentPlayerMove.equals("circle")) matrix[posRow][posCol] = 'O';
         else if (currentPlayerMove.equals("cross")) matrix[posRow][posCol] = 'X';
-        this.checkForWinner(matrix);
+        // Start checking for winners after three turns
+        if (turns >= 3) this.checkForWinner(matrix, posRow, posCol);
     }
 
-    protected void checkForWinner(char[][] matrix) {
-        String mat = Arrays.deepToString(matrix);
-        System.out.println(mat);
+    protected void checkForWinner(char[][] matrix, int lastMatrixRow, int lastMatrixCol) {
+        // Get character from last turn
+        checkLastTurn = matrix[lastMatrixRow][lastMatrixCol];
 
-        String line = "";
-        line += matrix[0][0];
-        line += matrix[0][1];
-        line += matrix[0][2];
-        System.out.println(line);
+        // Declare a winning line
+        winningLine = String.valueOf(checkLastTurn).repeat(3);
 
-        if (line.equals("XXX") | line.equals("OOO")) {
-            System.out.println("Winner!");
+        // Horizontal lines to check
+        String line0 = "" + matrix[0][0] + matrix[0][1] + matrix[0][2];
+        String line1 = "" + matrix[1][0] + matrix[1][1] + matrix[1][2];
+        String line2 = "" + matrix[2][0] + matrix[2][1] + matrix[2][2];
+
+        // Vertical lines to check
+        String line3 = "" + matrix[0][0] + matrix[1][0] + matrix[2][0];
+        String line4 = "" + matrix[0][1] + matrix[1][1] + matrix[2][1];
+        String line5 = "" + matrix[0][2] + matrix[1][2] + matrix[2][2];
+
+        // Across lines to check
+        String line6 = "" + matrix[0][0] + matrix[1][1] + matrix[2][2];
+        String line7 = "" + matrix[1][2] + matrix[1][1] + matrix[2][0];
+
+        // Create a list to store all winning line combinations
+        List<String> lineList = new ArrayList<>();
+
+        // Add lines to the list
+        lineList.add(line0);
+        lineList.add(line1);
+        lineList.add(line2);
+        lineList.add(line3);
+        lineList.add(line4);
+        lineList.add(line5);
+        lineList.add(line6);
+        lineList.add(line7);
+
+        // Compare every line to the winning line pattern
+        for (String line:lineList) {
+            if (line.equals(winningLine)) {
+                char winner = winningLine.charAt(0);
+                System.out.println("Winning line found! Winner: " + winner);
+            }
         }
     }
 
