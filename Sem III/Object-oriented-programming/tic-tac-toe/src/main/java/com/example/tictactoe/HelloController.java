@@ -111,11 +111,14 @@ public class HelloController {
         b.setText(turnName);
     }
 
+    // Fill matrix with corresponding player turn ID's
     protected void playerChoiceMatrix(int posRow, int posCol, String currentPlayerMove) {
-        // Fill matrix with corresponding turn ID's
         if (currentPlayerMove.equals("circle")) matrix[posRow][posCol] = 'O';
         else if (currentPlayerMove.equals("cross")) matrix[posRow][posCol] = 'X';
+        this.checkForWinner(matrix);
+    }
 
+    protected void checkForWinner(char[][] matrix) {
         System.out.println(Arrays.deepToString(matrix));
     }
 
