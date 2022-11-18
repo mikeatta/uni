@@ -119,7 +119,18 @@ public class HelloController {
     }
 
     protected void checkForWinner(char[][] matrix) {
-        System.out.println(Arrays.deepToString(matrix));
+        String mat = Arrays.deepToString(matrix);
+        System.out.println(mat);
+
+        String line = "";
+        line += matrix[0][0];
+        line += matrix[0][1];
+        line += matrix[0][2];
+        System.out.println(line);
+
+        if (line.equals("XXX") | line.equals("OOO")) {
+            System.out.println("Winner!");
+        }
     }
 
 }
