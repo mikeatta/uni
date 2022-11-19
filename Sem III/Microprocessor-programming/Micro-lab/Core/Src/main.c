@@ -85,7 +85,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-
+  uint8_t button_state = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -93,12 +93,25 @@ int main(void)
   while (1)
   {
 
-	  HAL_GPIO_TogglePin(GPIOB, LED_Blue_Pin);
-	  HAL_Delay(1000);
+//	  HAL_GPIO_TogglePin(GPIOB, LED_Blue_Pin);
+//	  HAL_Delay(1000);
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  // Read status of the pin
+	  button_state = HAL_GPIO_ReadPin(B1_button_GPIO_Port, B1_button_Pin);
+
+	  if(button_state == 1)
+	  {
+		  // While pressed down
+		  HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, SET);
+	  }
+	  else
+	  {
+		  // While not pressed down
+		  HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, RESET);
+	  }
   }
   /* USER CODE END 3 */
 }
@@ -154,10 +167,17 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : B1_button_Pin */
+  GPIO_InitStruct.Pin = B1_button_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(B1_button_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LED_Blue_Pin */
   GPIO_InitStruct.Pin = LED_Blue_Pin;
