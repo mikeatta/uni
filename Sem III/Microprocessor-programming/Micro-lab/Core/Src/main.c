@@ -41,7 +41,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+uint8_t static setDelay = 0;
+uint8_t static resetDelay = 0;
+int static timeout;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -53,6 +55,13 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+// Set LED blink delay back to the lowest delay
+void resetBlinkDelay(int reset){
+	if(reset == 1){
+		setDelay = 0;
+	}
+}
 
 /* USER CODE END 0 */
 
@@ -85,32 +94,56 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-  uint8_t button_state = 0;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
-//	  HAL_GPIO_TogglePin(GPIOB, LED_Blue_Pin);
-//	  HAL_Delay(1000);
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  // Read status of the pin
-	  button_state = HAL_GPIO_ReadPin(B1_button_GPIO_Port, B1_button_Pin);
 
-	  if(button_state == 1)
+	  // Toggle blue LED on / off
+	  HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
+	  HAL_Delay(timeout);
+
+	  // Check button state
+	  if(HAL_GPIO_ReadPin(B1_button_GPIO_Port, B1_button_Pin) == GPIO_PIN_SET)
 	  {
-		  // While pressed down
-		  HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, SET);
+		  // While button pressed down
+		  setDelay += 1; // Increment delay by a single point
+		  if(setDelay >= 3)
+		  {
+			  resetDelay = 1;
+			  resetBlinkDelay(resetDelay);
+		  }
 	  }
 	  else
 	  {
-		  // While not pressed down
-		  HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, RESET);
+		  // While button not pressed down
+		  setDelay = setDelay; // Leave previous delay
+
+	  }
+
+	  /* HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, RESET);
+	  HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, SET); */
+
+	  // Set timeout for each delay point
+	  switch(setDelay)
+	  {
+	  	  case 0:
+	  		  timeout = 1000; // 1 second blink timeout
+	  		  break;
+
+	  	  case 1:
+	  		  timeout = 2000; // 2 second blink timeout
+	  		  break;
+
+	  	  case 2:
+	  		  timeout = 4000; // 4 second blink timeout
+	  		  break;
 	  }
   }
   /* USER CODE END 3 */
