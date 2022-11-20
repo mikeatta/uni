@@ -41,9 +41,10 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t static setDelay = 0;
-uint8_t static resetDelay = 0;
-int static timeout;
+uint8_t setDelay = 0;
+uint8_t resetDelay = 0;
+uint16_t SysTickCount = 0;
+uint16_t timeout;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,6 +62,13 @@ void resetBlinkDelay(int reset){
 	if(reset == 1){
 		setDelay = 0;
 	}
+}
+
+// SysTick delay function
+void delayMs(uint16_t delay)
+{
+	SysTickCount = 0;
+	while(SysTickCount < delay);
 }
 
 /* USER CODE END 0 */
@@ -107,7 +115,7 @@ int main(void)
 
 	  // Toggle blue LED on / off
 	  HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
-	  HAL_Delay(timeout);
+	  delayMs(timeout);
 
 	  // Check button state
 	  if(HAL_GPIO_ReadPin(B1_button_GPIO_Port, B1_button_Pin) == GPIO_PIN_SET)
@@ -118,6 +126,7 @@ int main(void)
 		  {
 			  resetDelay = 1;
 			  resetBlinkDelay(resetDelay);
+			  resetDelay = 0;
 		  }
 	  }
 	  else
