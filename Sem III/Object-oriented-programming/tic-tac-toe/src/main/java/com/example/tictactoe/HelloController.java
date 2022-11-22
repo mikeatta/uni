@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -144,25 +145,32 @@ public class HelloController {
         String line7 = "" + matrix[1][2] + matrix[1][1] + matrix[2][0];
 
         // Create a list to store all winning line combinations
-        List<String> lineList = new ArrayList<>();
-
-        // Add lines to the list
-        lineList.add(line0);
-        lineList.add(line1);
-        lineList.add(line2);
-        lineList.add(line3);
-        lineList.add(line4);
-        lineList.add(line5);
-        lineList.add(line6);
-        lineList.add(line7);
+        List<String> lineList = new ArrayList<>(Arrays.asList(line0, line1, line2, line3, line4, line5, line6, line7));
 
         // Compare every line to the winning line pattern
         for (String line:lineList) {
             if (line.equals(winningLine)) {
                 char winner = winningLine.charAt(0);
+                endGame(winner);
                 System.out.println("Winning line found! Winner: " + winner);
             }
         }
+    }
+
+    // Disable buttons, show results and send reset prompt
+    protected void endGame(char winner) {
+        // Create list with every game button
+        List<Button> buttonList = new ArrayList<>(Arrays.asList(btn_R0_C0, btn_R0_C1, btn_R0_C2, btn_R1_C0, btn_R1_C1, btn_R1_C2, btn_R2_C0, btn_R2_C1, btn_R2_C2));
+
+        // Disable every button
+        for (Button button : buttonList) {
+            button.setDisable(true);
+        }
+
+        // Change text on score buttons and text fields
+        playerMove.setText("The end! The winner of this round is: " + winner);
+        startResetBtn.setText("Reset");
+
     }
 
 }
