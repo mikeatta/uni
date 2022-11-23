@@ -24,6 +24,7 @@ public class HelloController {
     public Button btn_R2_C2;
     public Button startResetBtn;
 
+
     @FXML
     protected Label playerMove;
 
@@ -119,6 +120,7 @@ public class HelloController {
     protected void playerChoiceMatrix(int posRow, int posCol, String currentPlayerMove) {
         if (currentPlayerMove.equals("circle")) matrix[posRow][posCol] = 'O';
         else if (currentPlayerMove.equals("cross")) matrix[posRow][posCol] = 'X';
+
         // Start checking for winners after three turns
         if (turns >= 3) this.checkForWinner(matrix, posRow, posCol);
     }
@@ -163,7 +165,7 @@ public class HelloController {
         List<Button> buttonList = new ArrayList<>(Arrays.asList(btn_R0_C0, btn_R0_C1, btn_R0_C2, btn_R1_C0, btn_R1_C1, btn_R1_C2, btn_R2_C0, btn_R2_C1, btn_R2_C2));
 
         // Disable every button
-        for (Button button : buttonList) {
+        for (Button button:buttonList) {
             button.setDisable(true);
         }
 
@@ -171,6 +173,27 @@ public class HelloController {
         playerMove.setText("The end! The winner of this round is: " + winner);
         startResetBtn.setText("Reset");
 
+        startResetBtn.setOnAction(actionEvent -> resetGame(buttonList));
+    }
+
+    // Reset game counter variables and button functions
+    protected void resetGame(List<Button> resetButtons) {
+        // Reset variables and clear the matrix
+        turns = 0;
+        winningLine = null;
+        matrix = new char[3][3];
+
+        // Re-enable buttons and reset text fields
+        for (Button buttons:resetButtons) {
+            buttons.setText("");
+            buttons.setDisable(false);
+        }
+
+        // Set button text fields and actions
+        playerMove.setText("Player's move shows up here...");
+        countMoves.setText("");
+        startResetBtn.setText("Draw first move");
+        startResetBtn.setOnAction(actionEvent -> setTurnPermissions());
     }
 
 }
