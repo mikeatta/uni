@@ -54,6 +54,7 @@ public class HelloController {
         this.currentMove = drawnTurn;
     }
 
+    // Change player move permission
     protected void setNextMove() {
         if (currentMove.equals("circle")) nextMove = "cross";
         else nextMove = "circle";
@@ -64,25 +65,11 @@ public class HelloController {
     @FXML
     protected void setTurnPermissions() {
         // Set first player to make a move
-        if (turns == 0) {
-            drawTurn();
-            playerMove.setText("Player move: " + this.currentMove);
-            setNextMove();
-            turns++;
-        }
-        // While turns are under 8
-        else if (turns <= 8) {
-            playerMove.setText("Player move: " + this.currentMove);
-            setNextMove();
-            turns++;
-        }
-        // If turns are equal to 8
-        else if (turns == 9) {
-            playerMove.setText("The game has ended (" + turns + " turns)");
-            turns = 0;
-        }
-
-        countMoves.setText("Turns taken: " + this.turns);
+        if (turns == 0) drawTurn();
+        playerMove.setText("Player move: " + this.currentMove);
+        setNextMove();
+        turns++;
+        countMoves.setText("Turns taken: " + (this.turns-1));
     }
 
     // Disable button after being clicked
@@ -156,6 +143,7 @@ public class HelloController {
                 endGame(winner);
                 System.out.println("Winning line found! Winner: " + winner);
             }
+            else if (turns == 10) endGame('N');
         }
     }
 
@@ -170,7 +158,8 @@ public class HelloController {
         }
 
         // Change text on score buttons and text fields
-        playerMove.setText("The end! The winner of this round is: " + winner);
+        if (winner == 'N') playerMove.setText("No winner found! This round ended with a draw!");
+        else playerMove.setText("The end! The winner of this round is: " + winner);
         startResetBtn.setText("Reset");
 
         startResetBtn.setOnAction(actionEvent -> resetGame(buttonList));
