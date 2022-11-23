@@ -70,6 +70,14 @@ public class HelloController {
         setNextMove();
         turns++;
         countMoves.setText("Turns taken: " + (this.turns-1));
+
+        // Enable button interaction
+        List<Button> buttonList = new ArrayList<>(Arrays.asList(btn_R0_C0, btn_R0_C1, btn_R0_C2, btn_R1_C0, btn_R1_C1, btn_R1_C2, btn_R2_C0, btn_R2_C1, btn_R2_C2));
+        for (Button btn:buttonList) btn.setDisable(false);
+
+        // Allow players to reset the game after the 1st move
+        startResetBtn.setText("Reset");
+        startResetBtn.setOnAction(actionEvent -> resetGame(buttonList));
     }
 
     // Disable button after being clicked
@@ -153,9 +161,7 @@ public class HelloController {
         List<Button> buttonList = new ArrayList<>(Arrays.asList(btn_R0_C0, btn_R0_C1, btn_R0_C2, btn_R1_C0, btn_R1_C1, btn_R1_C2, btn_R2_C0, btn_R2_C1, btn_R2_C2));
 
         // Disable every button
-        for (Button button:buttonList) {
-            button.setDisable(true);
-        }
+        for (Button button:buttonList) button.setDisable(true);
 
         // Change text on score buttons and text fields
         if (winner == 'N') playerMove.setText("No winner found! This round ended with a draw!");
@@ -172,10 +178,10 @@ public class HelloController {
         winningLine = null;
         matrix = new char[3][3];
 
-        // Re-enable buttons and reset text fields
+        // Disable buttons and reset text fields
         for (Button buttons:resetButtons) {
             buttons.setText("");
-            buttons.setDisable(false);
+            buttons.setDisable(true);
         }
 
         // Set button text fields and actions
