@@ -116,8 +116,8 @@ public class HelloController {
         if (currentPlayerMove.equals("circle")) matrix[posRow][posCol] = 'O';
         else if (currentPlayerMove.equals("cross")) matrix[posRow][posCol] = 'X';
 
-        // Start checking for winners after three turns
-        if (turns >= 3) this.checkForWinner(matrix, posRow, posCol);
+        // Start checking for winners after five turns
+        if (turns >= 5) this.checkForWinner(matrix, posRow, posCol);
     }
 
     protected void checkForWinner(char[][] matrix, int lastMatrixRow, int lastMatrixCol) {
