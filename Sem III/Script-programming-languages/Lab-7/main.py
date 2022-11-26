@@ -52,9 +52,28 @@ def countSpecialCharacters():
     print("Found [" + str(spaceAmount) + " spaces], [" + str(tabAmount) + " tab signs] and [" + str(newlineAmount) + " newlines]")
     f.close()
 
+# Exc 3
+def replaceSymbols():
+    print("\nExc 3 - Replace matching symbols")
+    f = open("./inwokacja.txt", "r")
+
+    keyword = input("Enter characters to look for: ")
+    replacement = input(f"Now enter characters to replace the [{keyword}] with: ")
+    fileContent = ""
+
+    for line in f:
+        if line.count(keyword) == 1:
+            fileContent += line.replace(keyword, replacement)
+        else:
+            fileContent += line
+
+    print("\nReplced the symbols.\n\nProcessed file content:\n" + fileContent)
+    f.close()
+
 def main():
     lineDetails() # Exc 1 - Remove whitespaces and count lines and characters
     countSpecialCharacters() # Exc 2 - Count specific special character occurences
+    replaceSymbols() # Exc 3 - Replace matching symbols in text
 
 if __name__ == "__main__":
     main()
