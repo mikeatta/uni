@@ -16,7 +16,6 @@ public class Lab2 {
 
     // Image path
     String imgPath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/IMG_2116.jpg";
-    String imgWritePath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/processed-imgs/output.jpg";
 
     private BufferedImage createImage(Mat image) throws IOException {
         MatOfByte matOfByte = new MatOfByte();
