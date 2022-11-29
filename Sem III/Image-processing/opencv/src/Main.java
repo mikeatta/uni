@@ -9,7 +9,7 @@ public class Main {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         // Lab 1
-        Lab1 lab1 = new Lab1(); // Creating class object
+//        Lab1 lab1 = new Lab1(); // Creating class object
 //        lab1.runTestCode(); // Exc 1 - Running method from class object
 //        lab1.readAndWriteImage(); // Exc 2 - Reading and writing an image
 //        lab1.displayImage(); // Exc 3 - Displaying image within JFrame window
@@ -20,7 +20,7 @@ public class Main {
 
         // Lab 2
         Lab2 lab2 = new Lab2();
-        lab2.translateImage(100,100, "up"); // Exc 1 - Translate image based on user input
+        lab2.shiftImage(100,100, "up"); // Exc 1 - Translate image based on user input
     }
 
 }
