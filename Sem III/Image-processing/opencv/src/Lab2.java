@@ -27,7 +27,7 @@ public class Lab2 {
     }
 
     // Exc 1 - Translate the image based on user input
-    public void shiftImage(int shiftX, int shiftY, String direction) throws IOException {
+    public void shiftImage(int shiftX, int shiftY) throws IOException {
         // Loading the image from path
         Mat src = Imgcodecs.imread(imgPath);
 
@@ -37,7 +37,7 @@ public class Lab2 {
         // Create warp matrix
         Mat warpMat = new Mat(2, 3, CvType.CV_64FC1);
         int row = 0, col = 0;
-        warpMat.put(row, col, 1, 0, 100, 0, 1, 100);
+        warpMat.put(row, col, 1, 0, shiftX, 0, 1, shiftY);
 
         // Warp the image
         Imgproc.warpAffine(src, dest, warpMat, new Size());
