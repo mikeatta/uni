@@ -76,4 +76,26 @@ public class Lab2 {
         makeJFrame(bufferedImage);
     }
 
+    // Exc 3 - Rotate the image by a set degree
+    public void rotateImage(float degrees) throws IOException {
+        // Destination matrix
+        Mat dest = new Mat(src.rows(), src.cols(), src.type());
+
+        // Add rotation point at the center of src image
+        Point point = new Point(src.width() / 2, src.width() / 2);
+
+        // Create rotation matrix
+        Mat rotationMatrix = Imgproc.getRotationMatrix2D(point, degrees, 1);
+
+        // Set size
+        Size size = new Size(src.rows(), src.cols());
+
+        // Rotate the matrix
+        Imgproc.warpAffine(src, dest, rotationMatrix, size);
+
+        // Display result
+        BufferedImage bufferedImage = createImage(dest);
+        makeJFrame(bufferedImage);
+    }
+
 }

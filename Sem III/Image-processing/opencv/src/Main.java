@@ -22,6 +22,7 @@ public class Main {
         Lab2 lab2 = new Lab2();
         lab2.shiftImage(100, 100); // Exc 1 - Translate image based on user input
         lab2.mirrorImage('v'); // Exc 2 - Mirror source image [v] vertically or [h] horizontally
+        lab2.rotateImage(90); // Exc 3 - Rotate image by a set amount of degrees
     }
 
 }
