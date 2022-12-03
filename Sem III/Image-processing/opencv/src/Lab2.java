@@ -1,7 +1,4 @@
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.core.Size;
+import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -56,6 +53,26 @@ public class Lab2 {
         BufferedImage bufferedImage = createImage(dest);
 
         // Display shifted image
+        makeJFrame(bufferedImage);
+    }
+
+    // Exc 2 - Mirror image vertically or horizontally
+    public void mirrorImage(char mirrorAxis) throws IOException {
+        // Destination matrix
+        Mat dest = new Mat();
+
+        // Flip the image
+        switch (mirrorAxis) {
+            // Flip vertically
+            case 'v': Core.flip(src, dest, 1); break;
+            // Flip horizontally
+            case 'h': Core.flip(src, dest, -1); break;
+            // Handle incorrect input
+            default: System.out.println("@Lab2: mirrorImage ERROR -> Incorrect input");
+        }
+
+        // Display result
+        BufferedImage bufferedImage = createImage(dest);
         makeJFrame(bufferedImage);
     }
 
