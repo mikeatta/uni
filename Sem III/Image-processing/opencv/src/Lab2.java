@@ -64,11 +64,13 @@ public class Lab2 {
         // Flip the image
         switch (mirrorAxis) {
             // Flip vertically
-            case 'v': Core.flip(src, dest, 1); break;
+            case 'v' -> Core.flip(src, dest, 1);
+
             // Flip horizontally
-            case 'h': Core.flip(src, dest, -1); break;
+            case 'h' -> Core.flip(src, dest, -1);
+
             // Handle incorrect input
-            default: System.out.println("@Lab2: mirrorImage ERROR -> Incorrect input");
+            default -> System.out.println("@Lab2: mirrorImage ERROR -> Incorrect input");
         }
 
         // Display result
@@ -82,7 +84,7 @@ public class Lab2 {
         Mat dest = new Mat(src.rows(), src.cols(), src.type());
 
         // Add rotation point at the center of src image
-        Point point = new Point(src.width() / 2, src.width() / 2);
+        Point point = new Point(src.width() / 2.0, src.width() / 2.0);
 
         // Create rotation matrix
         Mat rotationMatrix = Imgproc.getRotationMatrix2D(point, degrees, 1);
