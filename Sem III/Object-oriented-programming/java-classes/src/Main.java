@@ -3,22 +3,25 @@ import java.util.List;
 
 class Beaverton extends Cities {
     public static String cityDetails = "Beaverton, OR";
-    public void cityName() {
-        System.out.println("Beaverton, OR");
+
+    public void cityNote() {
+        System.out.println("NOTE: Nike was founded here.");
     }
 }
 
 class NewYork extends Cities {
     public static String cityDetails = "New York, NY";
-    public void cityName() {
-        System.out.println("New York, NY");
+    @Override
+    public void cityNote() {
+        System.out.println("NOTE: Wall St. resides here.");
     }
 }
 
 class LosAngeles extends Cities {
     public static String cityDetails = "Los Angeles, CA";
-    public void cityName() {
-        System.out.println("Los Angeles, CA");
+    @Override
+    public void cityNote() {
+        System.out.println("NOTE: Films are make here.");
     }
 }
 
