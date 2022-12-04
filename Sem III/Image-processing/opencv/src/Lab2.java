@@ -98,4 +98,16 @@ public class Lab2 {
         makeJFrame(bufferedImage);
     }
 
+    // Exc 4 - Crop selected region of the image
+    public void cropImage(int pointX, int pointY, int width, int height) throws IOException {
+        // Create the crop area
+        Rect cropArea = new Rect(pointX, pointY, width, height);
+
+        // Crop the image
+        Mat dest = new Mat(src, cropArea);
+
+        // Display result
+        BufferedImage bufferedImage = createImage(dest);
+        makeJFrame(bufferedImage);
+    }
 }

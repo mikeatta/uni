@@ -23,6 +23,7 @@ public class Main {
         lab2.shiftImage(100, 100); // Exc 1 - Translate image based on user input
         lab2.mirrorImage('v'); // Exc 2 - Mirror source image [v] vertically or [h] horizontally
         lab2.rotateImage(90); // Exc 3 - Rotate image by a set amount of degrees
+        lab2.cropImage(100, 115, 100, 100); // Exc 4 - Crop selected area of the image
     }
 
 }
