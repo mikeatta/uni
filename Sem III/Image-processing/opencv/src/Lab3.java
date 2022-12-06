@@ -41,7 +41,7 @@ public class Lab3 {
     }
 
     // Exc 1 - Change image contrast
-    public void changeImageContrast() throws IOException {
+    public void changeImageContrast(int setAlpha) throws IOException {
         // Read color from image at imgPath
         src = Imgcodecs.imread(imgPath, Imgcodecs.IMREAD_COLOR);
 

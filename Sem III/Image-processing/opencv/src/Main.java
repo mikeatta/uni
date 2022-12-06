@@ -29,7 +29,7 @@ public class Main {
 
         // Lab 3
         Lab3 lab3 = new Lab3();
-        lab3.changeImageContrast();
+        lab3.changeImageContrast(2); // Exc 1 - Change contrast of the image
     }
 
 }
