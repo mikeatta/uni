@@ -19,13 +19,17 @@ public class Main {
 //        lab1.addShapeToImage(); // Exc 7 - Adding geometrical shapes and lines to the image
 
         // Lab 2
-        Lab2 lab2 = new Lab2();
-        lab2.shiftImage(100, 100); // Exc 1 - Translate image based on user input
-        lab2.mirrorImage('v'); // Exc 2 - Mirror source image [v] vertically or [h] horizontally
-        lab2.rotateImage(90); // Exc 3 - Rotate image by a set amount of degrees
-        lab2.cropImage(100, 115, 100, 100); // Exc 4 - Crop selected area of the image
-        lab2.enlargeImage(2.0f, 4.0f); // Exc 5 - Compare methods of enlarging the image
-        lab2.shrinkImage(0.5f, 0.25f); // Exc 6 - Compare methods of shrinking the image
+//        Lab2 lab2 = new Lab2();
+//        lab2.shiftImage(100, 100); // Exc 1 - Translate image based on user input
+//        lab2.mirrorImage('v'); // Exc 2 - Mirror source image [v] vertically or [h] horizontally
+//        lab2.rotateImage(90); // Exc 3 - Rotate image by a set amount of degrees
+//        lab2.cropImage(100, 115, 100, 100); // Exc 4 - Crop selected area of the image
+//        lab2.enlargeImage(2.0f, 4.0f); // Exc 5 - Compare methods of enlarging the image
+//        lab2.shrinkImage(0.5f, 0.25f); // Exc 6 - Compare methods of shrinking the image
+
+        // Lab 3
+        Lab3 lab3 = new Lab3();
+        lab3.changeImageContrast();
     }
 
 }
