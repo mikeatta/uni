@@ -144,4 +144,32 @@ public class Lab2 {
         System.out.println("Done enlarging image with pyrUp");
     }
 
+    // Exc 6 - Compare OpenCV methods of shrinking images
+    public void shrinkImage(float scaleOne, float scaleTwo) {
+        // Create the destination matrix
+        Mat dest = new Mat();
+
+        // Set scale to x0.5
+        Size scale = new Size(src.cols() * scaleOne, src.rows() * scaleOne);
+
+        // Shrink src image
+        Imgproc.resize(src, dest, scale);
+        Imgcodecs.imwrite(imgWritePath + "resizeX0.5.jpg", dest);
+
+        // Set scale to x0.25
+        scale = new Size(src.cols() * scaleTwo, src.rows() * scaleTwo);
+        Imgproc.resize(src, dest, scale);
+        Imgcodecs.imwrite(imgWritePath + "resizeX0.25.jpg", dest);
+        System.out.println("Done shrinking image with resize");
+
+        // Shrink image using pyrDown
+        Imgproc.pyrDown(src, dest, new Size(src.cols() * scaleOne, src.rows() * scaleOne), Core.BORDER_DEFAULT);
+        Imgcodecs.imwrite(imgWritePath + "pyrDownX0.5.jpg", dest);
+
+        // Shrink image with second scale
+        Imgproc.pyrDown(src, dest, new Size(src.cols() * scaleTwo, src.rows() * scaleTwo), Core.BORDER_DEFAULT);
+        Imgcodecs.imwrite(imgWritePath + "pyrDownX0.25.jpg", dest);
+        System.out.println("Done shrinking image with pyrDown");
+    }
+
 }
