@@ -53,4 +53,13 @@ public class Lab3 {
         makeJFrame(buf);
     }
 
+    // Exc 2 - Change image brightness
+    public void changeImageBrightness(int setBeta) throws IOException {
+        // Alter image beta to change the brightness
+        src.convertTo(dest, -1, 1, setBeta);
+
+        // Display processed image
+        BufferedImage buf = createImage(dest);
+        makeJFrame(buf);
+    }
 }
