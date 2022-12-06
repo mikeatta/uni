@@ -119,28 +119,28 @@ public class Lab2 {
         // Create matrix for the processed image
         Mat dest = new Mat();
 
-        // Set scale to x2.0
+        // Set first scale
         Size scale = new Size(src.cols() * scaleOne, src.rows() * scaleOne);
 
         // Enlarge src image
         Imgproc.resize(src, dest, scale);
 
         // Save processed image on the drive
-        Imgcodecs.imwrite(imgWritePath + "resizeX2.jpg", dest);
+        Imgcodecs.imwrite(imgWritePath + "resizeX" + scaleOne + ".jpg", dest);
 
-        // Set scale to x4.0
+        // Change scale
         scale = new Size(src.cols() * scaleTwo, src.rows() * scaleTwo);
         Imgproc.resize(src, dest, scale);
-        Imgcodecs.imwrite(imgWritePath + "resizeX4.jpg", dest);
+        Imgcodecs.imwrite(imgWritePath + "resizeX" + scaleTwo + ".jpg", dest);
         System.out.println("Done enlarging image with resize");
 
         // Enlarge image using pyrUp
         Imgproc.pyrUp(src, dest, new Size(src.cols() * scaleOne, src.rows() * scaleOne), Core.BORDER_DEFAULT);
-        Imgcodecs.imwrite(imgWritePath + "pyrUpX2.jpg", dest);
+        Imgcodecs.imwrite(imgWritePath + "pyrUpX" + scaleOne + ".jpg", dest);
 
-        // Change scale to x4.0
+        // Change scale
         Imgproc.pyrUp(src, dest, new Size(src.cols() * scaleTwo, src.rows() * scaleTwo), Core.BORDER_DEFAULT);
-        Imgcodecs.imwrite(imgWritePath + "pyrUpX4.jpg", dest);
+        Imgcodecs.imwrite(imgWritePath + "pyrUpX" + scaleTwo + ".jpg", dest);
         System.out.println("Done enlarging image with pyrUp");
     }
 
@@ -149,26 +149,26 @@ public class Lab2 {
         // Create the destination matrix
         Mat dest = new Mat();
 
-        // Set scale to x0.5
+        // Set first scale
         Size scale = new Size(src.cols() * scaleOne, src.rows() * scaleOne);
 
         // Shrink src image
         Imgproc.resize(src, dest, scale);
-        Imgcodecs.imwrite(imgWritePath + "resizeX0.5.jpg", dest);
+        Imgcodecs.imwrite(imgWritePath + "resizeX" + scaleOne + ".jpg", dest);
 
-        // Set scale to x0.25
+        // Change scale
         scale = new Size(src.cols() * scaleTwo, src.rows() * scaleTwo);
         Imgproc.resize(src, dest, scale);
-        Imgcodecs.imwrite(imgWritePath + "resizeX0.25.jpg", dest);
+        Imgcodecs.imwrite(imgWritePath + "resizeX" + scaleOne + ".jpg", dest);
         System.out.println("Done shrinking image with resize");
 
         // Shrink image using pyrDown
         Imgproc.pyrDown(src, dest, new Size(src.cols() * scaleOne, src.rows() * scaleOne), Core.BORDER_DEFAULT);
-        Imgcodecs.imwrite(imgWritePath + "pyrDownX0.5.jpg", dest);
+        Imgcodecs.imwrite(imgWritePath + "pyrDownX" + scaleTwo + ".jpg", dest);
 
         // Shrink image with second scale
         Imgproc.pyrDown(src, dest, new Size(src.cols() * scaleTwo, src.rows() * scaleTwo), Core.BORDER_DEFAULT);
-        Imgcodecs.imwrite(imgWritePath + "pyrDownX0.25.jpg", dest);
+        Imgcodecs.imwrite(imgWritePath + "pyrDownX" + scaleTwo + ".jpg", dest);
         System.out.println("Done shrinking image with pyrDown");
     }
 

@@ -25,7 +25,7 @@ public class Main {
         lab2.rotateImage(90); // Exc 3 - Rotate image by a set amount of degrees
         lab2.cropImage(100, 115, 100, 100); // Exc 4 - Crop selected area of the image
         lab2.enlargeImage(2.0f, 4.0f); // Exc 5 - Compare methods of enlarging the image
-        lab2.shrinkImage(0.5f, 0.25f); // Exc 6 - Compare methods of shrinking images
+        lab2.shrinkImage(0.5f, 0.25f); // Exc 6 - Compare methods of shrinking the image
     }
 
 }
