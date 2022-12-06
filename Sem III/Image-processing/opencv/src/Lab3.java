@@ -1,3 +1,4 @@
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -59,4 +60,23 @@ public class Lab3 {
         BufferedImage buf = createImage(dest);
         makeJFrame(buf);
     }
+
+    // Exc 3 - Overlay images
+    public void overlayImages() throws IOException {
+        // Create image paths
+        String baseImage = imgPath;
+        String stackImage = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/overlay.jpg";
+
+        // Create image matrices
+        Mat base = Imgcodecs.imread(baseImage);
+        Mat stack = Imgcodecs.imread(stackImage);
+
+        // Overlay the images
+        Core.addWeighted(base, 0.8, stack, 0.8, 0.0, dest);
+
+        // Display results
+        BufferedImage buf = createImage(dest);
+        makeJFrame(buf);
+    }
+
 }
