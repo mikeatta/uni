@@ -13,6 +13,7 @@ public class Lab2 {
 
     // Image path
     String imgPath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/IMG_2116.jpg";
+    String imgWritePath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/processed-imgs/";
 
     // Load image from path
     Mat src = Imgcodecs.imread(imgPath);
@@ -112,4 +113,35 @@ public class Lab2 {
         BufferedImage bufferedImage = createImage(dest);
         makeJFrame(bufferedImage);
     }
+
+    // Exc 5 - Compare OpenCV methods of enlarging images
+    public void enlargeImage(float scaleOne, float scaleTwo) {
+        // Create matrix for the processed image
+        Mat dest = new Mat();
+
+        // Set scale to x2.0
+        Size zoomIn = new Size(src.cols() * scaleOne, src.rows() * scaleOne);
+
+        // Enlarge src image
+        Imgproc.resize(src, dest, zoomIn);
+
+        // Save processed image on the drive
+        Imgcodecs.imwrite(imgWritePath + "resizeX2.jpg", dest);
+
+        // Set scale to x4.0
+        zoomIn = new Size(src.cols() * scaleTwo, src.rows() * scaleTwo);
+        Imgproc.resize(src, dest, zoomIn);
+        Imgcodecs.imwrite(imgWritePath + "resizeX4.jpg", dest);
+        System.out.println("Done enlarging image with resize");
+
+        // Enlarge image using pyrUp
+        Imgproc.pyrUp(src, dest, new Size(src.cols() * scaleOne, src.rows() * scaleOne), Core.BORDER_DEFAULT);
+        Imgcodecs.imwrite(imgWritePath + "pyrUpX2.jpg", dest);
+
+        // Change scale to x4.0
+        Imgproc.pyrUp(src, dest, new Size(src.cols() * scaleTwo, src.rows() * scaleTwo), Core.BORDER_DEFAULT);
+        Imgcodecs.imwrite(imgWritePath + "pyrUpX4.jpg", dest);
+        System.out.println("Done enlarging image with pyrUp");
+    }
+
 }
