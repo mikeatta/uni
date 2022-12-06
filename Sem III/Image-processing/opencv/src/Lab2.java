@@ -120,17 +120,17 @@ public class Lab2 {
         Mat dest = new Mat();
 
         // Set scale to x2.0
-        Size zoomIn = new Size(src.cols() * scaleOne, src.rows() * scaleOne);
+        Size scale = new Size(src.cols() * scaleOne, src.rows() * scaleOne);
 
         // Enlarge src image
-        Imgproc.resize(src, dest, zoomIn);
+        Imgproc.resize(src, dest, scale);
 
         // Save processed image on the drive
         Imgcodecs.imwrite(imgWritePath + "resizeX2.jpg", dest);
 
         // Set scale to x4.0
-        zoomIn = new Size(src.cols() * scaleTwo, src.rows() * scaleTwo);
-        Imgproc.resize(src, dest, zoomIn);
+        scale = new Size(src.cols() * scaleTwo, src.rows() * scaleTwo);
+        Imgproc.resize(src, dest, scale);
         Imgcodecs.imwrite(imgWritePath + "resizeX4.jpg", dest);
         System.out.println("Done enlarging image with resize");
 
