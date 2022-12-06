@@ -15,8 +15,8 @@ public class Lab3 {
     // Image path
     String imgPath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/IMG_2116.jpg";
 
-    // Load image from path
-    Mat src = Imgcodecs.imread(imgPath);
+    // Load image from path, add reading color.
+    Mat src = Imgcodecs.imread(imgPath, Imgcodecs.IMREAD_COLOR);
 
     // Create destination matrix
     Mat dest = new Mat(src.cols(), src.rows(), src.type());
@@ -42,9 +42,6 @@ public class Lab3 {
 
     // Exc 1 - Change image contrast
     public void changeImageContrast(int setAlpha) throws IOException {
-        // Read color from image at imgPath
-        src = Imgcodecs.imread(imgPath, Imgcodecs.IMREAD_COLOR);
-
         // Alter image alpha to change the contrast
         src.convertTo(dest, -1, 2, 0);
 
