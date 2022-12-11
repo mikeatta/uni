@@ -21,7 +21,7 @@ class LosAngeles extends Cities {
     public static String cityDetails = "Los Angeles, CA";
     @Override
     public void cityNote() {
-        System.out.println("NOTE: Films are make here.");
+        System.out.println("NOTE: Films are being made here.");
     }
 }
 

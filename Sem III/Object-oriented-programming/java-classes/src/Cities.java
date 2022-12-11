@@ -7,5 +7,5 @@ public abstract class Cities {
         System.out.println("Is a city.");
     }
 
-    public void cityNote() {}
+    public abstract void cityNote();
 }
