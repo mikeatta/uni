@@ -14,18 +14,21 @@ public class HelloController {
     private void getTextAreaValue() {
         String text = textArea.getText();
         System.out.println(text);
+        createFile();
     }
 
     private void createFile() {
         try {
             // Create new file at set directory
             File myFile = new File("./file-directory/file.txt");
-            if(myFile.createNewFile()) {
-                System.out.println("Created new file.");
-            }
+            // If file exists and is not a directory
+            if(myFile.exists() && !myFile.isDirectory()) {
+                System.out.println("File already exists! Aborting...");
+            } else myFile.createNewFile();
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
     }
+
 }
