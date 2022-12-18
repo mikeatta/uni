@@ -1,9 +1,11 @@
 import org.opencv.core.*;
+import org.opencv.core.Point;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -105,12 +107,20 @@ public class Lab2 {
     }
 
     // Exc 4 - Crop selected region of the image
-    public void cropImage(int pointX, int pointY, int width, int height) throws IOException {
-        // Create the crop area
-        Rect cropArea = new Rect(pointX, pointY, width, height);
+    public void cropImage(int pointX, int pointY, int width, int height, int method) throws IOException {
+        // Initialize destination matrix
+        Mat dest = new Mat();
 
-        // Crop the image
-        Mat dest = new Mat(src, cropArea);
+        if (method == 1) {
+            // Create the crop area
+            Rect cropArea = new Rect(pointX, pointY, width, height);
+
+            // Crop the image
+            dest = new Mat(src, cropArea);
+        } else if (method == 2) {
+            // Submat selected area into dest matrix
+            dest = src.submat(pointX, width, pointY, height);
+        } else System.out.println("Error: Unexpected input in method parameter");
 
         // Display result
         BufferedImage bufferedImage = createImage(dest);
