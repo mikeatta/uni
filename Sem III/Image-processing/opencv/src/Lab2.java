@@ -70,6 +70,9 @@ public class Lab2 {
             // Flip horizontally
             case 'h' -> Core.flip(src, dest, -1);
 
+            // Test flip with '0' parameter
+            case '0' -> Core.flip(src, dest, 0);
+
             // Handle incorrect input
             default -> System.out.println("@Lab2: mirrorImage ERROR -> Incorrect input");
         }
