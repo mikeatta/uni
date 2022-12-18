@@ -107,24 +107,48 @@ public class Lab2 {
     }
 
     // Exc 4 - Crop selected region of the image
+    private Boolean validateInput(int pointX, int pointY, int width, int height, int method) {
+        switch (method) {
+            // Validate method 1 input
+            case 1:
+                if (pointX > src.width() || width > src.width()) return true;
+                else if (pointY > src.height() || height > src.height()) return true;
+                else return false;
+
+            // Validate method 2 input
+            case 2:
+                if (pointX > src.height() || width > src.height()) return true;
+                else if (pointY > src.width() || height > src.width()) return true;
+                else return false;
+
+            // Return true on incorrect method input
+            default: return true;
+        }
+    }
+
     public void cropImage(int pointX, int pointY, int width, int height, int method) throws IOException {
         // Initialize destination matrix
         Mat dest = new Mat();
 
-        if (method == 1) {
-            // Create the crop area
-            Rect cropArea = new Rect(pointX, pointY, width, height);
+        // Validate cropImage input
+        if (validateInput(pointX, pointY, width, height, method))
+            System.out.println("Error: Input exceeds image width, height or method index");
+        else {
+            if (method == 1) {
+                // Create the crop area
+                Rect cropArea = new Rect(pointX, pointY, width, height);
 
-            // Crop the image
-            dest = new Mat(src, cropArea);
-        } else if (method == 2) {
-            // Submat selected area into dest matrix
-            dest = src.submat(pointX, width, pointY, height);
-        } else System.out.println("Error: Unexpected input in method parameter");
+                // Crop the image
+                dest = new Mat(src, cropArea);
+            } else if (method == 2) {
+                // Submat selected area into dest matrix
+                dest = src.submat(pointX, width, pointY, height);
+            } else System.out.println("Error: Unexpected input in method parameter");
 
-        // Display result
-        BufferedImage bufferedImage = createImage(dest);
-        makeJFrame(bufferedImage);
+            // Display result
+            BufferedImage bufferedImage = createImage(dest);
+            makeJFrame(bufferedImage);
+        }
     }
 
     // Exc 5 - Compare OpenCV methods of enlarging images
