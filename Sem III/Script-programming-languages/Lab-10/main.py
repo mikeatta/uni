@@ -46,9 +46,29 @@ def alterPieChart():
     # Display the chart
     plt.show()
 
+# Exc 3 - Add info to bar chart
+def alterBarChart():
+    fig, ax = plt.subplots()
+
+    # Define bar chart content lists
+    fruits = ["apple", "blueberry", "cherry", "orange", "watermelon"]
+    counts = ["40", "100", "30", "55", "20"]
+    bar_labels = ["red", "blue", "red", "orange", "pink"]
+    bar_colors = ["red", "blue", "red", "orange", "pink"]
+
+    # Place elements on the bar chart
+    ax.bar(fruits, counts, label=bar_labels, color=bar_colors)
+    ax.set_ylabel("Amount")
+    ax.set_title("Fruit")
+    ax.legend(title="Legend")
+
+    # Display the chart
+    plt.show()
+
 def main():
     alterLineChart() # Exc 1 - Alter example line chart
     alterPieChart() # Exc 2 - Add info to example pie chart
+    alterBarChart() # Exc 3 - Add info to example bar chart
 
 if __name__ == '__main__':
     main()
