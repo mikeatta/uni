@@ -196,12 +196,12 @@ public class Lab2 {
         // Change scale
         scale = new Size(src.cols() * scaleTwo, src.rows() * scaleTwo);
         Imgproc.resize(src, dest, scale);
-        Imgcodecs.imwrite(imgWritePath + "resizeX" + scaleOne + ".jpg", dest);
+        Imgcodecs.imwrite(imgWritePath + "resizeX" + scaleTwo + ".jpg", dest);
         System.out.println("Done shrinking image with resize");
 
         // Shrink image using pyrDown
         Imgproc.pyrDown(src, dest, new Size(src.cols() * scaleOne, src.rows() * scaleOne), Core.BORDER_DEFAULT);
-        Imgcodecs.imwrite(imgWritePath + "pyrDownX" + scaleTwo + ".jpg", dest);
+        Imgcodecs.imwrite(imgWritePath + "pyrDownX" + scaleOne + ".jpg", dest);
 
         // Shrink image with second scale
         Imgproc.pyrDown(src, dest, new Size(src.cols() * scaleTwo, src.rows() * scaleTwo), Core.BORDER_DEFAULT);
