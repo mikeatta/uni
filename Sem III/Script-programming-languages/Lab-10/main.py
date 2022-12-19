@@ -5,7 +5,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Exc 1 - Alter diagram
+# Exc 1 - Add information the example line chart
 def alterLineChart():
     # Define x and y's
     x = np.linspace(-np.pi, np.pi, 100)
@@ -25,6 +25,7 @@ def alterLineChart():
     plt.legend(["sin(x)", "2cos(x)"], loc="lower right")
     plt.show()
 
+# Exc 2 - Add info to pie chart
 def alterPieChart():
     # Add 'birds' to the label list
     labels = ["Frogs", "Cats", "Dogs", "Birds"]
@@ -46,8 +47,8 @@ def alterPieChart():
     plt.show()
 
 def main():
-    # alterLineChart() # Exc 1 - Alter example diagram
-    alterPieChart() # Exc 2 - Alter info in pie chart
+    alterLineChart() # Exc 1 - Alter example line chart
+    alterPieChart() # Exc 2 - Add info to example pie chart
 
 if __name__ == '__main__':
     main()
