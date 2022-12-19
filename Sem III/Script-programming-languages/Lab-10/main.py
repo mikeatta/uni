@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Exc 1 - Alter diagram
-def alterDiagram():
+def alterLineChart():
     # Define x and y's
     x = np.linspace(-np.pi, np.pi, 100)
     y1 = np.sin(x)
@@ -25,8 +25,29 @@ def alterDiagram():
     plt.legend(["sin(x)", "2cos(x)"], loc="lower right")
     plt.show()
 
+def alterPieChart():
+    # Add 'birds' to the label list
+    labels = ["Frogs", "Cats", "Dogs", "Birds"]
+    sizes = [25, 30, 45, 60]
+    explode = (0, 0, 0, 0.1)
+    fig, ax = plt.subplots()
+
+    # Create pie chart
+    ax.pie(
+        sizes,
+        explode=explode,
+        labels=labels,
+        autopct="%1.1f%%",
+        shadow=False,
+        startangle=90
+    )
+
+    # Display the chart
+    plt.show()
+
 def main():
-    alterDiagram() # Exc 1 - Alter example diagram
+    # alterLineChart() # Exc 1 - Alter example diagram
+    alterPieChart() # Exc 2 - Alter info in pie chart
 
 if __name__ == '__main__':
     main()
