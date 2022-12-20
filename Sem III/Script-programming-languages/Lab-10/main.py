@@ -65,10 +65,52 @@ def alterBarChart():
     # Display the chart
     plt.show()
 
+# Exc 5 - Generate, count and display numbers in a chart
+def generate_random_number_chart():
+    # Generate random number list using numpy
+    random_list = np.random.randint(10, size=100)
+
+    print(f"{random_list}\n")
+
+    # Create a dictionary for storing number occurrences
+    number_occurrence_dict = {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0
+    }
+
+    # Assign number occurrences to dictionary indexes
+    for occurrence in range(10):
+        number_occurrence_dict[str(occurrence)] = np.count_nonzero(random_list == occurrence)
+
+    # Create the bar chart
+    fig, ax = plt.subplots()
+
+    # Define bar content
+    number_labels = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    number_values = []
+    for occurrence in range(10):
+        number_values.append(number_occurrence_dict[str(occurrence)])
+        print(f"[{occurrence}]: {number_occurrence_dict[str(occurrence)]}")
+    bar_colors = ["lightblue", "blue"]
+
+    ax.bar(number_labels, number_values, color=bar_colors)
+    ax.set_ylabel("Number occurrences")
+    ax.set_title("Numbers")
+    plt.show()
+
 def main():
-    alterLineChart() # Exc 1 - Alter example line chart
-    alterPieChart() # Exc 2 - Add info to example pie chart
-    alterBarChart() # Exc 3 - Add info to example bar chart
+    # alterLineChart() # Exc 1 - Alter example line chart
+    # alterPieChart() # Exc 2 - Add info to example pie chart
+    # alterBarChart() # Exc 3 - Add info to example bar chart
+    generate_random_number_chart() # Exc 5 - Create random number chart
 
 if __name__ == '__main__':
     main()
