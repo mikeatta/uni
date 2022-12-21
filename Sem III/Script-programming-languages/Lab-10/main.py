@@ -101,9 +101,14 @@ def generate_random_number_chart():
         print(f"[{occurrence}]: {number_occurrence_dict[str(occurrence)]}")
     bar_colors = ["lightblue", "blue"]
 
-    ax.bar(number_labels, number_values, color=bar_colors)
-    ax.set_ylabel("Number occurrences")
-    ax.set_title("Numbers")
+    # ax.bar(number_labels, number_values, color=bar_colors)
+    # ax.set_ylabel("Number occurrences")
+    # ax.set_title("Numbers")
+    # plt.show()
+
+    # Create a histogram
+    plt.hist(random_list, edgecolor="steelblue")
+    plt.xlim(0, 9)
     plt.show()
 
 def main():
