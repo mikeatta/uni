@@ -90,9 +90,6 @@ def generate_random_number_chart():
     for occurrence in range(10):
         number_occurrence_dict[str(occurrence)] = np.count_nonzero(random_list == occurrence)
 
-    # Create the bar chart
-    fig, ax = plt.subplots()
-
     # Define bar content
     number_labels = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
     number_values = []
@@ -101,14 +98,23 @@ def generate_random_number_chart():
         print(f"[{occurrence}]: {number_occurrence_dict[str(occurrence)]}")
     bar_colors = ["lightblue", "blue"]
 
-    # ax.bar(number_labels, number_values, color=bar_colors)
-    # ax.set_ylabel("Number occurrences")
-    # ax.set_title("Numbers")
-    # plt.show()
+    # Define frame size
+    plt.figure(figsize=(10,5))
 
-    # Create a histogram
-    plt.hist(random_list, edgecolor="steelblue")
-    plt.xlim(0, 9)
+    # Create bar chart
+    ax1 =  plt.subplot(1,2,1)
+    ax1.bar(number_labels, number_values, color=bar_colors)
+    ax1.set_ylabel("Number occurrences")
+    ax1.set_title("Number")
+
+    # Create histogram
+    ax2 = plt.subplot(1,2,2)
+    ax2.hist(random_list, range=(0,9), edgecolor="steelblue")
+    ax2.set_ylabel("Number occurrences")
+    ax2.set_title("Number")
+    ax2.set_xlim(0,9)
+
+    # Display result
     plt.show()
 
 def main():
