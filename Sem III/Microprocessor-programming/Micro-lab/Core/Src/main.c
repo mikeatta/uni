@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,36 +40,26 @@
 
 /* Private variables ---------------------------------------------------------*/
 
+UART_HandleTypeDef huart2;
+
 /* USER CODE BEGIN PV */
-uint8_t setDelay = 0;
-uint8_t resetDelay = 0;
-uint16_t SysTickCount = 0;
-uint16_t timeout;
+uint8_t character = 'e';
+uint8_t char_tab[20];
+uint16_t char_tab_len;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void MPU_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_USART2_UART_Init(void);
+static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-// Set LED blink delay back to the lowest delay
-void resetBlinkDelay(int reset){
-	if(reset == 1){
-		setDelay = 0;
-	}
-}
-
-// SysTick delay function
-void delayMs(uint16_t delay)
-{
-	SysTickCount = 0;
-	while(SysTickCount < delay);
-}
 
 /* USER CODE END 0 */
 
@@ -82,6 +72,15 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
+
+  /* MPU Configuration--------------------------------------------------------*/
+  MPU_Config();
+
+  /* Enable I-Cache---------------------------------------------------------*/
+  SCB_EnableICache();
+
+  /* Enable D-Cache---------------------------------------------------------*/
+  SCB_EnableDCache();
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -101,8 +100,13 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  /* USER CODE BEGIN 2 */
+  MX_USART2_UART_Init();
 
+  /* Initialize interrupts */
+  MX_NVIC_Init();
+  /* USER CODE BEGIN 2 */
+  character = 'e';
+  HAL_UART_Receive_IT(&huart2, character, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -112,48 +116,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-	  // Toggle blue LED on / off
-	  HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
-	  delayMs(timeout);
-
-	  // Check button state
-	  if(HAL_GPIO_ReadPin(B1_button_GPIO_Port, B1_button_Pin) == GPIO_PIN_SET)
-	  {
-		  // While button pressed down
-		  setDelay += 1; // Increment delay by a single point
-		  if(setDelay >= 3)
-		  {
-			  resetDelay = 1;
-			  resetBlinkDelay(resetDelay);
-			  resetDelay = 0;
-		  }
-	  }
-	  else
-	  {
-		  // While button not pressed down
-		  setDelay = setDelay; // Leave previous delay
-
-	  }
-
-	  /* HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, RESET);
-	  HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, SET); */
-
-	  // Set timeout for each delay point
-	  switch(setDelay)
-	  {
-	  	  case 0:
-	  		  timeout = 1000; // 1 second blink timeout
-	  		  break;
-
-	  	  case 1:
-	  		  timeout = 2000; // 2 second blink timeout
-	  		  break;
-
-	  	  case 2:
-	  		  timeout = 4000; // 4 second blink timeout
-	  		  break;
-	  }
   }
   /* USER CODE END 3 */
 }
@@ -200,6 +162,52 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief NVIC Configuration.
+  * @retval None
+  */
+static void MX_NVIC_Init(void)
+{
+  /* USART2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(USART2_IRQn);
+}
+
+/**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 9600;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -209,17 +217,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : B1_button_Pin */
-  GPIO_InitStruct.Pin = B1_button_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(B1_button_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LED_Blue_Pin */
   GPIO_InitStruct.Pin = LED_Blue_Pin;
@@ -231,8 +233,65 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->Instance == USART2)
+	{
+		// Display character in terminal
+		HAL_UART_Transmit_IT(&huart2, &character, 1);
+		if(character == 'e')
+		{
+			// Enable pin on 'e' as input
+			HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_SET);
+			sprintf(char_tab, "DIODE ON");
+			char_tab_len = 8;
+		}
+		else if(character == 'd')
+		{
+			// Disable pin on 'd' as input
+			HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
+			sprintf(char_tab, "DIODE OFF");
+			char_tab_len = 9;
+		}
+		else
+		{
+			sprintf(char_tab, "WRNG INPUT");
+			char_tab_len = 10;
+		}
+		HAL_UART_Transmit_IT(&huart2, char_tab, char_tab_len);
+		HAL_UART_Receive_IT(&huart2, &character, 1);
+	}
+}
 /* USER CODE END 4 */
+
+/* MPU Configuration */
+
+void MPU_Config(void)
+{
+  MPU_Region_InitTypeDef MPU_InitStruct = {0};
+
+  /* Disables the MPU */
+  HAL_MPU_Disable();
+
+  /** Initializes and configures the Region and the memory to be protected
+  */
+  MPU_InitStruct.Enable = MPU_REGION_ENABLE;
+  MPU_InitStruct.Number = MPU_REGION_NUMBER0;
+  MPU_InitStruct.BaseAddress = 0x0;
+  MPU_InitStruct.Size = MPU_REGION_SIZE_4GB;
+  MPU_InitStruct.SubRegionDisable = 0x87;
+  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
+  MPU_InitStruct.AccessPermission = MPU_REGION_NO_ACCESS;
+  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
+  MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
+  MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+  MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+
+  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+  /* Enables the MPU */
+  HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
+
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
