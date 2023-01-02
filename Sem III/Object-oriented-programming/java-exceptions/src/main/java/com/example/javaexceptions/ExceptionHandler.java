@@ -2,8 +2,10 @@ package com.example.javaexceptions;
 
 public class ExceptionHandler extends Exception {
 
+    String storeMessage;
+
     public ExceptionHandler(String message) {
-        System.out.println(message);
+        storeMessage = message;
     }
 }
 

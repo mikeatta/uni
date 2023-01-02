@@ -1,8 +1,8 @@
 package com.example.javaexceptions;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
-import javafx.scene.text.Text;
 
 public class HelloController {
     @FXML
@@ -11,6 +11,9 @@ public class HelloController {
     private TextField expiryDateField;
     @FXML
     private TextField cvvCodeField;
+
+    // Declare the alert
+    Alert a = new Alert(Alert.AlertType.NONE);
 
     @FXML
     protected void submitCardInformation() {
@@ -22,8 +25,14 @@ public class HelloController {
             System.out.println("Card number : " + cc);
             System.out.println("Exp. date : " + expDt);
             System.out.println("CVV code : " + cvv);
-        } catch (CardNumberEmpty | ExpiryDateEmpty | CvvEmpty ex) {
-            System.out.println(ex.getMessage().toString());
+        }
+        catch (CardNumberEmpty | ExpiryDateEmpty | CvvEmpty ex) {
+            String exceptionClassName = "Exception: " + ex.getClass().getSimpleName();
+            String exceptionErrorMessage = ex.storeMessage;
+
+            a.setAlertType(Alert.AlertType.ERROR);
+            a.setContentText(exceptionClassName + " : " + exceptionErrorMessage);
+            a.show();
         }
     }
 
