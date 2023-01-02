@@ -12,3 +12,15 @@ class CardNumberEmpty extends ExceptionHandler {
         super(message);
     }
 }
+
+class ExpiryDateEmpty extends ExceptionHandler {
+    public ExpiryDateEmpty(String message) {
+        super(message);
+    }
+}
+
+class CvvEmpty extends ExceptionHandler {
+    public CvvEmpty(String message) {
+        super(message);
+    }
+}

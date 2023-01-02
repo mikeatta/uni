@@ -31,5 +31,5 @@
          </Label>
       </children>
    </FlowPane>
-    <Button fx:id="submitButton" onAction="#getCardNumber" text="Submit" />
+    <Button fx:id="submitButton" onAction="#submitCardInformation" text="Submit" />
 </VBox>
