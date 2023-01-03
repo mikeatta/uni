@@ -15,6 +15,17 @@ public class HelloController {
     // Declare the alert
     Alert a = new Alert(Alert.AlertType.NONE);
 
+    private void displayAlertWindow(ExceptionHandler ex) {
+        // Create alert messages
+        String exceptionClassName = "Exception: " + ex.getClass().getSimpleName();
+        String exceptionErrorMessage = ex.storeMessage;
+
+        // Display alert pop-up
+        a.setAlertType(Alert.AlertType.ERROR);
+        a.setContentText(exceptionClassName + " : " + exceptionErrorMessage);
+        a.show();
+    }
+
     @FXML
     protected void submitCardInformation() {
         try {
@@ -27,35 +38,42 @@ public class HelloController {
             System.out.println("CVV code : " + cvv);
         }
         catch (CardNumberEmpty | ExpiryDateEmpty | CvvEmpty ex) {
-            String exceptionClassName = "Exception: " + ex.getClass().getSimpleName();
-            String exceptionErrorMessage = ex.storeMessage;
-
-            a.setAlertType(Alert.AlertType.ERROR);
-            a.setContentText(exceptionClassName + " : " + exceptionErrorMessage);
-            a.show();
+            displayAlertWindow(ex);
+        }
+        catch (IncorrectCardLength | IncorrectDateLength | IncorrectCvvLength ex) {
+            displayAlertWindow(ex);
         }
     }
 
-    protected String checkCardNumber() throws CardNumberEmpty {
+    private String checkCardNumber() throws CardNumberEmpty, IncorrectCardLength {
         String cardNumber = cardNumberField.getText();
         if(cardNumber.isEmpty()) {
             throw new CardNumberEmpty("Card number field cannot be empty!");
         }
+        if(cardNumber.length() != 12) {
+            throw new IncorrectCardLength("Card number field has to be 12 characters long!");
+        }
         return cardNumber;
     }
 
-    protected String checkExpiryDate() throws ExpiryDateEmpty {
+    private String checkExpiryDate() throws ExpiryDateEmpty, IncorrectDateLength {
         String expiryDate = expiryDateField.getText();
         if(expiryDate.isEmpty()) {
             throw new ExpiryDateEmpty("Expiry date field cannot be empty!");
         }
+        if(expiryDate.length() != 5) {
+            throw new IncorrectDateLength("Expiry date field has to 5 characters long!");
+        }
         return expiryDate;
     }
 
-    protected String checkCvv() throws CvvEmpty {
+    private String checkCvv() throws CvvEmpty, IncorrectCvvLength {
         String cvvCode = cvvCodeField.getText();
         if(cvvCode.isEmpty()) {
             throw new CvvEmpty("Cvv code field cannot be empty!");
+        }
+        if(cvvCode.length() != 3) {
+            throw new IncorrectCvvLength("Cvv code field has to be 3 characters long!");
         }
         return cvvCode;
     }
