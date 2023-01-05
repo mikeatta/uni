@@ -45,8 +45,8 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 uint8_t character = 'e';
-uint8_t char_tab[];
-uint16_t char_tab_len;
+//uint8_t char_tab[];
+//uint16_t char_tab_len;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -55,15 +55,15 @@ static void MPU_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
-int _write(int file, char *ptr, int len)
-{
-	int i=0;
-	for(i=0; i<len; i++)
-	{
-		ITM_SendChar((*ptr++));
-		return len;
-	}
-}
+//int _write(int file, char *ptr, int len)
+//{
+//	int i=0;
+//	for(i=0; i<len; i++)
+//	{
+//		ITM_SendChar((*ptr++));
+//		return len;
+//	}
+//}
 
 void uart2_write(unsigned char x)
 {
@@ -257,34 +257,49 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+	// Send character to terminal
+	uart2_write(character);
+
+	// Put dash and two white spaces between character and message
+	uint8_t put_space[] = " - ";
+	for(volatile int i=0;i<sizeof(put_space);i++)
+	{
+		uart2_write(put_space[i]);
+	}
+
+	// Handle USART3 reception callback
 	if(huart->Instance == USART3)
 	{
 		if(character == 'e')
 		{
 			// Enable pin on 'e' as input
 			HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_SET);
-//			printf(char_tab, "DIODE ON");
-			char_tab[] = "DD. ON\r\n";
-			char_tab_len = 10;
+			uint8_t message[] = "LED on\r\n";
+			for(volatile int i=0;i<sizeof(message);i++)
+			{
+				uart2_write(message[i]);
+			}
 		}
 		else if(character == 'd')
 		{
 			// Disable pin on 'd' as input
 			HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
-			printf(char_tab, "DIODE OFF");
-			char_tab_len = 9;
+			uint8_t message[] = "LED off\r\n";
+			for(volatile int i=0;i<sizeof(message);i++)
+			{
+				uart2_write(message[i]);
+			}
 		}
 		else
 		{
-			printf(char_tab, "WRNG INPUT");
-			char_tab_len = 10;
+			uint8_t message[] = "Neither e nor d pressed\r\n";
+			for(volatile int i=0;i<sizeof(message);i++)
+			{
+				uart2_write(message[i]);
+			}
 		}
 
-		for(volatile int i=0; i<=char_tab_len; i++)
-		{
-			uart2_write(char_tab[i]);
-		}
-//		HAL_UART_Transmit_IT(&huart3, char_tab, char_tab_len);
+		// Await new character
 		HAL_UART_Receive_IT(&huart3, &character, 1);
 	}
 }
