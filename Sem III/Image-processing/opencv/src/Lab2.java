@@ -1,9 +1,11 @@
 import org.opencv.core.*;
+import org.opencv.core.Point;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -70,6 +72,9 @@ public class Lab2 {
             // Flip horizontally
             case 'h' -> Core.flip(src, dest, -1);
 
+            // Test flip with '0' parameter
+            case '0' -> Core.flip(src, dest, 0);
+
             // Handle incorrect input
             default -> System.out.println("@Lab2: mirrorImage ERROR -> Incorrect input");
         }
@@ -102,16 +107,48 @@ public class Lab2 {
     }
 
     // Exc 4 - Crop selected region of the image
-    public void cropImage(int pointX, int pointY, int width, int height) throws IOException {
-        // Create the crop area
-        Rect cropArea = new Rect(pointX, pointY, width, height);
+    private Boolean validateInput(int pointX, int pointY, int width, int height, int method) {
+        switch (method) {
+            // Validate method 1 input
+            case 1:
+                if (pointX > src.width() || width > src.width()) return true;
+                else if (pointY > src.height() || height > src.height()) return true;
+                else return false;
 
-        // Crop the image
-        Mat dest = new Mat(src, cropArea);
+            // Validate method 2 input
+            case 2:
+                if (pointX > src.height() || width > src.height()) return true;
+                else if (pointY > src.width() || height > src.width()) return true;
+                else return false;
 
-        // Display result
-        BufferedImage bufferedImage = createImage(dest);
-        makeJFrame(bufferedImage);
+            // Return true on incorrect method input
+            default: return true;
+        }
+    }
+
+    public void cropImage(int pointX, int pointY, int width, int height, int method) throws IOException {
+        // Initialize destination matrix
+        Mat dest = new Mat();
+
+        // Validate cropImage input
+        if (validateInput(pointX, pointY, width, height, method))
+            System.out.println("Error: Input exceeds image width, height or method index");
+        else {
+            if (method == 1) {
+                // Create the crop area
+                Rect cropArea = new Rect(pointX, pointY, width, height);
+
+                // Crop the image
+                dest = new Mat(src, cropArea);
+            } else if (method == 2) {
+                // Submat selected area into dest matrix
+                dest = src.submat(pointX, width, pointY, height);
+            } else System.out.println("Error: Unexpected input in method parameter");
+
+            // Display result
+            BufferedImage bufferedImage = createImage(dest);
+            makeJFrame(bufferedImage);
+        }
     }
 
     // Exc 5 - Compare OpenCV methods of enlarging images
@@ -159,12 +196,12 @@ public class Lab2 {
         // Change scale
         scale = new Size(src.cols() * scaleTwo, src.rows() * scaleTwo);
         Imgproc.resize(src, dest, scale);
-        Imgcodecs.imwrite(imgWritePath + "resizeX" + scaleOne + ".jpg", dest);
+        Imgcodecs.imwrite(imgWritePath + "resizeX" + scaleTwo + ".jpg", dest);
         System.out.println("Done shrinking image with resize");
 
         // Shrink image using pyrDown
         Imgproc.pyrDown(src, dest, new Size(src.cols() * scaleOne, src.rows() * scaleOne), Core.BORDER_DEFAULT);
-        Imgcodecs.imwrite(imgWritePath + "pyrDownX" + scaleTwo + ".jpg", dest);
+        Imgcodecs.imwrite(imgWritePath + "pyrDownX" + scaleOne + ".jpg", dest);
 
         // Shrink image with second scale
         Imgproc.pyrDown(src, dest, new Size(src.cols() * scaleTwo, src.rows() * scaleTwo), Core.BORDER_DEFAULT);
