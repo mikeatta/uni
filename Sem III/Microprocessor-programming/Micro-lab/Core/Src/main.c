@@ -21,7 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
+#include "stdio.h"
+#include "stm32f7xx.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,11 +41,11 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-UART_HandleTypeDef huart2;
+UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 uint8_t character = 'e';
-uint8_t char_tab[20];
+uint8_t char_tab[];
 uint16_t char_tab_len;
 /* USER CODE END PV */
 
@@ -52,10 +53,24 @@ uint16_t char_tab_len;
 void SystemClock_Config(void);
 static void MPU_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_USART2_UART_Init(void);
-static void MX_NVIC_Init(void);
+static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
+int _write(int file, char *ptr, int len)
+{
+	int i=0;
+	for(i=0; i<len; i++)
+	{
+		ITM_SendChar((*ptr++));
+		return len;
+	}
+}
 
+void uart2_write(unsigned char x)
+{
+
+USART3->TDR =(x);
+while(!((USART3->ISR)&USART_ISR_TC)){;}
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -70,7 +85,19 @@ static void MX_NVIC_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	//Configure GPIOD PD8 as TX pin
+	RCC->AHB1ENR|=RCC_AHB1ENR_GPIODEN;
+	GPIOD->MODER|=GPIO_MODER_MODER8_1;
+	#define AF07 0x07
+	GPIOD->AFR[1]|=(AF07<<0);
 
+	//Configure the UART
+
+	RCC->APB1ENR|=RCC_APB1ENR_USART3EN;
+	USART3->BRR    = 0x008B; // baud rate 115200 @16MHz
+	USART3->CR1    = 0; // Enable Tx and Rx and Enable USART2
+	USART3->CR1|=USART_CR1_TE; //enbale TX
+	USART3->CR1|=USART_CR1_UE;
   /* USER CODE END 1 */
 
   /* MPU Configuration--------------------------------------------------------*/
@@ -100,13 +127,10 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART2_UART_Init();
-
-  /* Initialize interrupts */
-  MX_NVIC_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
   character = 'e';
-  HAL_UART_Receive_IT(&huart2, character, 1);
+  HAL_UART_Receive_IT(&huart3, &character, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -116,6 +140,14 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+//	uart2_write('a');
+//	uart2_write('\r');
+//	uart2_write('\n');
+//	for(volatile int i=0;i<100000;i++);
+//	  for(volatile int i=0; i<sizeof(char_tab); i++)
+//	  {
+//		  uart2_write(char_tab[i]);
+//	  }
   }
   /* USER CODE END 3 */
 }
@@ -162,48 +194,37 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief NVIC Configuration.
-  * @retval None
-  */
-static void MX_NVIC_Init(void)
-{
-  /* USART2_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(USART2_IRQn);
-}
-
-/**
-  * @brief USART2 Initialization Function
+  * @brief USART3 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_USART2_UART_Init(void)
+static void MX_USART3_UART_Init(void)
 {
 
-  /* USER CODE BEGIN USART2_Init 0 */
+  /* USER CODE BEGIN USART3_Init 0 */
 
-  /* USER CODE END USART2_Init 0 */
+  /* USER CODE END USART3_Init 0 */
 
-  /* USER CODE BEGIN USART2_Init 1 */
+  /* USER CODE BEGIN USART3_Init 1 */
 
-  /* USER CODE END USART2_Init 1 */
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 9600;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
+  /* USER CODE END USART3_Init 1 */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 115200;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_NONE;
+  huart3.Init.Mode = UART_MODE_TX_RX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart3.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN USART2_Init 2 */
+  /* USER CODE BEGIN USART3_Init 2 */
 
-  /* USER CODE END USART2_Init 2 */
+  /* USER CODE END USART3_Init 2 */
 
 }
 
@@ -218,6 +239,7 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
@@ -235,31 +257,35 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	if(huart->Instance == USART2)
+	if(huart->Instance == USART3)
 	{
-		// Display character in terminal
-		HAL_UART_Transmit_IT(&huart2, &character, 1);
 		if(character == 'e')
 		{
 			// Enable pin on 'e' as input
 			HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_SET);
-			sprintf(char_tab, "DIODE ON");
-			char_tab_len = 8;
+//			printf(char_tab, "DIODE ON");
+			char_tab[] = "DD. ON\r\n";
+			char_tab_len = 10;
 		}
 		else if(character == 'd')
 		{
 			// Disable pin on 'd' as input
 			HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
-			sprintf(char_tab, "DIODE OFF");
+			printf(char_tab, "DIODE OFF");
 			char_tab_len = 9;
 		}
 		else
 		{
-			sprintf(char_tab, "WRNG INPUT");
+			printf(char_tab, "WRNG INPUT");
 			char_tab_len = 10;
 		}
-		HAL_UART_Transmit_IT(&huart2, char_tab, char_tab_len);
-		HAL_UART_Receive_IT(&huart2, &character, 1);
+
+		for(volatile int i=0; i<=char_tab_len; i++)
+		{
+			uart2_write(char_tab[i]);
+		}
+//		HAL_UART_Transmit_IT(&huart3, char_tab, char_tab_len);
+		HAL_UART_Receive_IT(&huart3, &character, 1);
 	}
 }
 /* USER CODE END 4 */
