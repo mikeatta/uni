@@ -72,15 +72,6 @@ void increase_rx_empty()
 		rx_empty = 0;
 	}
 }
-
-//void increase_rx_busy()
-//{
-//	rx_busy++;
-//	if(rx_busy>=BUFFER_LENGTH)
-//	{
-//		rx_busy = 0;
-//	}
-//}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -137,30 +128,47 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	// Print reception buffer content after pressing ENTER
+	// If last character was ENTER
 	if(character == 13 || character == 10)
 	{
 		uint8_t message_length = rx_empty;
 		rx_empty = 0;
 
-		// Print reception buffer contents
+		// Save reception buffer contents in char array
+		uint8_t store_message[message_length];
 		for(volatile uint8_t i=0;i<message_length;i++)
 		{
-			uart_print(rx_buffer[i]);
+			store_message[i] = rx_buffer[i];
 		}
 
 		// Clear reception buffer
 		for(volatile uint8_t i=0;i<BUFFER_LENGTH;i++)
 		{
-			rx_buffer[i] = '\000';
+			rx_buffer[i] = '\0';
+		}
+
+		// Look for LED ON / OFF command in message array
+		for(volatile uint8_t i=0;i<message_length;i++)
+		{
+			// Enable LED
+			if(store_message[i] == 'L')
+			{
+				if(store_message[i+1] == 'E' && store_message[i+2] == 'D')
+				{
+					HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_SET);
+				}
+			}
+
+			// Disable LED
+			if(store_message[i] == 'O')
+			{
+				if(store_message[i+1] == 'F' && store_message[i+2] == 'F')
+				{
+					HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
+				}
+			}
 		}
 	}
-
-//	// Remove character from reception buffer on BACKSPACE
-//	if(character == '\b' && rx_empty>0)
-//	{
-//		rx_buffer[rx_empty] = '\000';
-//	}
   }
   /* USER CODE END 3 */
 }
