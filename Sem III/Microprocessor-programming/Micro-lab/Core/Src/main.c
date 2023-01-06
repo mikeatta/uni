@@ -48,6 +48,8 @@ UART_HandleTypeDef huart3;
 uint8_t character;
 uint8_t rx_buffer[BUFFER_LENGTH];
 __IO uint8_t rx_empty = 0;
+__IO uint8_t check_state = 0;
+__IO uint8_t set_action = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -150,22 +152,47 @@ int main(void)
 		// Look for LED ON / OFF command in message array
 		for(volatile uint8_t i=0;i<message_length;i++)
 		{
-			// Enable LED
+			// Check for initial command character
 			if(store_message[i] == 'L')
 			{
+				// Check for rest of the characters
 				if(store_message[i+1] == 'E' && store_message[i+2] == 'D')
 				{
-					HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_SET);
+					check_state = 1;
+					// Start checking for '[' symbol
+					i = i+3;
 				}
 			}
 
-			// Disable LED
-			if(store_message[i] == 'O')
+			switch(check_state)
 			{
-				if(store_message[i+1] == 'F' && store_message[i+2] == 'F')
+			case 1:
+				if(store_message[i] == '[') check_state++;
+				break;
+			case 2:
+				if(store_message[i] == 'O' && store_message[i+1] == 'N')
 				{
-					HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
+					check_state++;
+					i++;
+					set_action = 1;
 				}
+				else if(store_message[i] == 'O' && store_message[i+1] == 'F' && store_message[i+2] == 'F')
+				{
+					check_state++;
+					i = i+2;
+					set_action = 0;
+				}
+				break;
+			case 3:
+				if(store_message[i] == ']')
+				{
+					if(set_action == 0) HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
+					else if(set_action == 1) HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_SET);
+				}
+				break;
+			default:
+				check_state = 0;
+				break;
 			}
 		}
 	}
