@@ -22,7 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stdio.h"
-#include "stm32f7xx.h"
+//#include "stm32f7xx.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,6 +32,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define BUFFER_LENGTH 30
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -44,9 +45,9 @@
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-uint8_t character = 'e';
-//uint8_t char_tab[];
-//uint16_t char_tab_len;
+uint8_t character;
+uint8_t rx_buffer[BUFFER_LENGTH];
+__IO uint8_t rx_empty = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -55,22 +56,31 @@ static void MPU_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
-//int _write(int file, char *ptr, int len)
-//{
-//	int i=0;
-//	for(i=0; i<len; i++)
-//	{
-//		ITM_SendChar((*ptr++));
-//		return len;
-//	}
-//}
-
-void uart2_write(unsigned char x)
+// Print character to terminal
+void uart_print(unsigned char x)
 {
 
 USART3->TDR =(x);
 while(!((USART3->ISR)&USART_ISR_TC)){;}
 }
+
+void increase_rx_empty()
+{
+	rx_empty++;
+	if(rx_empty>BUFFER_LENGTH)
+	{
+		rx_empty = 0;
+	}
+}
+
+//void increase_rx_busy()
+//{
+//	rx_busy++;
+//	if(rx_busy>=BUFFER_LENGTH)
+//	{
+//		rx_busy = 0;
+//	}
+//}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -85,19 +95,7 @@ while(!((USART3->ISR)&USART_ISR_TC)){;}
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	//Configure GPIOD PD8 as TX pin
-	RCC->AHB1ENR|=RCC_AHB1ENR_GPIODEN;
-	GPIOD->MODER|=GPIO_MODER_MODER8_1;
-	#define AF07 0x07
-	GPIOD->AFR[1]|=(AF07<<0);
 
-	//Configure the UART
-
-	RCC->APB1ENR|=RCC_APB1ENR_USART3EN;
-	USART3->BRR    = 0x008B; // baud rate 115200 @16MHz
-	USART3->CR1    = 0; // Enable Tx and Rx and Enable USART2
-	USART3->CR1|=USART_CR1_TE; //enbale TX
-	USART3->CR1|=USART_CR1_UE;
   /* USER CODE END 1 */
 
   /* MPU Configuration--------------------------------------------------------*/
@@ -129,7 +127,6 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  character = 'e';
   HAL_UART_Receive_IT(&huart3, &character, 1);
   /* USER CODE END 2 */
 
@@ -140,14 +137,30 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	uart2_write('a');
-//	uart2_write('\r');
-//	uart2_write('\n');
-//	for(volatile int i=0;i<100000;i++);
-//	  for(volatile int i=0; i<sizeof(char_tab); i++)
-//	  {
-//		  uart2_write(char_tab[i]);
-//	  }
+	// Print reception buffer content after pressing ENTER
+	if(character == 13 || character == 10)
+	{
+		uint8_t message_length = rx_empty;
+		rx_empty = 0;
+
+		// Print reception buffer contents
+		for(volatile uint8_t i=0;i<message_length;i++)
+		{
+			uart_print(rx_buffer[i]);
+		}
+
+		// Clear reception buffer
+		for(volatile uint8_t i=0;i<BUFFER_LENGTH;i++)
+		{
+			rx_buffer[i] = '\000';
+		}
+	}
+
+//	// Remove character from reception buffer on BACKSPACE
+//	if(character == '\b' && rx_empty>0)
+//	{
+//		rx_buffer[rx_empty] = '\000';
+//	}
   }
   /* USER CODE END 3 */
 }
@@ -258,48 +271,18 @@ static void MX_GPIO_Init(void)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	// Send character to terminal
-	uart2_write(character);
-
-	// Put dash and two white spaces between character and message
-	uint8_t put_space[] = " - ";
-	for(volatile int i=0;i<sizeof(put_space);i++)
-	{
-		uart2_write(put_space[i]);
-	}
+	uart_print(character);
 
 	// Handle USART3 reception callback
 	if(huart->Instance == USART3)
 	{
-		if(character == 'e')
-		{
-			// Enable pin on 'e' as input
-			HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_SET);
-			uint8_t message[] = "LED on\r\n";
-			for(volatile int i=0;i<sizeof(message);i++)
-			{
-				uart2_write(message[i]);
-			}
-		}
-		else if(character == 'd')
-		{
-			// Disable pin on 'd' as input
-			HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
-			uint8_t message[] = "LED off\r\n";
-			for(volatile int i=0;i<sizeof(message);i++)
-			{
-				uart2_write(message[i]);
-			}
-		}
-		else
-		{
-			uint8_t message[] = "Neither e nor d pressed\r\n";
-			for(volatile int i=0;i<sizeof(message);i++)
-			{
-				uart2_write(message[i]);
-			}
-		}
+		// Save character to reception buffer
+		rx_buffer[rx_empty] = character;
 
-		// Await new character
+		// Increase empty index
+		increase_rx_empty();
+
+		// Await next character
 		HAL_UART_Receive_IT(&huart3, &character, 1);
 	}
 }
