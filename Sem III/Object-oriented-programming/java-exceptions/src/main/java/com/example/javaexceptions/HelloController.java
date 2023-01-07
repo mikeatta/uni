@@ -46,6 +46,9 @@ public class HelloController {
         catch (InvalidCardFieldFormat | InvalidDateFieldFormat | InvalidCvvFieldFormat ex) {
             displayAlertWindow(ex);
         }
+        catch (InvalidDateFieldMonth ex) {
+            displayAlertWindow(ex);
+        }
     }
 
     private String checkCardNumber() throws CardNumberEmpty, InvalidCardFieldFormat, IncorrectCardLength {
@@ -63,7 +66,7 @@ public class HelloController {
         return cardNumber;
     }
 
-    private String checkExpiryDate() throws ExpiryDateEmpty, InvalidDateFieldFormat, IncorrectDateLength {
+    private String checkExpiryDate() throws ExpiryDateEmpty, InvalidDateFieldFormat, IncorrectDateLength, InvalidDateFieldMonth {
         String expiryDate = expiryDateField.getText();
         if(expiryDate.isEmpty()) {
             throw new ExpiryDateEmpty("Expiry date field cannot be empty!");
@@ -74,6 +77,23 @@ public class HelloController {
         String regex = "^[0-9]{2}/[0-9]{4}$";
         if(!expiryDate.matches(regex)) {
             throw new InvalidDateFieldFormat("Expiry date filed has to follow the 'MM/YYYY' format!");
+        }
+        String firstMonthCharacter = String.valueOf(expiryDate.charAt(0));
+        String secondMonthCharacter = String.valueOf(expiryDate.charAt(1));
+        String validateCharOne = "^[0-1]$";
+        String validateCharTwo = "^[1-9]$";
+        String validateCharTwoAfterTen = "^[0-2]$";
+        if(!firstMonthCharacter.matches(validateCharOne)) {
+            throw new InvalidDateFieldMonth("Invalid first character in month field!");
+        }
+        if(firstMonthCharacter.matches(validateCharOne) && !secondMonthCharacter.matches(validateCharTwo)) {
+            throw new InvalidDateFieldMonth("Invalid second character in month field!");
+        }
+        if(firstMonthCharacter.equals("0") && !secondMonthCharacter.matches(validateCharTwo)) {
+            throw new InvalidDateFieldMonth("Invalid second character in month field!");
+        }
+        if(firstMonthCharacter.equals("1") && !secondMonthCharacter.matches(validateCharTwoAfterTen)) {
+            throw new InvalidDateFieldMonth("Invalid second character in month field!");
         }
         return expiryDate;
     }

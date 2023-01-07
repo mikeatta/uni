@@ -42,6 +42,11 @@ class InvalidDateFieldFormat extends ExceptionHandler {
         super(message);
     }
 }
+class InvalidDateFieldMonth extends ExceptionHandler {
+    public InvalidDateFieldMonth(String message) {
+        super(message);
+    }
+}
 
 // Cvv code TextField exceptions
 class CvvEmpty extends ExceptionHandler {
