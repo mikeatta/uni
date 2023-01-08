@@ -58,8 +58,9 @@ def alterBarChart():
 
     # Place elements on the bar chart
     ax.bar(fruits, counts, label=bar_labels, color=bar_colors)
+    ax.set_xlabel("Fruit")
     ax.set_ylabel("Amount")
-    ax.set_title("Fruit")
+    ax.set_title("Fruit chart")
     ax.legend(title="Legend")
 
     # Display the chart
