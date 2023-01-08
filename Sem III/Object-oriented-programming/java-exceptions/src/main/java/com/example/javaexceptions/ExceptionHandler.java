@@ -10,67 +10,67 @@ public class ExceptionHandler extends Exception {
 }
 
 // Card number TextField exceptions
-class CardNumberEmpty extends ExceptionHandler {
-    public CardNumberEmpty(String message) {
+class CardNumberEmptyException extends ExceptionHandler {
+    public CardNumberEmptyException(String message) {
         super(message);
     }
 }
-class IncorrectCardLength extends ExceptionHandler {
-    public IncorrectCardLength(String message) {
+class IncorrectCardLengthException extends ExceptionHandler {
+    public IncorrectCardLengthException(String message) {
         super(message);
     }
 }
-class InvalidCardFieldFormat extends ExceptionHandler {
-    public InvalidCardFieldFormat(String message) {
+class InvalidCardFieldFormatException extends ExceptionHandler {
+    public InvalidCardFieldFormatException(String message) {
         super(message);
     }
 }
 
 // Expiry date TextField exceptions
-class ExpiryDateEmpty extends ExceptionHandler {
-    public ExpiryDateEmpty(String message) {
+class ExpiryDateEmptyException extends ExceptionHandler {
+    public ExpiryDateEmptyException(String message) {
         super(message);
     }
 }
-class IncorrectDateLength extends ExceptionHandler {
-    public IncorrectDateLength(String message) {
+class IncorrectDateLengthException extends ExceptionHandler {
+    public IncorrectDateLengthException(String message) {
         super(message);
     }
 }
-class InvalidDateFieldFormat extends ExceptionHandler {
-    public InvalidDateFieldFormat(String message) {
+class InvalidDateFieldFormatException extends ExceptionHandler {
+    public InvalidDateFieldFormatException(String message) {
         super(message);
     }
 }
-class InvalidDateFieldMonth extends ExceptionHandler {
-    public InvalidDateFieldMonth(String message) {
+class InvalidDateFieldMonthException extends ExceptionHandler {
+    public InvalidDateFieldMonthException(String message) {
         super(message);
     }
 }
-class InvalidDateFieldYear extends ExceptionHandler {
-    public InvalidDateFieldYear(String message) {
+class InvalidDateFieldYearException extends ExceptionHandler {
+    public InvalidDateFieldYearException(String message) {
         super(message);
     }
 }
-class ExpiryDateDue extends ExceptionHandler {
-    public ExpiryDateDue(String message) {
+class ExpiryDateDueException extends ExceptionHandler {
+    public ExpiryDateDueException(String message) {
         super(message);
     }
 }
 
 // Cvv code TextField exceptions
-class CvvEmpty extends ExceptionHandler {
-    public CvvEmpty(String message) {
+class CvvEmptyException extends ExceptionHandler {
+    public CvvEmptyException(String message) {
         super(message);
     }
 }
-class IncorrectCvvLength extends ExceptionHandler {
-    public IncorrectCvvLength(String message) {
+class IncorrectCvvLengthException extends ExceptionHandler {
+    public IncorrectCvvLengthException(String message) {
         super(message);
     }
 }
-class InvalidCvvFieldFormat extends ExceptionHandler {
-    public InvalidCvvFieldFormat(String message) {
+class InvalidCvvFieldFormatException extends ExceptionHandler {
+    public InvalidCvvFieldFormatException(String message) {
         super(message);
     }
 }

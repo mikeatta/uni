@@ -41,16 +41,16 @@ public class HelloController {
             System.out.println("Exp. date : " + expDt);
             System.out.println("CVV code : " + cvv);
         }
-        catch (CardNumberEmpty | ExpiryDateEmpty | CvvEmpty ex) {
+        catch (CardNumberEmptyException | ExpiryDateEmptyException | CvvEmptyException ex) {
             displayAlertWindow(ex);
         }
-        catch (IncorrectCardLength | IncorrectDateLength | IncorrectCvvLength ex) {
+        catch (IncorrectCardLengthException | IncorrectDateLengthException | IncorrectCvvLengthException ex) {
             displayAlertWindow(ex);
         }
-        catch (InvalidCardFieldFormat | InvalidDateFieldFormat | InvalidCvvFieldFormat ex) {
+        catch (InvalidCardFieldFormatException | InvalidDateFieldFormatException | InvalidCvvFieldFormatException ex) {
             displayAlertWindow(ex);
         }
-        catch (InvalidDateFieldMonth | InvalidDateFieldYear | ExpiryDateDue ex) {
+        catch (InvalidDateFieldMonthException | InvalidDateFieldYearException | ExpiryDateDueException ex) {
             displayAlertWindow(ex);
         }
         catch (ParseException ex) {
@@ -58,32 +58,32 @@ public class HelloController {
         }
     }
 
-    private String checkCardNumber() throws CardNumberEmpty, InvalidCardFieldFormat, IncorrectCardLength {
+    private String checkCardNumber() throws CardNumberEmptyException, InvalidCardFieldFormatException, IncorrectCardLengthException {
         String cardNumber = cardNumberField.getText();
         if(cardNumber.isEmpty()) {
-            throw new CardNumberEmpty("Card number field cannot be empty!");
+            throw new CardNumberEmptyException("Card number field cannot be empty!");
         }
         if(cardNumber.length() != 19) {
-            throw new IncorrectCardLength("Card number field has to be 19 characters long!");
+            throw new IncorrectCardLengthException("Card number field has to be 19 characters long!");
         }
         String regex = "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$";
         if(!cardNumber.matches(regex)) {
-            throw new InvalidCardFieldFormat("Card number field has to follow the 'XXXX-XXXX-XXXX-XXXX' format!");
+            throw new InvalidCardFieldFormatException("Card number field has to follow the 'XXXX-XXXX-XXXX-XXXX' format!");
         }
         return cardNumber;
     }
 
-    private String checkExpiryDate() throws ExpiryDateEmpty, InvalidDateFieldFormat, IncorrectDateLength, InvalidDateFieldMonth, InvalidDateFieldYear, ExpiryDateDue, ParseException {
+    private String checkExpiryDate() throws ExpiryDateEmptyException, InvalidDateFieldFormatException, IncorrectDateLengthException, InvalidDateFieldMonthException, InvalidDateFieldYearException, ExpiryDateDueException, ParseException {
         String expiryDate = expiryDateField.getText();
         if(expiryDate.isEmpty()) {
-            throw new ExpiryDateEmpty("Expiry date field cannot be empty!");
+            throw new ExpiryDateEmptyException("Expiry date field cannot be empty!");
         }
         if(expiryDate.length() != 7) {
-            throw new IncorrectDateLength("Expiry date field has to 7 characters long!");
+            throw new IncorrectDateLengthException("Expiry date field has to 7 characters long!");
         }
         String regex = "^[0-9]{2}/[0-9]{4}$";
         if(!expiryDate.matches(regex)) {
-            throw new InvalidDateFieldFormat("Expiry date filed has to follow the 'MM/YYYY' format!");
+            throw new InvalidDateFieldFormatException("Expiry date filed has to follow the 'MM/YYYY' format!");
         }
         String firstMonthCharacter = String.valueOf(expiryDate.charAt(0));
         String secondMonthCharacter = String.valueOf(expiryDate.charAt(1));
@@ -91,13 +91,13 @@ public class HelloController {
         String validateCharTwo = "^[1-9]$";
         String validateCharTwoAfterTen = "^[0-2]$";
         if(!firstMonthCharacter.matches(validateCharOne)) {
-            throw new InvalidDateFieldMonth("Incorrect first character in month field!");
+            throw new InvalidDateFieldMonthException("Incorrect first character in month field!");
         }
         if(firstMonthCharacter.equals("0") && !secondMonthCharacter.matches(validateCharTwo)) {
-            throw new InvalidDateFieldMonth("Incorrect second character in month field!");
+            throw new InvalidDateFieldMonthException("Incorrect second character in month field!");
         }
         if(firstMonthCharacter.equals("1") && !secondMonthCharacter.matches(validateCharTwoAfterTen)) {
-            throw new InvalidDateFieldMonth("Incorrect second character in month field!");
+            throw new InvalidDateFieldMonthException("Incorrect second character in month field!");
         }
         StringBuilder expiryYearStr = new StringBuilder();
         for(int i=3; i<7; i++) {
@@ -105,29 +105,29 @@ public class HelloController {
         }
         int expiryYearInt = Integer.parseInt(expiryYearStr.toString());
         if(expiryYearInt>2099 || expiryYearInt<1928) {
-            throw new InvalidDateFieldYear("Invalid input in card expiry year field!");
+            throw new InvalidDateFieldYearException("Invalid input in card expiry year field!");
         }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/yyyy");
         simpleDateFormat.setLenient(false);
         Date expiry = simpleDateFormat.parse(expiryDate);
         boolean cardExpired = expiry.before(new Date());
         if(cardExpired) {
-            throw new ExpiryDateDue("Card expiry date is due!");
+            throw new ExpiryDateDueException("Card expiry date is due!");
         }
         return expiryDate;
     }
 
-    private String checkCvv() throws CvvEmpty, InvalidCvvFieldFormat, IncorrectCvvLength {
+    private String checkCvv() throws CvvEmptyException, InvalidCvvFieldFormatException, IncorrectCvvLengthException {
         String cvvCode = cvvCodeField.getText();
         if(cvvCode.isEmpty()) {
-            throw new CvvEmpty("Cvv code field cannot be empty!");
+            throw new CvvEmptyException("Cvv code field cannot be empty!");
         }
         if(cvvCode.length() != 3) {
-            throw new IncorrectCvvLength("Cvv code field has to be 3 characters long!");
+            throw new IncorrectCvvLengthException("Cvv code field has to be 3 characters long!");
         }
         String regex = "^[0-9]{3}$";
         if(!cvvCode.matches(regex)) {
-            throw new InvalidCvvFieldFormat("Expiry date field has to follow the 'XXX' format!");
+            throw new InvalidCvvFieldFormatException("Expiry date field has to follow the 'XXX' format!");
         }
         return cvvCode;
     }
