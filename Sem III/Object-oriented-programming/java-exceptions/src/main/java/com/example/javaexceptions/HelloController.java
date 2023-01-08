@@ -92,6 +92,14 @@ public class HelloController {
         if(firstMonthCharacter.equals("1") && !secondMonthCharacter.matches(validateCharTwoAfterTen)) {
             throw new InvalidDateFieldMonth("Incorrect second character in month field!");
         }
+        StringBuilder expiryYearStr = new StringBuilder();
+        for(int i=3; i<7; i++) {
+            expiryYearStr.append(expiryDate.charAt(i));
+        }
+        int expiryYearInt = Integer.parseInt(expiryYearStr.toString());
+        if(expiryYearInt>2099 || expiryYearInt<1928) {
+            throw new InvalidDateFieldYear("Invalid input in card expiry year field!");
+        }
         return expiryDate;
     }
 
