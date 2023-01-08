@@ -52,6 +52,11 @@ class InvalidDateFieldYear extends ExceptionHandler {
         super(message);
     }
 }
+class ExpiryDateDue extends ExceptionHandler {
+    public ExpiryDateDue(String message) {
+        super(message);
+    }
+}
 
 // Cvv code TextField exceptions
 class CvvEmpty extends ExceptionHandler {

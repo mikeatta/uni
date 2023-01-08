@@ -4,6 +4,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class HelloController {
     @FXML
     private TextField cardNumberField;
@@ -46,8 +50,11 @@ public class HelloController {
         catch (InvalidCardFieldFormat | InvalidDateFieldFormat | InvalidCvvFieldFormat ex) {
             displayAlertWindow(ex);
         }
-        catch (InvalidDateFieldMonth | InvalidDateFieldYear ex) {
+        catch (InvalidDateFieldMonth | InvalidDateFieldYear | ExpiryDateDue ex) {
             displayAlertWindow(ex);
+        }
+        catch (ParseException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -66,7 +73,7 @@ public class HelloController {
         return cardNumber;
     }
 
-    private String checkExpiryDate() throws ExpiryDateEmpty, InvalidDateFieldFormat, IncorrectDateLength, InvalidDateFieldMonth, InvalidDateFieldYear {
+    private String checkExpiryDate() throws ExpiryDateEmpty, InvalidDateFieldFormat, IncorrectDateLength, InvalidDateFieldMonth, InvalidDateFieldYear, ExpiryDateDue, ParseException {
         String expiryDate = expiryDateField.getText();
         if(expiryDate.isEmpty()) {
             throw new ExpiryDateEmpty("Expiry date field cannot be empty!");
@@ -99,6 +106,13 @@ public class HelloController {
         int expiryYearInt = Integer.parseInt(expiryYearStr.toString());
         if(expiryYearInt>2099 || expiryYearInt<1928) {
             throw new InvalidDateFieldYear("Invalid input in card expiry year field!");
+        }
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/yyyy");
+        simpleDateFormat.setLenient(false);
+        Date expiry = simpleDateFormat.parse(expiryDate);
+        boolean cardExpired = expiry.before(new Date());
+        if(cardExpired) {
+            throw new ExpiryDateDue("Card expiry date is due!");
         }
         return expiryDate;
     }
