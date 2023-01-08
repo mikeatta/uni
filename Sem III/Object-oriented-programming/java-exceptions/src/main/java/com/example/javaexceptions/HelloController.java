@@ -46,7 +46,7 @@ public class HelloController {
         catch (InvalidCardFieldFormat | InvalidDateFieldFormat | InvalidCvvFieldFormat ex) {
             displayAlertWindow(ex);
         }
-        catch (InvalidDateFieldMonth ex) {
+        catch (InvalidDateFieldMonth | InvalidDateFieldYear ex) {
             displayAlertWindow(ex);
         }
     }
@@ -66,7 +66,7 @@ public class HelloController {
         return cardNumber;
     }
 
-    private String checkExpiryDate() throws ExpiryDateEmpty, InvalidDateFieldFormat, IncorrectDateLength, InvalidDateFieldMonth {
+    private String checkExpiryDate() throws ExpiryDateEmpty, InvalidDateFieldFormat, IncorrectDateLength, InvalidDateFieldMonth, InvalidDateFieldYear {
         String expiryDate = expiryDateField.getText();
         if(expiryDate.isEmpty()) {
             throw new ExpiryDateEmpty("Expiry date field cannot be empty!");
@@ -84,16 +84,13 @@ public class HelloController {
         String validateCharTwo = "^[1-9]$";
         String validateCharTwoAfterTen = "^[0-2]$";
         if(!firstMonthCharacter.matches(validateCharOne)) {
-            throw new InvalidDateFieldMonth("Invalid first character in month field!");
-        }
-        if(firstMonthCharacter.matches(validateCharOne) && !secondMonthCharacter.matches(validateCharTwo)) {
-            throw new InvalidDateFieldMonth("Invalid second character in month field!");
+            throw new InvalidDateFieldMonth("Incorrect first character in month field!");
         }
         if(firstMonthCharacter.equals("0") && !secondMonthCharacter.matches(validateCharTwo)) {
-            throw new InvalidDateFieldMonth("Invalid second character in month field!");
+            throw new InvalidDateFieldMonth("Incorrect second character in month field!");
         }
         if(firstMonthCharacter.equals("1") && !secondMonthCharacter.matches(validateCharTwoAfterTen)) {
-            throw new InvalidDateFieldMonth("Invalid second character in month field!");
+            throw new InvalidDateFieldMonth("Incorrect second character in month field!");
         }
         return expiryDate;
     }
