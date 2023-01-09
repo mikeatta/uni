@@ -1,3 +1,7 @@
+// Exc 1 - Create an alert pop-up on the webpage
+let popUpDialog = "Hello world";
+alert(popUpDialog);
+
 // Exc 2 - Store string in variable & test string operations
 console.log("Exc 2 - String operations");
 
