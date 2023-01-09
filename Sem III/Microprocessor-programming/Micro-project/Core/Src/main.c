@@ -21,11 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
-#include <stdarg.h>
-#include <string.h>
-#include <stdio.h>
-
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -37,8 +33,7 @@
 /* USER CODE BEGIN PD */
 
 // Length == 300 + 10% margin
-#define buffer_length 330
-
+#define BUFFER_LENGTH 30
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -51,26 +46,12 @@
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
+uint8_t character;
 
-// Amount of characters in the frame
-__IO uint8_t frame_length;
-
-// Array for received characters
-__IO uint8_t frame[buffer_length];
-
-__IO uint8_t frame_idx;
-
-// Transmission buffer
-uint8_t buffer_rx[buffer_length];
-__IO uint16_t rx_empty;
-__IO uint16_t rx_busy;
-
-// Collection buffer
-uint8_t buffer_tx[buffer_length];
-__IO uint16_t tx_empty;
-__IO uint16_t tx_busy;
-
-__IO uint8_t test_char;
+// --- Reception Buffer ---
+uint8_t rx_buffer[BUFFER_LENGTH];
+__IO uint8_t rx_empty = 0;
+__IO uint8_t rx_busy = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -83,184 +64,22 @@ static void MX_USART3_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-/* --- TRANSMISSION --- */
-
-// Check transmission buffer state
-uint8_t tx_has_data()
+// Print single character to terminal
+void uart_print(unsigned char x)
 {
-	if(tx_empty == tx_busy)
-		return 0;
-	else
-		return 1;
+	USART3->TDR =(x);
+	while(!((USART3->ISR)&USART_ISR_TC)){;}
 }
 
-void increment_tx_empty()
-{
-	tx_empty++;
-
-	// Reset tx_empty back to idx 0, if value >= buffer_length
-	if(tx_empty >= buffer_length)
-		tx_empty = 0;
-}
-
-void increment_tx_busy()
-{
-	tx_busy++;
-
-	// Reset tx_busy back to idx 0, if value >= buffer_length
-	if(tx_busy >= buffer_length)
-		tx_busy = 0;
-}
-
-/* --- COLLECTION --- */
-
-// Check collection buffer state
-uint8_t rx_has_data()
-{
-	if(rx_empty == rx_busy)
-		return 0;
-	else
-		return 1;
-}
-
-void increment_rx_empty()
+// --- Reception ---
+void increase_rx_empty()
 {
 	rx_empty++;
-
-	// Reset rx_empty back to idx 0, if value >= buffer_length
-	if(rx_empty >= buffer_length)
+	if(rx_empty>BUFFER_LENGTH)
+	{
 		rx_empty = 0;
-}
-
-void increment_rx_busy()
-{
-	rx_busy++;
-
-	// Reset rx_busy back to idx 0, if value >= buffer_length
-	if(rx_busy >= buffer_length)
-		rx_busy = 0;
-}
-
-// Check for end-of-line characters
-uint8_t is_end_of_line(char c)
-{
-	// If char is LF or CR
-	if(c == 13 || c == 10)
-		return 1;
-	else
-		return 0;
-}
-
-// Get single character from collection buffer
-uint8_t get_char()
-{
-	// Temporary char storage
-	uint8_t tmp;
-
-	// Check, if buffer has any data to collect
-	if(rx_has_data() == 1)
-	{
-		// Store character in tmp variable, increment busy idx
-		tmp = buffer_rx[rx_busy];
-		increment_rx_busy();
-		return tmp;
-	}
-	else
-	{
-		return 0;
 	}
 }
-
-// Get entire frame
-uint8_t get_frame(char *arr)
-{
-	// Temporary chars storage array
-	uint8_t tmp_arr[buffer_length];
-	uint8_t idx = 0;
-	uint8_t frame_length;
-	int i;
-
-	// Check, if buffer has any data to collect
-	if(rx_has_data() == 1)
-	{
-		// Assign character to tmp array
-		tmp_arr[idx] = buffer_rx[rx_busy];
-
-		// Check if current char is an end of line character
-		if(is_end_of_line(tmp_arr[idx]) == 1)
-		{
-			tmp_arr[idx] = 0;
-
-			for(i=0; i<=idx; i++)
-			{
-				arr[i] = tmp_arr[i];
-			}
-
-			// Amount of characters stored
-			frame_length = idx;
-
-			// Reset idx
-			idx = 0;
-
-			return frame_length;
-		}
-		else
-		{
-			idx++;
-
-			if(idx >= buffer_length)
-				return 0;
-		}
-	}
-	return 0;
-}
-
-// Sending a frame
-void send_frame(char *input, ...)
-{
-	// Data array
-	char tmp_arr[buffer_length];
-
-	uint16_t idx;
-	int i;
-
-	va_list arglist;
-	va_start(arglist, input);
-	vsprintf(tmp_arr, input, arglist);
-	va_end(arglist);
-
-	// Set pointer to the first empty idx of collection buffer
-	idx = rx_empty;
-
-	for(i=0; i<strlen(input); i++)
-	{
-		buffer_tx[idx] = input[i];
-		idx++;
-		idx %= buffer_length;
-	}
-	__disable_irq();
-
-	if(tx_has_data() == 0 && (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_TXE) == SET))
-	{
-		// Set idx to first empty field in transmission array == there is new data to send
-		tx_empty = idx;
-
-		// Transmit data
-		HAL_UART_Transmit_IT(&huart3, &buffer_tx[tx_busy], 1);
-
-		// Increment tx_busy idx
-		increment_tx_busy();
-	}
-	else
-	{
-		tx_empty = idx;
-	}
-
-	// Enable interrupts
-	__enable_irq();
-}
-
 /* USER CODE END 0 */
 
 /**
@@ -293,15 +112,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-
-  for(int i=0; i<100; i++)
-  {
-	  buffer_rx[rx_empty] = i;
-	  rx_empty++;
-  }
-
-  HAL_UART_Receive_IT(&huart3, &buffer_rx[rx_empty], 1);
-
+  HAL_UART_Receive_IT(&huart3, &character, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -385,7 +196,7 @@ static void MX_USART3_UART_Init(void)
 
   /* USER CODE END USART3_Init 1 */
   huart3.Instance = USART3;
-  huart3.Init.BaudRate = 9600;
+  huart3.Init.BaudRate = 115200;
   huart3.Init.WordLength = UART_WORDLENGTH_8B;
   huart3.Init.StopBits = UART_STOPBITS_1;
   huart3.Init.Parity = UART_PARITY_NONE;
@@ -415,12 +226,8 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5, GPIO_PIN_RESET);
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
@@ -430,19 +237,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_button_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PD5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_5;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PD6 */
-  GPIO_InitStruct.Pin = GPIO_PIN_6;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LED_Blue_Pin */
   GPIO_InitStruct.Pin = LED_Blue_Pin;
@@ -454,41 +248,25 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-// Transmission callback
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
-{
-	// Check for correct huart port
-	if(huart == &huart3)
-	{
-		// Check, if collection buffer had and data to transmit
-		if(tx_has_data() == 1)
-		{
-			static uint8_t tmp;
-			tmp = buffer_tx[tx_busy];
-
-			// Increment busy idx
-			increment_tx_busy();
-
-			// Send character
-			HAL_UART_Transmit_IT(huart, &tmp, 1);
-		}
-	}
-}
-
 // Collection callback
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+	// Print character to terminal
+	uart_print(character);
+
 	// Check for correct huart port
-	if(huart == &huart3)
+	if(huart->Instance == USART3)
 	{
-		increment_rx_empty();
+		// Collect character to reception buffer
+		rx_buffer[rx_empty] = character;
+
+		// Increase rx_empty index
+		increase_rx_empty();
 
 		// Continue data collection
-		HAL_UART_Receive_IT(huart, &buffer_rx[rx_empty], 1);
+		HAL_UART_Receive_IT(huart, &character, 1);
 	}
 }
-
 /* USER CODE END 4 */
 
 /**
