@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.Buffer;
 
 public class Lab3 {
 
@@ -77,6 +76,35 @@ public class Lab3 {
         // Display results
         BufferedImage buf = createImage(dest);
         makeJFrame(buf);
+    }
+
+    public void normalizeImage() throws IOException {
+        // Create image path
+        String normalizationImgPath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/normalizacja.png";
+        String normalizationImgWritePath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/processed-imgs/normalizacja-out.png";
+
+        // Create image matrices
+        Mat mat = Imgcodecs.imread(normalizationImgPath, Imgcodecs.IMREAD_GRAYSCALE);
+
+        // Create minMaxResult object
+        Core.MinMaxLocResult mmr = Core.minMaxLoc(mat);
+
+        // Get initial min & max values
+        System.out.println("Min val : " + mmr.minVal + " @ point : " + mmr.minLoc);
+        System.out.println("Max val : " + mmr.maxVal + " @ point : " + mmr.maxLoc + "\n");
+
+        // Perform image normalization
+        Core.normalize(mat, mat, 0, 255, Core.NORM_MINMAX);
+
+        // Get post-normalization mix & max values
+        mmr = Core.minMaxLoc(mat);
+
+        System.out.println("New min : " + mmr.minVal + " @ point : " +mmr.minLoc);
+        System.out.println("New min : " + mmr.maxVal + " @ point : " +mmr.maxLoc + "\n");
+
+        // Write the image
+        Imgcodecs.imwrite(normalizationImgWritePath, mat);
+        System.out.println("Image successfully written\n");
     }
 
 }
