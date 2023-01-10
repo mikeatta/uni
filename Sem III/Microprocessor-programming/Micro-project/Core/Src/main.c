@@ -48,10 +48,15 @@ UART_HandleTypeDef huart3;
 /* USER CODE BEGIN PV */
 uint8_t character;
 
+// --- Message array ----
+uint8_t message[BUFFER_LENGTH];
+__IO uint16_t message_length;
+__IO uint16_t message_idx;
+
 // --- Reception Buffer ---
 uint8_t rx_buffer[BUFFER_LENGTH];
-__IO uint8_t rx_empty = 0;
-__IO uint8_t rx_busy = 0;
+__IO uint16_t rx_empty = 0;
+__IO uint16_t rx_busy = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,11 +72,29 @@ static void MX_USART3_UART_Init(void);
 // Print single character to terminal
 void uart_print(unsigned char x)
 {
-	USART3->TDR =(x);
+	USART3->TDR = (x);
 	while(!((USART3->ISR)&USART_ISR_TC)){;}
 }
 
 // --- Reception ---
+uint8_t char_is_endmessage(char c)
+{
+	if (c == '\r' || c == '\n')
+	{
+		return 1;
+	}
+	else return 0;
+}
+
+uint8_t rx_has_data()
+{
+	if(rx_empty == rx_busy)
+	{
+		return 0;
+	}
+	else return 1;
+}
+
 void increase_rx_empty()
 {
 	rx_empty++;
@@ -79,6 +102,61 @@ void increase_rx_empty()
 	{
 		rx_empty = 0;
 	}
+}
+
+void increase_rx_busy()
+{
+	rx_busy++;
+	if(rx_busy>BUFFER_LENGTH)
+	{
+		rx_busy = 0;
+	}
+}
+
+// Get character from the reception buffer
+uint8_t get_char()
+{
+	uint8_t tmp;
+
+	tmp = rx_buffer[rx_busy];
+	increase_rx_busy();
+	return tmp;
+}
+
+// Get message from the reception buffer
+uint16_t get_message(uint8_t *array)
+{
+	static uint8_t tmp_arr[BUFFER_LENGTH];
+	static uint16_t idx = 0;
+	__IO uint16_t mssg_length = 0;
+
+	// Collect data from the reception buffer
+	while(rx_has_data() == 1)
+	{
+		tmp_arr[idx] = get_char();
+
+		if (char_is_endmessage(tmp_arr[idx]))
+		{
+			// Set character at endmessage index to null
+			tmp_arr[idx] = '\0';
+
+			// Assign collected data to passed array
+			for (uint8_t i=0; i<idx; i++)
+			{
+				array[i] = tmp_arr[i];
+			}
+
+			mssg_length = idx;
+			idx = 0;
+			return mssg_length;
+		}
+		else
+		{
+			idx++;
+			if(idx>BUFFER_LENGTH) return 0;
+		}
+	}
+	return 0;
 }
 /* USER CODE END 0 */
 
@@ -119,9 +197,14 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  if (char_is_endmessage(character))
+	  {
+		  message_length = get_message(message);
+	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
   }
   /* USER CODE END 3 */
 }
@@ -254,7 +337,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	// Print character to terminal
 	uart_print(character);
 
-	// Check for correct huart port
+	// Check for correct USART port
 	if(huart->Instance == USART3)
 	{
 		// Collect character to reception buffer
