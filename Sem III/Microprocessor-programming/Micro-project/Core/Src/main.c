@@ -53,6 +53,15 @@ uint8_t message[BUFFER_LENGTH];
 __IO uint16_t message_length;
 __IO uint16_t message_idx;
 
+// --- Frame content ---
+uint8_t sender[3];
+uint8_t receiver[3];
+uint8_t command_length[3];
+uint8_t data[512];
+uint8_t checksum[3];
+
+uint8_t led_state = 1;
+
 // --- Reception Buffer ---
 uint8_t rx_buffer[BUFFER_LENGTH];
 __IO uint16_t rx_empty = 0;
@@ -128,7 +137,7 @@ uint16_t get_message(uint8_t *array)
 {
 	static uint8_t tmp_arr[BUFFER_LENGTH];
 	static uint16_t idx = 0;
-	__IO uint16_t mssg_length = 0;
+	__IO uint16_t message_length = 0;
 
 	// Collect data from the reception buffer
 	while(rx_has_data() == 1)
@@ -146,15 +155,62 @@ uint16_t get_message(uint8_t *array)
 				array[i] = tmp_arr[i];
 			}
 
-			mssg_length = idx;
+			message_length = idx;
 			idx = 0;
-			return mssg_length;
+			return message_length;
 		}
 		else
 		{
 			idx++;
 			if(idx>BUFFER_LENGTH) return 0;
 		}
+	}
+	return 0;
+}
+
+// Collect & validate frame content
+uint16_t get_frame(uint8_t *message)
+{
+	uint8_t frame[BUFFER_LENGTH];
+	// Store last analyzed char position
+	// Set index to 1 to skip starting char
+	uint16_t collection_index = 1;
+
+	// Get sender
+	for (uint8_t i=0; i<sizeof(sender); i++)
+	{
+		sender[i] = message[collection_index];
+		collection_index++;
+	}
+
+	// Get receiver
+	for (uint8_t i=0; i<sizeof(receiver); i++)
+	{
+		receiver[i] = message[collection_index];
+		collection_index++;
+	}
+
+	// Get command length
+	for (uint8_t i=0; i<sizeof(command_length); i++)
+	{
+		command_length[i] = message[collection_index];
+		collection_index++;
+	}
+	// Return command length
+	// Use length to get characters from 'data' array in next step
+
+	// Get data
+	for (uint16_t i=0; i<sizeof(command_length); i++)
+	{
+		data[i] = message[collection_index];
+		collection_index++;
+	}
+
+	// Get checksum
+	for (uint8_t i=0; i<sizeof(checksum); i++)
+	{
+		checksum[i] = message[collection_index];
+		collection_index++;
 	}
 	return 0;
 }
@@ -197,10 +253,14 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  // Retrieve the message
 	  if (char_is_endmessage(character))
 	  {
 		  message_length = get_message(message);
+		  get_frame(message);
 	  }
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
