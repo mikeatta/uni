@@ -22,7 +22,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stdio.h"
-//#include "stm32f7xx.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,10 +45,16 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 uint8_t character;
+
+// --- Reception buffer ---
 uint8_t rx_buffer[BUFFER_LENGTH];
 __IO uint8_t rx_empty = 0;
-__IO uint8_t check_state = 0;
-__IO uint8_t set_action = 0;
+__IO uint8_t rx_busy = 0;
+
+// --- Message buffer ---
+uint8_t message[BUFFER_LENGTH];
+__IO uint8_t message_idx = 0;
+__IO uint8_t message_length = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -66,6 +71,24 @@ USART3->TDR =(x);
 while(!((USART3->ISR)&USART_ISR_TC)){;}
 }
 
+uint8_t char_is_endmessage(char c)
+{
+	if (c == '\r' || c == '\n')
+	{
+		return 1;
+	}
+	else return 0;
+}
+
+uint8_t rx_has_data()
+{
+	if(rx_empty == rx_busy)
+	{
+		return 0;
+	}
+	else return 1;
+}
+
 void increase_rx_empty()
 {
 	rx_empty++;
@@ -73,6 +96,61 @@ void increase_rx_empty()
 	{
 		rx_empty = 0;
 	}
+}
+
+void increase_rx_busy()
+{
+	rx_busy++;
+	if(rx_busy>BUFFER_LENGTH)
+	{
+		rx_busy = 0;
+	}
+}
+
+// Get character from the reception buffer
+uint8_t get_char()
+{
+	uint8_t tmp;
+
+	tmp = rx_buffer[rx_busy];
+	increase_rx_busy();
+	return tmp;
+}
+
+// Get message from the reception buffer
+uint16_t get_message(uint8_t *array)
+{
+	static uint8_t tmp_arr[BUFFER_LENGTH];
+	static uint16_t idx = 0;
+	__IO uint16_t message_length = 0;
+
+	// Collect data from the reception buffer
+	while(rx_has_data() == 1)
+	{
+		tmp_arr[idx] = get_char();
+
+		if (char_is_endmessage(tmp_arr[idx]))
+		{
+			// Set character at endmessage index to null
+			tmp_arr[idx] = '\0';
+
+			// Assign collected data to passed array
+			for (uint8_t i=0; i<idx; i++)
+			{
+				array[i] = tmp_arr[i];
+			}
+
+			message_length = idx;
+			idx = 0;
+			return message_length;
+		}
+		else
+		{
+			idx++;
+			if(idx>BUFFER_LENGTH) return 0;
+		}
+	}
+	return 0;
 }
 /* USER CODE END PFP */
 
@@ -127,75 +205,19 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	// Store character in reception buffer
+	rx_buffer[rx_empty] = character;
+
+	// Increase empty index
+	increase_rx_empty();
+
+	if (character == '\n' || character == '\r')
+	{
+		message_length = get_message(message);
+	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	// If last character was ENTER
-	if(character == 13 || character == 10)
-	{
-		uint8_t message_length = rx_empty;
-		rx_empty = 0;
-
-		// Save reception buffer contents in char array
-		uint8_t store_message[message_length];
-		for(volatile uint8_t i=0;i<message_length;i++)
-		{
-			store_message[i] = rx_buffer[i];
-		}
-
-		// Clear reception buffer
-		for(volatile uint8_t i=0;i<BUFFER_LENGTH;i++)
-		{
-			rx_buffer[i] = '\0';
-		}
-
-		// Look for LED ON / OFF command in message array
-		for(volatile uint8_t i=0;i<message_length;i++)
-		{
-			// Check for initial command character
-			if(store_message[i] == 'L')
-			{
-				// Check for rest of the characters
-				if(store_message[i+1] == 'E' && store_message[i+2] == 'D')
-				{
-					check_state = 1;
-					// Start checking for '[' symbol
-					i = i+3;
-				}
-			}
-
-			switch(check_state)
-			{
-			case 1:
-				if(store_message[i] == '[') check_state++;
-				break;
-			case 2:
-				if(store_message[i] == 'O' && store_message[i+1] == 'N')
-				{
-					check_state++;
-					i++;
-					set_action = 1;
-				}
-				else if(store_message[i] == 'O' && store_message[i+1] == 'F' && store_message[i+2] == 'F')
-				{
-					check_state++;
-					i = i+2;
-					set_action = 0;
-				}
-				break;
-			case 3:
-				if(store_message[i] == ']')
-				{
-					if(set_action == 0) HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
-					else if(set_action == 1) HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_SET);
-				}
-				break;
-			default:
-				check_state = 0;
-				break;
-			}
-		}
-	}
   }
   /* USER CODE END 3 */
 }
@@ -311,12 +333,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	// Handle USART3 reception callback
 	if(huart->Instance == USART3)
 	{
-		// Save character to reception buffer
-		rx_buffer[rx_empty] = character;
-
-		// Increase empty index
-		increase_rx_empty();
-
 		// Await next character
 		HAL_UART_Receive_IT(&huart3, &character, 1);
 	}
