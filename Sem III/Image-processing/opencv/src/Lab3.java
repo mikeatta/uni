@@ -79,6 +79,7 @@ public class Lab3 {
         makeJFrame(buf);
     }
 
+    // Exc 4 - Read min / max pixel values & normalize the image
     public void normalizeImage() throws IOException {
         // Create image path
         String normalizationImgPath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/normalizacja.png";
@@ -108,6 +109,7 @@ public class Lab3 {
         System.out.println("Image successfully written\n");
     }
 
+    // Exc 5 - Extract color channels from the image & save results on drive
     public void splitColorChannels() {
         // Define image path
         String channelImagePath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/shapes.png";
