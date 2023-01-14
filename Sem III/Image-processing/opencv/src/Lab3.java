@@ -14,6 +14,7 @@ public class Lab3 {
 
     // Image path
     String imgPath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/IMG_2116.jpg";
+    String imgWritePath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/processed-imgs/";
 
     // Load image from path, add reading color.
     Mat src = Imgcodecs.imread(imgPath, Imgcodecs.IMREAD_COLOR);
@@ -105,6 +106,27 @@ public class Lab3 {
         // Write the image
         Imgcodecs.imwrite(normalizationImgWritePath, mat);
         System.out.println("Image successfully written\n");
+    }
+
+    public void splitColorChannels() {
+        // Define image path
+        String channelImagePath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/shapes.png";
+
+        // Create image matrices
+        Mat channelImgMat = Imgcodecs.imread(channelImagePath);
+        Mat dest = new Mat(channelImgMat.cols(), channelImgMat.rows(), channelImgMat.type());
+
+        // Extract blue channel
+        Core.extractChannel(channelImgMat, dest, 0);
+        Imgcodecs.imwrite(imgWritePath + "channel-blue.jpg", dest);
+
+        // Extract green channel
+        Core.extractChannel(channelImgMat, dest, 1);
+        Imgcodecs.imwrite(imgWritePath + "channel-green.jpg", dest);
+
+        // Extract blue channel
+        Core.extractChannel(channelImgMat, dest, 2);
+        Imgcodecs.imwrite(imgWritePath + "channel-red.jpg", dest);
     }
 
 }

@@ -34,7 +34,8 @@ public class Main {
 //        lab3.changeImageContrast(2); // Exc 1 - Change contrast of the image
 //        lab3.changeImageBrightness(128); // Exc 2 - Change brightness of the image
 //        lab3.overlayImages(); // Exc 3 - Overlay two images
-        lab3.normalizeImage();
+//        lab3.normalizeImage();
+        lab3.splitColorChannels();
     }
 
 }
