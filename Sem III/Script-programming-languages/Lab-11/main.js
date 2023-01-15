@@ -16,12 +16,12 @@ let replacedWordString = string.replace("najlepszej", "pierwszej");
 console.log(`Altered string : ${replacedWordString}\n`);
 
 // Exc 3 - Split string into words & display words backwards
-console.log("Exc 3 - Split string & display backwards in alert pop-up\n...")
+console.log("Exc 3 - Split string & display it backwards in alert pop-up");
 
 string = "Turków. przez Podolskiego Kamieńca przejęcie i Oblężenie";
 
 // Split the string using &nbsp as separator
-splitString = string.split(" ").reverse();
+let splitString = string.split(" ").reverse();
 
 let alertString = "";
 for (i=0; i<splitString.length; i++) {
@@ -33,7 +33,7 @@ console.log(`Reverse string content : ${alertString}\n`);
 
 // --- Browser code ---
 
-// // Exc 1 - Create an alert pop-up on the webpage
+// Exc 1 - Create an alert pop-up on the webpage
 let popUpDialog = "Hello world";
 alert(popUpDialog);
 
