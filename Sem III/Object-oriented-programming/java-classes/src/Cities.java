@@ -1,4 +1,6 @@
 public abstract class Cities {
+    String cityName;
+
     public static void cityName(String cityDetails) {
         System.out.println(cityDetails);
     }
