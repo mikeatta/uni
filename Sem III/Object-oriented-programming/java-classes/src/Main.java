@@ -34,10 +34,6 @@ class Ford implements Vehicles {
         System.out.println("Ford");
     }
 
-    public void engineType() {
-        System.out.println("Engine type: combustion");
-    }
-
     public void drive() {
         System.out.println("Ford drives away...");
     }
@@ -46,10 +42,6 @@ class Ford implements Vehicles {
 class Tesla implements Vehicles {
     public void vehicleMake() {
         System.out.println("Tesla");
-    }
-
-    public void engineType() {
-        System.out.println("Engine type: electric");
     }
 
     public void drive() {
@@ -85,16 +77,19 @@ public class Main {
 
         new CityDetails().showInfo(city, cityDetails);
 
+        // Upcast vehicles
+        Vehicles ford = new Ford();
+        Vehicles tesla = new Tesla();
+
         // Interfaces
         System.out.println("\nInterfaces:\n");
-        Ford ford = new Ford();
-        Tesla tesla = new Tesla();
 
         ford.vehicleMake();
-        ford.engineType();
+        ford.engineType("combustion");
         ford.drive();
+
         tesla.vehicleMake();
-        tesla.engineType();
+        tesla.engineType("electric");
         tesla.drive();
     }
 }
