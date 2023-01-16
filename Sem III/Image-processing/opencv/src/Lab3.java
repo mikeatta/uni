@@ -9,12 +9,12 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.Buffer;
 
 public class Lab3 {
 
     // Image path
     String imgPath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/IMG_2116.jpg";
+    String imgWritePath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/processed-imgs/";
 
     // Load image from path, add reading color.
     Mat src = Imgcodecs.imread(imgPath, Imgcodecs.IMREAD_COLOR);
@@ -77,6 +77,58 @@ public class Lab3 {
         // Display results
         BufferedImage buf = createImage(dest);
         makeJFrame(buf);
+    }
+
+    // Exc 4 - Read min / max pixel values & normalize the image
+    public void normalizeImage() throws IOException {
+        // Create image path
+        String normalizationImgPath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/normalizacja.png";
+        String normalizationImgWritePath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/processed-imgs/normalizacja-out.png";
+
+        // Create image matrices
+        Mat mat = Imgcodecs.imread(normalizationImgPath, Imgcodecs.IMREAD_GRAYSCALE);
+
+        // Create minMaxResult object
+        Core.MinMaxLocResult mmr = Core.minMaxLoc(mat);
+
+        // Get initial min & max values
+        System.out.println("Min val : " + mmr.minVal + " @ point : " + mmr.minLoc);
+        System.out.println("Max val : " + mmr.maxVal + " @ point : " + mmr.maxLoc + "\n");
+
+        // Perform image normalization
+        Core.normalize(mat, mat, 0, 255, Core.NORM_MINMAX);
+
+        // Get post-normalization mix & max values
+        mmr = Core.minMaxLoc(mat);
+
+        System.out.println("New min : " + mmr.minVal + " @ point : " +mmr.minLoc);
+        System.out.println("New min : " + mmr.maxVal + " @ point : " +mmr.maxLoc + "\n");
+
+        // Write the image
+        Imgcodecs.imwrite(normalizationImgWritePath, mat);
+        System.out.println("Image successfully written\n");
+    }
+
+    // Exc 5 - Extract color channels from the image & save results on drive
+    public void splitColorChannels() {
+        // Define image path
+        String channelImagePath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/shapes.png";
+
+        // Create image matrices
+        Mat channelImgMat = Imgcodecs.imread(channelImagePath);
+        Mat dest = new Mat(channelImgMat.cols(), channelImgMat.rows(), channelImgMat.type());
+
+        // Extract blue channel
+        Core.extractChannel(channelImgMat, dest, 0);
+        Imgcodecs.imwrite(imgWritePath + "channel-blue.jpg", dest);
+
+        // Extract green channel
+        Core.extractChannel(channelImgMat, dest, 1);
+        Imgcodecs.imwrite(imgWritePath + "channel-green.jpg", dest);
+
+        // Extract blue channel
+        Core.extractChannel(channelImgMat, dest, 2);
+        Imgcodecs.imwrite(imgWritePath + "channel-red.jpg", dest);
     }
 
 }
