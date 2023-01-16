@@ -2,6 +2,7 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -131,4 +132,16 @@ public class Lab3 {
         Imgcodecs.imwrite(imgWritePath + "channel-red.jpg", dest);
     }
 
+    // Exc 6 - Read image with HSV color space
+    public void readImageAsHSV() throws IOException {
+        // Create dest HSV color space matrix
+        dest = new Mat();
+
+        // Change color space to HSV
+        Imgproc.cvtColor(src, dest, Imgproc.COLOR_RGB2HSV);
+
+        // Display the image
+        BufferedImage buf = createImage(dest);
+        makeJFrame(buf);
+    }
 }

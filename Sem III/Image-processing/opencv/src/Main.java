@@ -35,7 +35,8 @@ public class Main {
 //        lab3.changeImageBrightness(128); // Exc 2 - Change brightness of the image
 //        lab3.overlayImages(); // Exc 3 - Overlay two images
 //        lab3.normalizeImage();
-        lab3.splitColorChannels();
+//        lab3.splitColorChannels();
+        lab3.readImageAsHSV();
     }
 
 }
