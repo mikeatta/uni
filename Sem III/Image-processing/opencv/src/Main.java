@@ -36,7 +36,8 @@ public class Main {
 //        lab3.overlayImages(); // Exc 3 - Overlay two images
 //        lab3.normalizeImage();
 //        lab3.splitColorChannels();
-        lab3.readImageAsHSV();
+//        lab3.readImageAsHSV();
+        lab3.applyThresholding();
     }
 
 }
