@@ -44,9 +44,9 @@ public class Lab3 {
     }
 
     // Exc 1 - Change image contrast
-    public void changeImageContrast(int setAlpha) throws IOException {
+    public void changeImageContrast(float setAlpha) throws IOException {
         // Alter image alpha to change the contrast
-        src.convertTo(dest, -1, 2, 0);
+        src.convertTo(dest, -1, setAlpha, 0);
 
         // Display processed image
         BufferedImage buf = createImage(dest);
