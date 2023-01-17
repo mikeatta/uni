@@ -37,7 +37,8 @@ public class Main {
 //        lab3.normalizeImage();
 //        lab3.splitColorChannels();
 //        lab3.readImageAsHSV();
-        lab3.applyThresholding();
+//        lab3.applyThresholding();
+        lab3.matrixOperations();
     }
 
 }

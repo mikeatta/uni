@@ -147,7 +147,7 @@ public class Lab3 {
     }
 
     // Exc 7 - Apply different methods of thresholding to the image
-    public void applyThresholding() throws IOException {
+    public void applyThresholding() {
         // Create dest image matrices
         Mat method1 = new Mat();
         Mat method2 = new Mat();
@@ -171,5 +171,47 @@ public class Lab3 {
         methods.forEach((method) -> {
             Imgcodecs.imwrite(imgWritePath + method + ".jpg", method);
         });
+    }
+
+    // Exc 8 - Perform operations on matrices
+    public void matrixOperations() {
+        // Create 2nd matrix image
+        String newSrcPath = "/home/zorin/Documents/git/uni/Sem III/Image-processing/img/overlay.jpg";
+        Mat newSrc = Imgcodecs.imread(newSrcPath);
+
+        // Create matrices for storing results
+        Mat addition = new Mat();
+        Mat subtraction = new Mat();
+        Mat subtraction2 = new Mat();
+        Mat multiplication = new Mat();
+        Mat division = new Mat();
+        Mat division2 = new Mat();
+
+        // Perform matrix operations
+        // Addition: A + B
+        Core.add(src, newSrc, addition);
+
+        // Subtraction: A - B and B - A
+        Core.subtract(src, newSrc, subtraction);
+        Core.subtract(newSrc, src, subtraction2);
+
+        // Multiplication: A * B
+        Core.multiply(src, newSrc, multiplication);
+
+        // Division: A / B and B / A
+        Core.divide(src, newSrc, division);
+        Core.divide(newSrc, src, division2);
+
+        // Save results on drive
+        ArrayList<Mat> results = new ArrayList<>();
+
+        results.add(addition);
+        results.add(subtraction);
+        results.add(subtraction2);
+        results.add(multiplication);
+        results.add(division);
+        results.add(division2);
+
+        results.forEach((matrix) -> Imgcodecs.imwrite(imgWritePath + matrix + ".jpg", matrix));
     }
 }
