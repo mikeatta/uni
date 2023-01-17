@@ -30,7 +30,7 @@ public class Main {
 //        lab2.shrinkImage(0.5f, 0.25f); // Exc 6 - Compare methods of shrinking the image
 
         // Lab 3
-        Lab3 lab3 = new Lab3();
+//        Lab3 lab3 = new Lab3();
 //        lab3.changeImageContrast(2); // Exc 1 - Change contrast of the image
 //        lab3.changeImageBrightness(128); // Exc 2 - Change brightness of the image
 //        lab3.overlayImages(); // Exc 3 - Overlay two images
@@ -39,6 +39,10 @@ public class Main {
 //        lab3.readImageAsHSV();
 //        lab3.applyThresholding();
 //        lab3.matrixOperations();
+//        lab3.createHistogram();
+
+        // Lab 7
+        Lab7 lab7 = new Lab7();
     }
 
 }
