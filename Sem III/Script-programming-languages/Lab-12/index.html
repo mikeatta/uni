@@ -5,13 +5,32 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        .exc3-div {
+            margin: 15px 15px;
+            padding: 6px 6px;
+            border: solid 3px;
+            border-color: hsl(240, 100%, 50%);
+        }
+    </style>
 </head>
 <body>
+    <!-- Exc 1 - Test code functionality -->
     <form name='formularz'>
         <input type='text' name='tekst' id="textfield" onkeyup="validateText()">
         <label id="valLabel"></label>
         <input type="checkbox" name="zaznacz" onclick="validateCheckBox()"/>
     </form>
+
+    <!-- Exc 3 - Create button actions -->
+    <div id="action-div" class="exc3-div">
+        <p id="action-paragraph">Change my color.</p>
+        <form name="exc3-form">
+            <button id="action-button">Action button</button>
+        </form>
+    </div>
+
+    <!-- Script file -->
     <script src="./main.js"></script>
 </body>
 </html>
