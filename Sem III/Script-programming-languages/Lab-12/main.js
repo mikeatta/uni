@@ -41,3 +41,13 @@ document.getElementById("action-button").addEventListener("mouseleave", () => {
     paragraphSelector.style.backgroundColor = "hsl(0, 100%, 100%)";
     paragraphSelector.style.color = "hsl(0, 0%, 0%)";
 })
+
+// Button down event
+document.getElementById("action-button").addEventListener("mousedown", () => {
+    paragraphSelector.style.color = "hsl(60, 100%, 61%)";
+});
+
+// Button up event
+document.getElementById("action-button").addEventListener("mouseup", () => {
+    paragraphSelector.style.color = "hsl(0, 100%, 100%)";
+});
