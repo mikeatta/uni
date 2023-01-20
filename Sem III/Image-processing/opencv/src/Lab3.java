@@ -1,6 +1,4 @@
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
+import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -11,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Lab3 {
 
@@ -214,4 +213,57 @@ public class Lab3 {
 
         results.forEach((matrix) -> Imgcodecs.imwrite(imgWritePath + matrix + ".jpg", matrix));
     }
+
+    // Exc 9 - Create an image histogram
+    public void createHistogram() throws IOException {
+        // Create array list of background planes
+        List<Mat> bgrPlanes = new ArrayList<>();
+        Core.split(src, bgrPlanes);
+
+        // Configure the histogram
+        int histSize = 256;
+
+        float[] range = {0, 256};
+        MatOfFloat histRange = new MatOfFloat(range);
+
+        boolean accumulate = false;
+
+        // Calculate histograms
+        Mat bHist = new Mat(), gHist = new Mat(), rHist = new Mat();
+        Imgproc.calcHist(bgrPlanes, new MatOfInt(0), new Mat(), bHist, new MatOfInt(histSize), histRange, accumulate);
+        Imgproc.calcHist(bgrPlanes, new MatOfInt(1), new Mat(), gHist, new MatOfInt(histSize), histRange, accumulate);
+        Imgproc.calcHist(bgrPlanes, new MatOfInt(2), new Mat(), rHist, new MatOfInt(histSize), histRange, accumulate);
+
+        // Create an image for the histogram
+        int histWidth = 512, histHeight = 400;
+        int binWidth = (int) Math.round((double) histWidth / histSize);
+
+        Mat histImage = new Mat(histHeight, histWidth, CvType.CV_8UC3, new Scalar(0, 0, 0));
+
+        // Normalize the histogram
+        Core.normalize(bHist, bHist, 0, histImage.rows(), Core.NORM_MINMAX);
+        Core.normalize(gHist, gHist, 0, histImage.rows(), Core.NORM_MINMAX);
+        Core.normalize(rHist, rHist, 0, histImage.rows(), Core.NORM_MINMAX);
+
+        float[] bHistData = new float[(int) bHist.total() * bHist.channels()];
+        bHist.get(0, 0, bHistData);
+        float[] gHistData = new float[(int) gHist.total() * gHist.channels()];
+        gHist.get(0, 0, gHistData);
+        float[] rHistData = new float[(int) rHist.total() * rHist.channels()];
+        rHist.get(0, 0, rHistData);
+
+        for (int i=1; i<histSize; i++) {
+            Imgproc.line(histImage, new Point(binWidth * (i - 1), histHeight - Math.round(bHistData[i - 1])),
+                    new Point(binWidth * (i), histHeight - Math.round(bHistData[i])), new Scalar(255, 0, 0), 1);
+            Imgproc.line(histImage, new Point(binWidth * (i - 1), histHeight - Math.round(gHistData[i - 1])),
+                    new Point(binWidth * (i), histHeight - Math.round(gHistData[i])), new Scalar(0, 255, 0), 1);
+            Imgproc.line(histImage, new Point(binWidth * (i -1), histHeight - Math.round(rHistData[i - 1])),
+                    new Point(binWidth * (i), histHeight - Math.round(rHistData[i])), new Scalar(0, 0, 255), 1);
+        }
+
+        // Display results
+        BufferedImage buf = createImage(histImage);
+        makeJFrame(buf);
+    }
+
 }
