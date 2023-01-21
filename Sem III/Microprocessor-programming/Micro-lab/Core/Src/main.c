@@ -55,6 +55,9 @@ __IO uint8_t rx_busy = 0;
 uint8_t message[BUFFER_LENGTH];
 __IO uint8_t message_idx = 0;
 __IO uint8_t message_length = 0;
+
+// --- Frame content ---
+__IO uint8_t frame_state = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -152,6 +155,16 @@ uint16_t get_message(uint8_t *array)
 	}
 	return 0;
 }
+
+void turn_on_led()
+{
+	HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_SET);
+}
+
+void turn_off_led()
+{
+	HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -203,17 +216,75 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uint8_t led_action;
+
   while (1)
   {
-	// Store character in reception buffer
-	rx_buffer[rx_empty] = character;
-
-	// Increase empty index
-	increase_rx_empty();
-
 	if (character == '\n' || character == '\r')
 	{
 		message_length = get_message(message);
+	}
+
+	if (message_length > 0)
+	{
+		for (uint8_t i=0; i<message_length; i++)
+		{
+			/* Find command start */
+			if (message[i] == 'L')
+			{
+				i++;
+				frame_state = 1;
+			} /* if character is 'L' */
+			if (message[i] == 'I')
+			{
+				i++;
+				frame_state = 1;
+			} /* if character is 'I' */
+
+			switch (frame_state)
+			{
+				case 1:
+					if (message[i] == 'E' && message[i+1] == 'D')
+					{
+						i = i+1;
+						frame_state = 2;
+					} /* if 'LED' sequence found */
+					else frame_state = 0;
+					break;
+
+				case 2:
+					if (message[i] == '[' && message[i+1] == 'O' && message[i+2] == 'N')
+					{
+						i = i+2;
+						led_action = 1;
+						frame_state = 3;
+					} /* if command 'ON' found */
+					else if (message[i] == '[' && message[i+1] == 'O' && message[i+2] == 'F' && message[i+3] == 'F')
+					{
+						i = i+3;
+						led_action = 0;
+						frame_state = 3;
+					}
+					else frame_state = 0;
+					break;
+
+				case 3:
+					if (message[i] == ']' && led_action == 0)
+					{
+						frame_state = 0;
+						turn_off_led();
+					} /* toggle LED ON */
+					else if (message[i] == ']' && led_action == 1)
+					{
+						frame_state = 0;
+						turn_on_led();
+					} /* toggle LED OFF */
+					else frame_state = 0;
+					break;
+
+				default: break;
+			}
+		}
 	}
     /* USER CODE END WHILE */
 
@@ -333,6 +404,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	// Handle USART3 reception callback
 	if(huart->Instance == USART3)
 	{
+		// Store character in reception buffer
+		rx_buffer[rx_empty] = character;
+
+		// Increase empty index
+		increase_rx_empty();
+
 		// Await next character
 		HAL_UART_Receive_IT(&huart3, &character, 1);
 	}
