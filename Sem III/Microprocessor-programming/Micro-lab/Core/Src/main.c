@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stdio.h"
+#include "math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,6 +59,11 @@ __IO uint8_t message_length = 0;
 
 // --- Frame content ---
 __IO uint8_t frame_state = 0;
+
+// --- Blink delay ---
+__IO uint8_t blink_delay;
+__IO uint8_t delay;
+__IO uint16_t blink_ms;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -165,6 +171,15 @@ void turn_off_led()
 {
 	HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
 }
+
+uint16_t led_delay(uint8_t blink_hz)
+{
+	float delay_f = 1000.0;
+	delay_f = delay_f / blink_hz;
+	delay_f = ceil(delay_f);
+	uint16_t delay = (uint16_t)delay_f;
+	return delay;
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -216,10 +231,21 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint8_t led_action;
+  __IO uint8_t led_action;
+
+  /* Command templates */
+  uint8_t blink_cmd[5] = "BLINK";
+  __IO uint8_t blink_active;
 
   while (1)
   {
+	if (blink_active == 1)
+	{
+		HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
+		HAL_Delay(blink_ms);
+
+	} /* Blink LED */
+
 	if (character == '\n' || character == '\r')
 	{
 		message_length = get_message(message);
@@ -258,31 +284,65 @@ int main(void)
 						i = i+2;
 						led_action = 1;
 						frame_state = 3;
-					} /* if command 'ON' found */
+					} /* if 'ON' sequence found */
 					else if (message[i] == '[' && message[i+1] == 'O' && message[i+2] == 'F' && message[i+3] == 'F')
 					{
 						i = i+3;
 						led_action = 0;
 						frame_state = 3;
-					}
+					} /* if command 'OFF' found */
+					else if (message[i] == '[' && message[i+1] == 'B')
+					{
+						i++;
+						for (uint8_t i=0; i<5; i++)
+						{
+							if (message[i] != blink_cmd[i])
+							{
+								frame_state = 0;
+								break;
+							} /* check for 'BLINK' sequence */
+						}
+
+						i = i+5;
+						if (message[i] == ',' && (message[i+1] >= 0x30 && message[i+1] <= 0x39))
+						{
+							/* Get blink delay */
+							i = i+1;
+							led_action = 2;
+							frame_state = 3;
+						} /* if ',' found and char between '0' and '9' */
+					} /* if command 'BLINK' found */
 					else frame_state = 0;
 					break;
 
 				case 3:
 					if (message[i] == ']' && led_action == 0)
 					{
+						blink_active = 0;
 						frame_state = 0;
 						turn_off_led();
 					} /* toggle LED ON */
 					else if (message[i] == ']' && led_action == 1)
 					{
+						blink_active = 0;
 						frame_state = 0;
 						turn_on_led();
 					} /* toggle LED OFF */
+					else if (message[i] == ']' && led_action == 2)
+					{
+						blink_delay = message[i-1];
+						delay = blink_delay - '0';
+						blink_ms = led_delay(delay);
+						/* convert char to int */
+						blink_active = 1;
+						frame_state = 0;
+					} /* blink LED */
 					else frame_state = 0;
 					break;
 
-				default: break;
+				default:
+					frame_state = 0;
+					break;
 			}
 		}
 	}
