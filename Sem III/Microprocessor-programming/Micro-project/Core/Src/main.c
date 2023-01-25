@@ -123,6 +123,17 @@ void increase_rx_busy()
 	}
 }
 
+// Check for frame start and frame end characters
+uint8_t char_is_frame_start_end(char c)
+{
+	if (c == '#' || c == ';')
+	{
+		uart_print('*');
+		return 1;
+	}
+	else return 0;
+}
+
 // Get single character from the reception buffer
 uint8_t get_char()
 {
@@ -170,15 +181,21 @@ uint16_t get_message(uint8_t *array)
 }
 
 // Analyze frame content
-uint16_t analyze_frame(uint8_t *message)
+uint8_t analyze_frame(uint8_t *message)
 {
-	/* Store last analyzed char position
-	Set index to 1 to skip starting char */
-	uint16_t collection_index = 1;
+	// Store last analyzed char position
+	uint16_t collection_index = 0;
+
+	// Get frame start char ( '#' )
+	while (message[collection_index] == '#')
+		collection_index++;
 
 	// Get sender
 	for (uint8_t i=0; i<3; i++)
 	{
+		if (char_is_frame_start_end(message[collection_index]) == 1)
+			return 0;
+
 		sender[i] = message[collection_index];
 		collection_index++;
 	}
@@ -186,6 +203,9 @@ uint16_t analyze_frame(uint8_t *message)
 	// Get receiver
 	for (uint8_t i=0; i<3; i++)
 	{
+		if (char_is_frame_start_end(message[collection_index]) == 1)
+			return 0;
+
 		receiver[i] = message[collection_index];
 		collection_index++;
 	}
@@ -193,18 +213,23 @@ uint16_t analyze_frame(uint8_t *message)
 	// Get command length
 	for (uint8_t i=0; i<3; i++)
 	{
+		if (char_is_frame_start_end(message[collection_index]) == 1)
+			return 0;
+
 		command_chars[i] = message[collection_index];
 		collection_index++;
 	}
 
-	// Return command length
+	// Get data field length as integer value
 	// Use length to get characters from 'data' array in next step
-//	command_length = strtol(command_chars, &str_ptr, 10);
 	command_length = atoi(command_chars);
 
 	// Get data
 	for (uint16_t i=0; i<command_length; i++)
 	{
+		if (char_is_frame_start_end(message[collection_index]) == 1)
+			return 0;
+
 		data[i] = message[collection_index];
 		collection_index++;
 	}
@@ -212,10 +237,18 @@ uint16_t analyze_frame(uint8_t *message)
 	// Get checksum
 	for (uint8_t i=0; i<3; i++)
 	{
+		if (char_is_frame_start_end(message[collection_index]) == 1)
+			return 0;
+
 		checksum[i] = message[collection_index];
 		collection_index++;
 	}
-	return 0;
+
+	// Get frame end char ( ';' )
+	if (message[collection_index] == ';')
+		return 1;
+	// Otherwise return 0
+	else return 0;
 }
 /* USER CODE END 0 */
 
@@ -258,10 +291,18 @@ int main(void)
   {
 	  // Retrieve the message
 	  if (char_is_endmessage(character))
-	  {
 		  message_length = get_message(message);
-		  analyze_frame(message);
+
+	  // Analyze frame if message had any content
+	  if (message_length > 0 && analyze_frame(message) == 1)
+	  {
+		  // Print received message
+		  for (uint16_t i=0; i<command_length; i++)
+			  uart_print(data[i]);
+		  uart_print('\n');
+		  uart_print('\r');
 	  }
+
 
     /* USER CODE END WHILE */
 
