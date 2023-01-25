@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stdio.h"
+#include "stdlib.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -31,9 +32,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
-// Length == 300 + 10% margin
+#define MAX_FRAME_LENGTH 526
+// Length == MAX_FRAME_LENGTH + 10% margin
 #define BUFFER_LENGTH 30
+/* BUFFER LENGTH FOR DEBUGGING */
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -56,11 +58,10 @@ __IO uint16_t message_idx;
 // --- Frame content ---
 uint8_t sender[3];
 uint8_t receiver[3];
-uint8_t command_length[3];
+char command_chars[3];
+uint16_t command_length;
 uint8_t data[512];
 uint8_t checksum[3];
-
-uint8_t led_state = 1;
 
 // --- Reception Buffer ---
 uint8_t rx_buffer[BUFFER_LENGTH];
@@ -122,7 +123,7 @@ void increase_rx_busy()
 	}
 }
 
-// Get character from the reception buffer
+// Get single character from the reception buffer
 uint8_t get_char()
 {
 	uint8_t tmp;
@@ -168,46 +169,48 @@ uint16_t get_message(uint8_t *array)
 	return 0;
 }
 
-// Collect & validate frame content
-uint16_t get_frame(uint8_t *message)
+// Analyze frame content
+uint16_t analyze_frame(uint8_t *message)
 {
-	uint8_t frame[BUFFER_LENGTH];
-	// Store last analyzed char position
-	// Set index to 1 to skip starting char
+	/* Store last analyzed char position
+	Set index to 1 to skip starting char */
 	uint16_t collection_index = 1;
 
 	// Get sender
-	for (uint8_t i=0; i<sizeof(sender); i++)
+	for (uint8_t i=0; i<3; i++)
 	{
 		sender[i] = message[collection_index];
 		collection_index++;
 	}
 
 	// Get receiver
-	for (uint8_t i=0; i<sizeof(receiver); i++)
+	for (uint8_t i=0; i<3; i++)
 	{
 		receiver[i] = message[collection_index];
 		collection_index++;
 	}
 
 	// Get command length
-	for (uint8_t i=0; i<sizeof(command_length); i++)
+	for (uint8_t i=0; i<3; i++)
 	{
-		command_length[i] = message[collection_index];
+		command_chars[i] = message[collection_index];
 		collection_index++;
 	}
+
 	// Return command length
 	// Use length to get characters from 'data' array in next step
+//	command_length = strtol(command_chars, &str_ptr, 10);
+	command_length = atoi(command_chars);
 
 	// Get data
-	for (uint16_t i=0; i<sizeof(command_length); i++)
+	for (uint16_t i=0; i<command_length; i++)
 	{
 		data[i] = message[collection_index];
 		collection_index++;
 	}
 
 	// Get checksum
-	for (uint8_t i=0; i<sizeof(checksum); i++)
+	for (uint8_t i=0; i<3; i++)
 	{
 		checksum[i] = message[collection_index];
 		collection_index++;
@@ -257,9 +260,8 @@ int main(void)
 	  if (char_is_endmessage(character))
 	  {
 		  message_length = get_message(message);
-		  get_frame(message);
+		  analyze_frame(message);
 	  }
-
 
     /* USER CODE END WHILE */
 
