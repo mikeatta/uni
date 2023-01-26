@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "stdlib.h"
 #include "stdio.h"
 #include "math.h"
 /* USER CODE END Includes */
@@ -59,11 +60,18 @@ __IO uint8_t message_length = 0;
 
 // --- Frame content ---
 __IO uint8_t frame_state = 0;
+__IO uint8_t led_action;
 
-// --- Blink delay ---
+// --- Blink function ---
+__IO uint8_t blink_active;
 __IO uint8_t blink_delay;
 __IO uint8_t delay;
 __IO uint16_t blink_ms;
+
+// --- Delay function ---
+__IO uint8_t delay_active;
+uint16_t loop_delay;
+char temp[4];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -75,9 +83,8 @@ static void MX_USART3_UART_Init(void);
 // Print character to terminal
 void uart_print(unsigned char x)
 {
-
-USART3->TDR =(x);
-while(!((USART3->ISR)&USART_ISR_TC)){;}
+	USART3->TDR =(x);
+	while(!((USART3->ISR)&USART_ISR_TC)){;}
 }
 
 uint8_t char_is_endmessage(char c)
@@ -116,7 +123,7 @@ void increase_rx_busy()
 	}
 }
 
-// Get character from the reception buffer
+// Get single character from the reception buffer
 uint8_t get_char()
 {
 	uint8_t tmp;
@@ -231,21 +238,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  __IO uint8_t led_action;
-
   /* Command templates */
-  uint8_t blink_cmd[5] = "BLINK";
-  __IO uint8_t blink_active;
+  uint8_t blink_cmd[6] = "BLINK,";
+  uint8_t delay_cmd[6] = "DELAY,";
 
   while (1)
   {
-	if (blink_active == 1)
-	{
-		HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
-		HAL_Delay(blink_ms);
-
-	} /* Blink LED */
-
 	if (character == '\n' || character == '\r')
 	{
 		message_length = get_message(message);
@@ -275,6 +273,11 @@ int main(void)
 						i = i+1;
 						frame_state = 2;
 					} /* if 'LED' sequence found */
+					else if (message[i] == 'N' && message[i+1] == 'S' && message[i+2] == 'E' && message[i+3] == 'R' && message[i+4] == 'T')
+					{
+						i = i+4;
+						frame_state = 2;
+					} /* if 'INSERT' sequence found */
 					else frame_state = 0;
 					break;
 
@@ -294,7 +297,7 @@ int main(void)
 					else if (message[i] == '[' && message[i+1] == 'B')
 					{
 						i++;
-						for (uint8_t i=0; i<5; i++)
+						for (uint8_t i=0; i<6; i++)
 						{
 							if (message[i] != blink_cmd[i])
 							{
@@ -303,15 +306,41 @@ int main(void)
 							} /* check for 'BLINK' sequence */
 						}
 
-						i = i+5;
-						if (message[i] == ',' && (message[i+1] >= 0x30 && message[i+1] <= 0x39))
+						i = i+6;
+						if (message[i] >= 0x30 && message[i] <= 0x39)
 						{
 							/* Get blink delay */
-							i = i+1;
+							blink_delay = message[i];
+							delay = blink_delay - '0';
+							blink_ms = led_delay(delay);
+							/* convert char to int */
 							led_action = 2;
 							frame_state = 3;
-						} /* if ',' found and char between '0' and '9' */
+						} /* if char is between '0' and '9' */
 					} /* if command 'BLINK' found */
+					else if (message[i] == '[' && message[i+1] == 'D')
+					{
+						i++;
+						for (uint8_t i=0; i<6; i++)
+						{
+							if (message[i] != delay_cmd[i])
+							{
+								frame_state = 0;
+								break;
+							} /* check for 'DELAY,' sequence */
+						}
+
+						i = i+6;
+						for (int y=0; y<4; y++)
+						{
+							if (message[i+y] >= 0x30 && message[i+y] <= 0x39)
+							{
+								temp[y] = message[i+y];
+							}
+						} /* store 4 chars as delay value */
+
+						loop_delay = atoi(temp);
+					} /* if command 'DELAY' found */
 					else frame_state = 0;
 					break;
 
@@ -330,10 +359,6 @@ int main(void)
 					} /* toggle LED OFF */
 					else if (message[i] == ']' && led_action == 2)
 					{
-						blink_delay = message[i-1];
-						delay = blink_delay - '0';
-						blink_ms = led_delay(delay);
-						/* convert char to int */
 						blink_active = 1;
 						frame_state = 0;
 					} /* blink LED */
@@ -349,6 +374,14 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	if (blink_active == 1)
+	{
+		HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
+		HAL_Delay(blink_ms);
+	} /* Blink LED */
+
+	HAL_Delay(loop_delay);
+	/* Set while loop delay */
   }
   /* USER CODE END 3 */
 }
