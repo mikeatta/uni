@@ -59,7 +59,7 @@ __IO uint8_t message_idx = 0;
 __IO uint8_t message_length = 0;
 
 // --- Frame content ---
-__IO uint8_t frame_state = 0;
+__IO uint8_t frame_state;
 __IO uint8_t led_action;
 
 // --- Blink function ---
@@ -242,6 +242,8 @@ int main(void)
   uint8_t blink_cmd[6] = "BLINK,";
   uint8_t delay_cmd[6] = "DELAY,";
 
+  uint8_t error_message[] = "Error: Command not found\r\n";
+
   while (1)
   {
 	if (character == '\n' || character == '\r')
@@ -259,11 +261,23 @@ int main(void)
 				i++;
 				frame_state = 1;
 			} /* if character is 'L' */
-			if (message[i] == 'I')
+			else if (message[i] == 'I')
 			{
 				i++;
 				frame_state = 1;
 			} /* if character is 'I' */
+			else if (message[i] == ';')
+			{
+				i++;
+				frame_state = 1;
+			} /* if character is ';' */
+			else
+			{
+				for (uint8_t i=0; i<(sizeof(error_message)-2); i++)
+				{
+					uart_print(error_message[i]);
+				}
+			} /* send error message to terminal */
 
 			switch (frame_state)
 			{
@@ -278,7 +292,6 @@ int main(void)
 						i = i+4;
 						frame_state = 2;
 					} /* if 'INSERT' sequence found */
-					else frame_state = 0;
 					break;
 
 				case 2:
@@ -301,7 +314,6 @@ int main(void)
 						{
 							if (message[i] != blink_cmd[i])
 							{
-								frame_state = 0;
 								break;
 							} /* check for 'BLINK' sequence */
 						}
@@ -341,32 +353,23 @@ int main(void)
 
 						loop_delay = atoi(temp);
 					} /* if command 'DELAY' found */
-					else frame_state = 0;
 					break;
 
 				case 3:
-					if (message[i] == ']' && led_action == 0)
+					if ((message[i] == ']' && message[i+1] == ';') && led_action == 0)
 					{
 						blink_active = 0;
-						frame_state = 0;
 						turn_off_led();
 					} /* toggle LED ON */
-					else if (message[i] == ']' && led_action == 1)
+					else if ((message[i] == ']' && message[i+1] == ';') && led_action == 1)
 					{
 						blink_active = 0;
-						frame_state = 0;
 						turn_on_led();
 					} /* toggle LED OFF */
-					else if (message[i] == ']' && led_action == 2)
+					else if ((message[i] == ']' && message[i+1] == ';') && led_action == 2)
 					{
 						blink_active = 1;
-						frame_state = 0;
 					} /* blink LED */
-					else frame_state = 0;
-					break;
-
-				default:
-					frame_state = 0;
 					break;
 			}
 		}
