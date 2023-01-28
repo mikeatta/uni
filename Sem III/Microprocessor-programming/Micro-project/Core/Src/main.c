@@ -23,6 +23,8 @@
 /* USER CODE BEGIN Includes */
 #include "stdio.h"
 #include "stdlib.h"
+#include "stdarg.h"
+#include "string.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -70,6 +72,11 @@ uint16_t data_len;
 uint8_t rx_buffer[BUFFER_LENGTH];
 __IO uint16_t rx_empty = 0;
 __IO uint16_t rx_busy = 0;
+
+// --- Transmission Buffer ---
+uint8_t tx_buffer[BUFFER_LENGTH];
+__IO uint16_t tx_empty = 0;
+__IO uint16_t tx_busy = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -111,7 +118,7 @@ uint8_t rx_has_data()
 void increase_rx_empty()
 {
 	rx_empty++;
-	if(rx_empty>BUFFER_LENGTH)
+	if(rx_empty >= BUFFER_LENGTH)
 	{
 		rx_empty = 0;
 	}
@@ -120,9 +127,37 @@ void increase_rx_empty()
 void increase_rx_busy()
 {
 	rx_busy++;
-	if(rx_busy>BUFFER_LENGTH)
+	if(rx_busy >= BUFFER_LENGTH)
 	{
 		rx_busy = 0;
+	}
+}
+
+// --- Transmission ---
+uint8_t tx_has_data()
+{
+	if(tx_empty == tx_busy)
+	{
+		return 0;
+	}
+	else return 1;
+}
+
+void increase_tx_empty()
+{
+	tx_empty++;
+	if(rx_busy >= BUFFER_LENGTH)
+	{
+		tx_empty = 0;
+	}
+}
+
+void increase_tx_busy()
+{
+	tx_busy++;
+	if(tx_busy >= BUFFER_LENGTH)
+	{
+		tx_busy = 0;
 	}
 }
 
@@ -131,7 +166,6 @@ uint8_t char_is_frame_start_end(char c)
 {
 	if (c == '#' || c == ';')
 	{
-		uart_print('*');
 		return 1;
 	}
 	else return 0;
@@ -183,6 +217,45 @@ uint16_t get_message(uint8_t *array)
 	return 0;
 }
 
+// Send response from STM
+void return_message(char *message, ...)
+{
+	// Store STM return message
+	char response[BUFFER_LENGTH];
+	uint16_t idx;
+
+	va_list arglist;
+	va_start(arglist, message);
+	vsprintf(response, message, arglist);
+	va_end(arglist);
+
+	// Set index to the first empty space in transmission buffer
+	idx = tx_empty;
+
+	// Send response to the transmission buffer
+	for (uint16_t i=0; i<strlen(response); i++)
+	{
+		tx_buffer[idx] = response[i];
+		idx++;
+
+		if (idx >= BUFFER_LENGTH)
+			idx = 0;
+	}
+	__disable_irq();
+
+	// Check if there is no more data to transmit
+	if (tx_has_data() == 0 && (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_TXE) == SET))
+	{
+		tx_empty = idx;
+		HAL_UART_Transmit_IT(&huart3, &tx_buffer[tx_busy], 1);
+		increase_tx_busy();
+	}
+	else
+		tx_empty = idx;
+
+	__enable_irq();
+}
+
 // Analyze frame content
 uint8_t analyze_frame(uint8_t *message)
 {
@@ -196,8 +269,13 @@ uint8_t analyze_frame(uint8_t *message)
 	// Get sender
 	for (uint8_t i=0; i<3; i++)
 	{
-		if (char_is_frame_start_end(message[collection_index]) == 1)
+		if (char_is_frame_start_end(message[collection_index]) == 1 || message[collection_index] == ' ')
+		{
+			// Send [CHECKSENDER] message
+			char CHECKSENDER[] = "CHECKSENDER\r\n";
+			return_message(CHECKSENDER);
 			return 0;
+		}
 
 		sender[i] = message[collection_index];
 		collection_index++;
@@ -263,7 +341,7 @@ void execute_command(uint8_t *frame_command, uint16_t frame_command_length)
 	uint8_t frameempty[] = "FRMEMPTY\r\n";
 
 	// Check if command is too long
-	if (frame_command_length > 526)
+	if (frame_command_length > 512)
 	{
 		for (uint16_t i=0; i<(sizeof(frameoverflow)-2); i++)
 			uart_print(frameoverflow[i]);
@@ -481,6 +559,22 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 		// Continue data collection
 		HAL_UART_Receive_IT(huart, &character, 1);
+	}
+}
+
+// Transmission callback
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->Instance == USART3)
+	{
+		if(tx_has_data() == 1)
+		{
+			static uint8_t tmp;
+			tmp = tx_buffer[tx_busy];
+
+			increase_tx_busy();
+			HAL_UART_Transmit_IT(huart, &tmp, 1);
+		}
 	}
 }
 /* USER CODE END 4 */
