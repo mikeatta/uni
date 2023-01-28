@@ -63,6 +63,9 @@ uint16_t command_length;
 uint8_t data[512];
 uint8_t checksum[3];
 
+// --- Command variables ---
+uint16_t data_len;
+
 // --- Reception Buffer ---
 uint8_t rx_buffer[BUFFER_LENGTH];
 __IO uint16_t rx_empty = 0;
@@ -223,6 +226,8 @@ uint8_t analyze_frame(uint8_t *message)
 	// Get data field length as integer value
 	// Use length to get characters from 'data' array in next step
 	command_length = atoi(command_chars);
+	// Pass command length to the variable outside the function
+	data_len = command_length;
 
 	// Get data
 	for (uint16_t i=0; i<command_length; i++)
@@ -249,6 +254,28 @@ uint8_t analyze_frame(uint8_t *message)
 		return 1;
 	// Otherwise return 0
 	else return 0;
+}
+
+// Execute command
+void execute_command(uint8_t *frame_command, uint16_t frame_command_length)
+{
+	uint8_t frameoverflow[] = "FRMOVERFLOW\r\n";
+	uint8_t frameempty[] = "FRMEMPTY\r\n";
+
+	// Check if command is too long
+	if (frame_command_length > 526)
+	{
+		for (uint16_t i=0; i<(sizeof(frameoverflow)-2); i++)
+			uart_print(frameoverflow[i]);
+	}
+
+	// Check whether command field was filled
+	if (frame_command_length == 0)
+	{
+		// Return empty command message
+		for (uint16_t i=0; i<(sizeof(frameempty)-2); i++)
+			uart_print(frameempty[i]);
+	}
 }
 /* USER CODE END 0 */
 
@@ -301,6 +328,9 @@ int main(void)
 			  uart_print(data[i]);
 		  uart_print('\n');
 		  uart_print('\r');
+
+		  // Run sent command
+		  execute_command(data, data_len);
 	  }
 
 
