@@ -284,8 +284,13 @@ uint8_t analyze_frame(uint8_t *message)
 	// Get receiver
 	for (uint8_t i=0; i<3; i++)
 	{
-		if (char_is_frame_start_end(message[collection_index]) == 1)
+		if (char_is_frame_start_end(message[collection_index]) == 1 || message[collection_index] == ' ')
+		{
+			// Send [CHECKRECEIVER] message
+			char CHECKRECEIVER[] = "CHECKRECEIVER\r\n";
+			return_message(CHECKRECEIVER);
 			return 0;
+		}
 
 		receiver[i] = message[collection_index];
 		collection_index++;
@@ -294,8 +299,13 @@ uint8_t analyze_frame(uint8_t *message)
 	// Get command length
 	for (uint8_t i=0; i<3; i++)
 	{
-		if (char_is_frame_start_end(message[collection_index]) == 1)
+		if (!(message[collection_index] >= 0x30 && message[collection_index] <= 0x39))
+		{
+			// Send [CHECKLENGTH] message
+			char CHECKLENGTH[] = "CHECKLENGTH\r\n";
+			return_message(CHECKLENGTH);
 			return 0;
+		}
 
 		command_chars[i] = message[collection_index];
 		collection_index++;
@@ -311,7 +321,12 @@ uint8_t analyze_frame(uint8_t *message)
 	for (uint16_t i=0; i<command_length; i++)
 	{
 		if (char_is_frame_start_end(message[collection_index]) == 1)
+		{
+			// Send [CHECKDATA] message
+			char CHECKDATA[] = "CHECKDATA\r\n";
+			return_message(CHECKDATA);
 			return 0;
+		}
 
 		data[i] = message[collection_index];
 		collection_index++;
@@ -320,8 +335,13 @@ uint8_t analyze_frame(uint8_t *message)
 	// Get checksum
 	for (uint8_t i=0; i<3; i++)
 	{
-		if (char_is_frame_start_end(message[collection_index]) == 1)
+		if (!(message[collection_index] >= 0x30 && message[collection_index] <= 0x39))
+		{
+			// Send [CHECKCSUM] message
+			char CHECKCSUM[] = "CHECKCSUM\r\n";
+			return_message(CHECKCSUM);
 			return 0;
+		}
 
 		checksum[i] = message[collection_index];
 		collection_index++;
