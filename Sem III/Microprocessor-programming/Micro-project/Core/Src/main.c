@@ -34,8 +34,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MAX_FRAME_LENGTH 526
-// Length == MAX_FRAME_LENGTH + 10% margin
+// Set max length of data field in the frame
+#define MAX_DATA_LENGTH 512
 #define BUFFER_LENGTH 30
 /* BUFFER LENGTH FOR DEBUGGING */
 /* USER CODE END PD */
@@ -314,6 +314,23 @@ uint8_t analyze_frame(uint8_t *message)
 	// Get data field length as integer value
 	// Use length to get characters from 'data' array in next step
 	command_length = atoi(command_chars);
+
+	// Check declared message length
+	if (command_length == 0)
+	{
+		// Send [FRAMEEMPTY] message
+		char FRAMEEMPTY[] = "FRAMEEMPTY\r\n";
+		return_message(FRAMEEMPTY);
+		return 0;
+	}
+	else if (command_length > MAX_DATA_LENGTH)
+	{
+		// Send [DATAOVERFLOW] message
+		char DATAOVERFLOW[] = "DATAOVERFLOW\r\n";
+		return_message(DATAOVERFLOW);
+		return 0;
+	}
+
 	// Pass command length to the variable outside the function
 	data_len = command_length;
 
@@ -357,23 +374,23 @@ uint8_t analyze_frame(uint8_t *message)
 // Execute command
 void execute_command(uint8_t *frame_command, uint16_t frame_command_length)
 {
-	uint8_t frameoverflow[] = "FRMOVERFLOW\r\n";
-	uint8_t frameempty[] = "FRMEMPTY\r\n";
-
-	// Check if command is too long
-	if (frame_command_length > 512)
-	{
-		for (uint16_t i=0; i<(sizeof(frameoverflow)-2); i++)
-			uart_print(frameoverflow[i]);
-	}
-
-	// Check whether command field was filled
-	if (frame_command_length == 0)
-	{
-		// Return empty command message
-		for (uint16_t i=0; i<(sizeof(frameempty)-2); i++)
-			uart_print(frameempty[i]);
-	}
+//	uint8_t frameoverflow[] = "FRMOVERFLOW\r\n";
+//	uint8_t frameempty[] = "FRMEMPTY\r\n";
+//
+//	// Check if command is too long
+//	if (frame_command_length > 512)
+//	{
+//		for (uint16_t i=0; i<(sizeof(frameoverflow)-2); i++)
+//			uart_print(frameoverflow[i]);
+//	}
+//
+//	// Check whether command field was filled
+//	if (frame_command_length == 0)
+//	{
+//		// Return empty command message
+//		for (uint16_t i=0; i<(sizeof(frameempty)-2); i++)
+//			uart_print(frameempty[i]);
+//	}
 }
 /* USER CODE END 0 */
 
