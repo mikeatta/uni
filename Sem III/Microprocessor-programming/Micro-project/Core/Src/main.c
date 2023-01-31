@@ -61,7 +61,7 @@ __IO uint16_t message_idx;
 uint8_t sender[3];
 uint8_t receiver[3];
 char command_chars[3];
-uint16_t command_length;
+static uint16_t command_length;
 uint8_t data[512];
 uint8_t checksum[3];
 
@@ -262,6 +262,10 @@ uint8_t analyze_frame(uint8_t *message)
 	// Store last analyzed char position
 	uint16_t collection_index = 0;
 
+	// Skip any character before '#' is found
+	while (message[collection_index] != '#')
+		collection_index++;
+
 	// Get frame start char ( '#' )
 	while (message[collection_index] == '#')
 		collection_index++;
@@ -441,8 +445,8 @@ int main(void)
 		  // Print received message
 		  for (uint16_t i=0; i<command_length; i++)
 			  uart_print(data[i]);
-		  uart_print('\n');
 		  uart_print('\r');
+		  uart_print('\n');
 
 		  // Run sent command
 		  execute_command(data, data_len);
