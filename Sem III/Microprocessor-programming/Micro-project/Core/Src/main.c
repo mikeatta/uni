@@ -53,7 +53,7 @@ UART_HandleTypeDef huart3;
 uint8_t character;
 
 // --- Message array ----
-uint8_t message[BUFFER_LENGTH];
+char message[BUFFER_LENGTH];
 __IO uint16_t message_length;
 __IO uint16_t message_idx;
 
@@ -257,10 +257,23 @@ void return_message(char *message, ...)
 }
 
 // Analyze frame content
-uint8_t analyze_frame(uint8_t *message)
+uint8_t analyze_frame(char *message)
 {
 	// Store last analyzed char position
 	uint16_t collection_index = 0;
+
+	// Check for '#' and ';' characters in received message
+	char *frame_begin;
+	char *frame_end;
+
+	frame_begin = strchr(message, '#');
+	frame_end = strchr(message, ';');
+
+	if (frame_begin == NULL || frame_end == NULL)
+	{
+		uart_print('%');
+		return 0;
+	}
 
 	// Skip any character before '#' is found
 	while (message[collection_index] != '#')
