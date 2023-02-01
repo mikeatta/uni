@@ -24,6 +24,7 @@
 #include "stdlib.h"
 #include "stdio.h"
 #include "math.h"
+#include "string.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,16 +55,16 @@ __IO uint8_t rx_empty = 0;
 __IO uint8_t rx_busy = 0;
 
 // --- Message buffer ---
-uint8_t message[BUFFER_LENGTH];
+char message[BUFFER_LENGTH];
 __IO uint8_t message_idx = 0;
 __IO uint8_t message_length = 0;
 
-// --- Frame content ---
-__IO uint8_t frame_state;
-__IO uint8_t led_action;
+// --- Frame details ---
+static uint8_t sw_state = 0;
+static uint8_t led_action;
 
 // --- Blink function ---
-__IO uint8_t blink_active;
+static uint8_t blink_active;
 __IO uint8_t blink_delay;
 __IO uint8_t delay;
 __IO uint16_t blink_ms;
@@ -72,6 +73,18 @@ __IO uint16_t blink_ms;
 __IO uint8_t delay_active;
 uint16_t loop_delay;
 char temp[4];
+
+// DEBUG
+uint16_t idx;
+
+char *open_bracket;
+uint16_t open_idx;
+
+char *close_bracket;
+uint16_t close_idx;
+
+uint16_t param_length;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -134,7 +147,7 @@ uint8_t get_char()
 }
 
 // Get message from the reception buffer
-uint16_t get_message(uint8_t *array)
+uint16_t get_message(char *array)
 {
 	static uint8_t tmp_arr[BUFFER_LENGTH];
 	static uint16_t idx = 0;
@@ -238,10 +251,25 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  /* Command templates */
-  uint8_t blink_cmd[6] = "BLINK,";
-  uint8_t delay_cmd[6] = "DELAY,";
+  // Helper variables
+//  char *open_bracket;
+//  uint16_t open_idx;
+//
+//  char *close_bracket;
+//  uint16_t close_idx;
+//
+//  uint16_t param_length;
 
+  // Command templates
+  // LED command parameters
+  uint8_t on_cmd[] = "ON";
+  uint8_t off_cmd[] = "OFF";
+  uint8_t blink_cmd[] = "BLINK,";
+
+  // INSERT command parameters
+  uint8_t delay_cmd[] = "DELAY,";
+
+  // Error message content
   uint8_t error_message[] = "Error: Command not found\r\n";
 
   while (1)
@@ -255,122 +283,65 @@ int main(void)
 	{
 		for (uint8_t i=0; i<message_length; i++)
 		{
-			/* Find command start */
-			if (message[i] == 'L')
+			// Enter the switch statement when first character is found
+			if ((sw_state == 0 && message[i] == 'L') || (sw_state == 0 && message[i] == 'I'))
+				sw_state = 1;
+
+			switch (sw_state)
 			{
-				i++;
-				frame_state = 1;
-			} /* if character is 'L' */
-			else if (message[i] == 'I')
-			{
-				i++;
-				frame_state = 1;
-			} /* if character is 'I' */
-			else if (message[i] == ';')
-			{
-				i++;
-				frame_state = 1;
-			} /* if character is ';' */
-			else
-			{
-				for (uint8_t i=0; i<(sizeof(error_message)-2); i++)
+			case 1:
+				// Check for remaining command characters
+				if (message[i+1] == 'E' && message[i+2] == 'D')
 				{
-					uart_print(error_message[i]);
+					i = i+2;
+					sw_state = 2;
 				}
-			} /* send error message to terminal */
+				else
+					sw_state = 0;
+				break;
 
-			switch (frame_state)
-			{
-				case 1:
-					if (message[i] == 'E' && message[i+1] == 'D')
-					{
-						i = i+1;
-						frame_state = 2;
-					} /* if 'LED' sequence found */
-					else if (message[i] == 'N' && message[i+1] == 'S' && message[i+2] == 'E' && message[i+3] == 'R' && message[i+4] == 'T')
-					{
-						i = i+4;
-						frame_state = 2;
-					} /* if 'INSERT' sequence found */
-					break;
+			case 2:
+				// Get opening bracket index
+				open_bracket = strchr(message, '[');
 
-				case 2:
-					if (message[i] == '[' && message[i+1] == 'O' && message[i+2] == 'N')
-					{
-						i = i+2;
-						led_action = 1;
-						frame_state = 3;
-					} /* if 'ON' sequence found */
-					else if (message[i] == '[' && message[i+1] == 'O' && message[i+2] == 'F' && message[i+3] == 'F')
-					{
-						i = i+3;
-						led_action = 0;
-						frame_state = 3;
-					} /* if command 'OFF' found */
-					else if (message[i] == '[' && message[i+1] == 'B')
-					{
-						i++;
-						for (uint8_t i=0; i<6; i++)
-						{
-							if (message[i] != blink_cmd[i])
-							{
-								break;
-							} /* check for 'BLINK' sequence */
-						}
+				// Reset sw_state if opening bracket was not found
+				if (open_bracket == NULL)
+					sw_state = 0;
+				else
+				{
+					// Get index of the opening bracket
+					open_idx = (uint16_t)(open_bracket - message);
+					sw_state = 3;
+				}
+				break;
 
-						i = i+6;
-						if (message[i] >= 0x30 && message[i] <= 0x39)
-						{
-							/* Get blink delay */
-							blink_delay = message[i];
-							delay = blink_delay - '0';
-							blink_ms = led_delay(delay);
-							/* convert char to int */
-							led_action = 2;
-							frame_state = 3;
-						} /* if char is between '0' and '9' */
-					} /* if command 'BLINK' found */
-					else if (message[i] == '[' && message[i+1] == 'D')
-					{
-						i++;
-						for (uint8_t i=0; i<6; i++)
-						{
-							if (message[i] != delay_cmd[i])
-							{
-								frame_state = 0;
-								break;
-							} /* check for 'DELAY,' sequence */
-						}
+			case 3:
+				// Get closing bracket index
+				close_bracket = strchr(message, ']');
 
-						i = i+6;
-						for (int y=0; y<4; y++)
-						{
-							if (message[i+y] >= 0x30 && message[i+y] <= 0x39)
-							{
-								temp[y] = message[i+y];
-							}
-						} /* store 4 chars as delay value */
+				// Reset sw_state if closing bracket was not found
+				if (close_bracket == NULL)
+					sw_state = 0;
+				else
+				{
+					// Get index of closing bracket
+					close_idx = (uint16_t)(close_bracket - message);
+					sw_state = 4;
+				}
+				break;
 
-						loop_delay = atoi(temp);
-					} /* if command 'DELAY' found */
-					break;
+			case 4:
+				// Calculate parameter length in chars - basic CRC
+				param_length = close_idx - open_idx;
 
-				case 3:
-					if ((message[i] == ']' && message[i+1] == ';') && led_action == 0)
-					{
-						blink_active = 0;
-						turn_off_led();
-					} /* toggle LED ON */
-					else if ((message[i] == ']' && message[i+1] == ';') && led_action == 1)
-					{
-						blink_active = 0;
-						turn_on_led();
-					} /* toggle LED OFF */
-					else if ((message[i] == ']' && message[i+1] == ';') && led_action == 2)
-					{
-						blink_active = 1;
-					} /* blink LED */
-					break;
+				for (uint16_t y=open_idx+1; y<close_idx; y++)
+					uart_print(message[y]);
+				uart_print('\r');
+				uart_print('\n');
+
+				// Reset switch state
+				sw_state = 0;
+				break;
 			}
 		}
 	}
@@ -381,10 +352,9 @@ int main(void)
 	{
 		HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
 		HAL_Delay(blink_ms);
-	} /* Blink LED */
+	}
 
 	HAL_Delay(loop_delay);
-	/* Set while loop delay */
   }
   /* USER CODE END 3 */
 }
