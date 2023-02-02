@@ -85,6 +85,9 @@ uint16_t close_idx;
 
 uint16_t param_length;
 
+//uint8_t command[BUFFER_LENGTH];
+
+uint8_t len;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -260,7 +263,9 @@ int main(void)
 //
 //  uint16_t param_length;
 
-  // Command templates
+  // Temporary command array
+  uint8_t command[BUFFER_LENGTH];
+
   // LED command parameters
   uint8_t on_cmd[] = "ON";
   uint8_t off_cmd[] = "OFF";
@@ -334,12 +339,30 @@ int main(void)
 				// Calculate parameter length in chars - basic CRC
 				param_length = close_idx - open_idx;
 
+				// Place chars between the brackets into temporary command array
+				uint8_t command_length = 0;
+				uint8_t j = 0;
 				for (uint16_t y=open_idx+1; y<close_idx; y++)
-					uart_print(message[y]);
+				{
+					command[j] = message[y];
+					j++;
+					command_length = j;
+				}
+
+				if (command_length != param_length)
+					sw_state = 5;
+				else
+					sw_state = 0;
+				break;
+
+			case 5:
+				// Test CRC validation
+				for (uint8_t y=0; y<param_length-1; y++)
+					uart_print(command[y]);
 				uart_print('\r');
 				uart_print('\n');
 
-				// Reset switch state
+				// Reset sw_state
 				sw_state = 0;
 				break;
 			}
