@@ -129,7 +129,7 @@ void increase_rx_empty()
 void increase_rx_busy()
 {
 	rx_busy++;
-	if(rx_busy>BUFFER_LENGTH)
+	if(rx_busy>=BUFFER_LENGTH)
 	{
 		rx_busy = 0;
 	}
@@ -258,20 +258,22 @@ int main(void)
 //  uint16_t close_idx;
 //
 //  uint16_t param_length;
+	static uint16_t command_length;
 
   // Temporary command array
-  uint8_t command[BUFFER_LENGTH];
+//  uint8_t command[BUFFER_LENGTH];
 
   // LED command parameters
-  uint8_t on_cmd[] = "ON";
-  uint8_t off_cmd[] = "OFF";
-  uint8_t blink_cmd[] = "BLINK,";
+//  __IO uint8_t led_action;
+  char on_cmd[] = "ON";
+  char off_cmd[] = "OFF";
+//  char blink_cmd[] = "BLINK,";
 
   // INSERT command parameters
-  uint8_t delay_cmd[] = "DELAY,";
+//  char delay_cmd[] = "DELAY,";
 
   // Error message content
-  uint8_t error_message[] = "Error: Command not found\r\n";
+//  char error_message[] = "Error: Command not found\r\n";
 
   while (1)
   {
@@ -336,7 +338,8 @@ int main(void)
 				param_length = (close_idx - open_idx) - 1;
 
 				// Place chars between the brackets into temporary command array
-				static uint8_t command_length = 0;
+				char command[BUFFER_LENGTH];
+				command_length = 0;
 				uint8_t j = 0;
 				for (uint16_t y=open_idx+1; y<close_idx; y++)
 				{
@@ -352,28 +355,71 @@ int main(void)
 				break;
 
 			case 5:
+				// Check for command separator
+				if (message[close_idx+1] != ';')
+				{
+					uart_print(message[close_idx+1]);
+					sw_state = 0;
+					break;
+				}
+
 				// Test CRC validation
 				for (uint8_t y=0; y<param_length; y++)
 					uart_print(command[y]);
 				uart_print('\r');
 				uart_print('\n');
 
+				// Compare char arrays and execute the command
+				__IO size_t len = param_length;
+				if (strncmp(command, on_cmd, len) == 0)
+				{
+					// Turn on LED
+					led_action = 1;
+				}
+				else if (strncmp(command, off_cmd, len) == 0)
+				{
+					// Turn off LED
+					led_action = 0;
+				}
+				else
+				{
+					// DEBUG: Print '#' on error
+					uart_print('#');
+					uart_print('\r');
+					uart_print('\n');
+				}
+
 				// Reset sw_state
 				sw_state = 0;
 				break;
-			}
-		}
+			} /* switch end */
+		} /* for loop end */
 	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	if (blink_active == 1)
+	// Diode control switch
+	switch (led_action)
 	{
+	case 0:
+		// Turn off LED
+		turn_off_led();
+		break;
+
+	case 1:
+		// Turn on LED
+		turn_on_led();
+		break;
+
+	case 2:
+		// Blink LED with delay
 		HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
 		HAL_Delay(blink_ms);
-	}
+		break;
 
-	HAL_Delay(loop_delay);
+	case 3:
+		break;
+	} /* switch end */
   }
   /* USER CODE END 3 */
 }
