@@ -120,7 +120,7 @@ uint8_t rx_has_data()
 void increase_rx_empty()
 {
 	rx_empty++;
-	if(rx_empty>BUFFER_LENGTH)
+	if(rx_empty >= BUFFER_LENGTH)
 	{
 		rx_empty = 0;
 	}
@@ -129,7 +129,7 @@ void increase_rx_empty()
 void increase_rx_busy()
 {
 	rx_busy++;
-	if(rx_busy>=BUFFER_LENGTH)
+	if(rx_busy >= BUFFER_LENGTH)
 	{
 		rx_busy = 0;
 	}
