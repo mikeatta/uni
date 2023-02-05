@@ -84,7 +84,7 @@ __IO uint16_t close_idx;
 
 __IO uint16_t param_length;
 
-char command[BUFFER_LENGTH];
+//char command[BUFFER_LENGTH];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -305,10 +305,6 @@ int main(void)
 				break;
 
 			case 2:
-				// If index was previously found, search for next one
-//				if (open_bracket != NULL)
-//					open_bracket += 1;
-
 				// Get opening bracket index
 				open_bracket = strchr(message, '[');
 
@@ -324,10 +320,6 @@ int main(void)
 				break;
 
 			case 3:
-				// If index was previously found, search for next one
-//				if (close_bracket != NULL)
-//					close_bracket += 1;
-
 				// Get closing bracket index
 				close_bracket = strchr(message, ']');
 
@@ -347,7 +339,7 @@ int main(void)
 				param_length = (close_idx - open_idx) - 1;
 
 				// Place chars between the brackets into temporary command array
-//				char command[BUFFER_LENGTH];
+				char command[BUFFER_LENGTH];
 				command_length = 0;
 				uint8_t j = 0;
 				for (uint16_t y=open_idx+1; y<close_idx; y++)
@@ -398,13 +390,9 @@ int main(void)
 					uart_print('\n');
 				}
 
-				// Clear the first bracket indexes of the message array
-				message[open_idx] = '*';
-				message[close_idx] = '*';
-				open_bracket++;
-				close_bracket++;
-//				open_bracket = '\0';
-//				close_bracket = '\0';
+				// Replace bracket chars at the current opening and closing indexes
+				message[open_idx] = '#';
+				message[close_idx] = '#';
 
 				// Reset sw_state
 				sw_state = 0;
