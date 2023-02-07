@@ -34,7 +34,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define BUFFER_LENGTH 30
+#define BUFFER_LENGTH 50
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -59,8 +59,8 @@ char message[BUFFER_LENGTH];
 __IO uint8_t message_length = 0;
 
 // --- Frame details ---
-static uint8_t sw_state = 0;
-static uint8_t led_action;
+__IO uint8_t sw_state = 0;
+__IO uint8_t led_action;
 
 // --- Blink function ---
 static uint8_t blink_active;
@@ -273,8 +273,8 @@ int main(void)
   // INSERT command parameters
 //  char delay_cmd[] = "DELAY,";
 
-  // Error message content
-//  char error_message[] = "Error: Command not found\r\n";
+  // Error message
+  char error_message[] = "Error: Command not found\r\n";
 
   while (1)
   {
@@ -384,8 +384,19 @@ int main(void)
 				}
 				else if (strncmp(command, blink_cmd, len-1) == 0)
 				{
-					// Enable LED blink
-					led_action = 2;
+					// Check if delay is a digit
+					if (!(message[close_idx-1] >= 0x30 && message[close_idx-1] <= 0x39))
+					{
+						// Print error message
+						for (uint8_t y=0; y<26; y++)
+							uart_print(error_message[y]);
+
+						// Reset sw_state
+						sw_state = 0;
+					}
+					else
+						// Enable LED blink
+						led_action = 2;
 				}
 				else
 				{
