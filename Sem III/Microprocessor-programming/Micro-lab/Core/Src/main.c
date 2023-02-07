@@ -76,15 +76,15 @@ char temp[4];
 // DEBUG
 uint16_t idx;
 
-__IO char *open_bracket;
+char *open_bracket;
 __IO uint16_t open_idx;
 
-__IO char *close_bracket;
+char *close_bracket;
 __IO uint16_t close_idx;
 
 __IO uint16_t param_length;
 
-//char command[BUFFER_LENGTH];
+char command[BUFFER_LENGTH];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -192,7 +192,7 @@ void turn_off_led()
 	HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
 }
 
-uint16_t led_delay(uint8_t blink_hz)
+uint16_t calculate_delay(uint8_t blink_hz)
 {
 	float delay_f = 1000.0;
 	delay_f = delay_f / blink_hz;
@@ -251,7 +251,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  // Helper variables
+  // Parameter variables
 //  char *open_bracket;
 //  uint16_t open_idx;
 //
@@ -268,7 +268,7 @@ int main(void)
 //  __IO uint8_t led_action;
   char on_cmd[] = "ON";
   char off_cmd[] = "OFF";
-//  char blink_cmd[] = "BLINK,";
+  char blink_cmd[] = "BLINK,";
 
   // INSERT command parameters
 //  char delay_cmd[] = "DELAY,";
@@ -382,6 +382,11 @@ int main(void)
 					// Turn off LED
 					led_action = 0;
 				}
+				else if (strncmp(command, blink_cmd, len-1) == 0)
+				{
+					// Enable LED blink
+					led_action = 2;
+				}
 				else
 				{
 					// DEBUG: Print '#' on error
@@ -413,9 +418,9 @@ int main(void)
 				break;
 
 			case 2:
-				// Blink LED with delay
-				HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
-				HAL_Delay(blink_ms);
+				// Set blink interval
+				delay = message[close_idx-1] - '0';
+				blink_ms = calculate_delay(delay);
 				break;
 
 			case 3:
@@ -426,7 +431,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
+	if (led_action == 2)
+	{
+		// Blink LED with delay
+		HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
+		HAL_Delay(blink_ms);
+	}
   }
   /* USER CODE END 3 */
 }
