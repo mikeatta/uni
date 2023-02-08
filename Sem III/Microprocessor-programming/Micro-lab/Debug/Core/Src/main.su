@@ -11,9 +11,9 @@
 ../Core/Src/main.c:190:6:turn_off_led	8	static
 ../Core/Src/main.c:195:10:calculate_delay	24	static
 ../Core/Src/main.c:214:5:main	136	static
-../Core/Src/main.c:491:6:SystemClock_Config	88	static
-../Core/Src/main.c:533:13:MX_USART3_UART_Init	8	static
-../Core/Src/main.c:568:13:MX_GPIO_Init	40	static
-../Core/Src/main.c:590:6:HAL_UART_RxCpltCallback	16	static
-../Core/Src/main.c:612:6:MPU_Config	24	static
-../Core/Src/main.c:643:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/main.c:501:6:SystemClock_Config	88	static
+../Core/Src/main.c:543:13:MX_USART3_UART_Init	8	static
+../Core/Src/main.c:578:13:MX_GPIO_Init	40	static
+../Core/Src/main.c:600:6:HAL_UART_RxCpltCallback	16	static
+../Core/Src/main.c:622:6:MPU_Config	24	static
+../Core/Src/main.c:653:6:Error_Handler	4	static,ignoring_inline_asm

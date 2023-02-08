@@ -63,7 +63,7 @@ __IO uint8_t sw_state = 0;
 __IO uint8_t led_action;
 
 // --- Blink function ---
-static uint8_t blink_active;
+__IO uint8_t blink_setup;
 __IO uint8_t blink_delay;
 __IO uint8_t delay;
 __IO uint16_t blink_ms;
@@ -400,8 +400,11 @@ int main(void)
 						sw_state = 0;
 					}
 					else
+					{
 						// Enable LED blink
+						blink_setup = 1;
 						led_action = 2;
+					}
 				}
 				else if (strncmp(command, delay_cmd, len-4) == 0)
 				{
@@ -457,8 +460,15 @@ int main(void)
 
 			case 2:
 				// Set blink interval
-				delay = message[close_idx-1] - '0';
-				blink_ms = calculate_delay(delay);
+				if (blink_setup == 1)
+				{
+					delay = message[close_idx-1] - '0';
+					if (delay == 0)
+						blink_ms = 0;
+					else
+						blink_ms = calculate_delay(delay);
+					blink_setup = 0;
+				}
 				break;
 
 			case 3:
@@ -471,7 +481,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	if (led_action == 2)
+	if (blink_ms != 0)
 	{
 		// Blink LED with delay
 		HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
