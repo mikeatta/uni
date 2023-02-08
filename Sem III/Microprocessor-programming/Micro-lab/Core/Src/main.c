@@ -69,7 +69,7 @@ __IO uint8_t delay;
 __IO uint16_t blink_ms;
 
 // --- Delay function ---
-__IO uint8_t delay_active;
+//__IO uint8_t delay_active;
 uint16_t loop_delay;
 char temp[4];
 
@@ -197,8 +197,8 @@ uint16_t calculate_delay(uint8_t blink_hz)
 	float delay_f = 1000.0;
 	delay_f = delay_f / blink_hz;
 	delay_f = ceil(delay_f);
-	uint16_t delay = (uint16_t)delay_f;
-	return delay;
+	uint16_t delay_ms = (uint16_t)delay_f;
+	return delay_ms;
 }
 /* USER CODE END PFP */
 
@@ -271,7 +271,7 @@ int main(void)
   char blink_cmd[] = "BLINK,";
 
   // INSERT command parameters
-//  char delay_cmd[] = "DELAY,";
+  char delay_cmd[] = "DELAY,";
 
   // Error message
   char error_message[] = "Error: Command not found\r\n";
@@ -298,6 +298,11 @@ int main(void)
 				if (message[i+1] == 'E' && message[i+2] == 'D')
 				{
 					i = i+2;
+					sw_state = 2;
+				}
+				else if (message[i+1] == 'N' && message[i+2] == 'S' && message[i+3] == 'E' && message[i+4] == 'R' && message[i+5] == 'T')
+				{
+					i = i+5;
 					sw_state = 2;
 				}
 				else
@@ -398,6 +403,28 @@ int main(void)
 						// Enable LED blink
 						led_action = 2;
 				}
+				else if (strncmp(command, delay_cmd, len-4) == 0)
+				{
+					// Check if delay is a digit
+					for (uint8_t y=0; y<4; y++)
+						if (!(message[close_idx-4+y] >= 0x30 && message[close_idx-4+y] <= 0x39))
+						{
+							// Print error message
+							for (uint8_t y=0; y<26; y++)
+								uart_print(error_message[y]);
+
+							// Reset sw_state
+							sw_state = 0;
+						}
+						else
+						{
+							// Assign delay to temporary array
+							temp[y] = message[close_idx-4+y];
+
+							// Enable the delay
+							led_action = 3;
+						}
+				}
 				else
 				{
 					// DEBUG: Print '#' on error
@@ -435,6 +462,8 @@ int main(void)
 				break;
 
 			case 3:
+				// Set delay interval
+				loop_delay = atoi(temp);
 				break;
 			} /* control switch end */
 		} /* for loop end */
@@ -448,6 +477,9 @@ int main(void)
 		HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
 		HAL_Delay(blink_ms);
 	}
+
+	// Start the delay
+	HAL_Delay(loop_delay);
   }
   /* USER CODE END 3 */
 }
