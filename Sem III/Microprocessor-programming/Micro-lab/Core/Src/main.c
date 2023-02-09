@@ -85,6 +85,9 @@ __IO uint16_t close_idx;
 __IO uint16_t param_length;
 
 char command[BUFFER_LENGTH];
+
+__IO uint8_t error_found = 0;
+char *command_separator;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -200,6 +203,13 @@ uint16_t calculate_delay(uint8_t blink_hz)
 	uint16_t delay_ms = (uint16_t)delay_f;
 	return delay_ms;
 }
+
+void display_error(char *error_info)
+{
+	for (uint8_t i=0; i<26; i++)
+		uart_print(error_info[i]);
+	error_found = 0;
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -287,6 +297,18 @@ int main(void)
 	{
 		for (uint8_t i=0; i<message_length; i++)
 		{
+			// Check for command separator character
+			command_separator = strchr(message, ';');
+
+			// If separator char was not found
+			if (command_separator == NULL)
+			{
+				for (uint8_t i=0; i<26; i++)
+					uart_print(error_message[i]);
+				while (i < message_length)
+					i++;
+			}
+
 			// Enter the switch statement when first character is found
 			if ((sw_state == 0 && message[i] == 'L') || (sw_state == 0 && message[i] == 'I'))
 				sw_state = 1;
