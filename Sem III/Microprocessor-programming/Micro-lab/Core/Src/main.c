@@ -87,7 +87,12 @@ __IO uint16_t param_length;
 char command[BUFFER_LENGTH];
 
 __IO uint8_t error_found = 0;
+
+char single_command[BUFFER_LENGTH];
+
 char *command_separator;
+
+uint8_t temp_check;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -204,11 +209,45 @@ uint16_t calculate_delay(uint8_t blink_hz)
 	return delay_ms;
 }
 
-void display_error(char *error_info)
+void display_error(char *error_info, size_t error_length)
 {
-	for (uint8_t i=0; i<26; i++)
+	for (uint8_t i=0; i<error_length-1; i++)
 		uart_print(error_info[i]);
 	error_found = 0;
+}
+
+uint8_t validate_command(char *single_command_message)
+{
+	uint8_t command_valid = 0;
+
+	// Command template arrays
+	char led_on[] = "LED[ON]";
+	char led_off[] = "LED[OFF]";
+	char led_blink[] = "LED[BLINK,X]";
+	char insert_delay[] = "INSERT[DELAY,XXXX]";
+
+	// Compare command with templates
+	if (strncmp(single_command_message, led_on, sizeof(led_on)) == 0)
+	{
+		command_valid = 1;
+	}
+	else if (strncmp(single_command_message, led_off, sizeof(led_off)) == 0)
+	{
+		command_valid = 1;
+	}
+	else if (strncmp(single_command_message, led_blink, sizeof(led_blink)-3) == 0)
+	{
+		if ((single_command_message[10] >= 0x30 && single_command_message[10] <= 0x39) && single_command[11] == ']')
+			command_valid = 1;
+	}
+	else if (strncmp(single_command_message, insert_delay, sizeof(insert_delay)-6) == 0)
+	{
+		for (uint8_t y=0; y<4; y++)
+			if ((single_command_message[12+y] >= 0x30 && single_command_message[12+y] <= 0x39) && single_command[17] == ']')
+				command_valid = 1;
+	}
+
+	return command_valid;
 }
 /* USER CODE END PFP */
 
@@ -283,8 +322,9 @@ int main(void)
   // INSERT command parameters
   char delay_cmd[] = "DELAY,";
 
-  // Error message
-  char error_message[] = "Error: Command not found\r\n";
+  // Error messages
+  char invalid_command[] = "Error: Command not found\r\n";
+  char missing_separator[] = "Error: No command separator found\r\n";
 
   while (1)
   {
@@ -303,10 +343,9 @@ int main(void)
 			// If separator char was not found
 			if (command_separator == NULL)
 			{
-				for (uint8_t i=0; i<26; i++)
-					uart_print(error_message[i]);
 				while (i < message_length)
 					i++;
+				display_error(missing_separator, sizeof(missing_separator));
 			}
 
 			// Enter the switch statement when first character is found
@@ -328,7 +367,10 @@ int main(void)
 					sw_state = 2;
 				}
 				else
+				{
+					error_found = 1;
 					sw_state = 0;
+				}
 				break;
 
 			case 2:
@@ -337,7 +379,10 @@ int main(void)
 
 				// Reset sw_state if opening bracket was not found
 				if (open_bracket == NULL)
+				{
+					error_found = 1;
 					sw_state = 0;
+				}
 				else
 				{
 					// Get index of the opening bracket
@@ -352,7 +397,10 @@ int main(void)
 
 				// Reset sw_state if closing bracket was not found
 				if (close_bracket == NULL)
+				{
+					error_found = 1;
 					sw_state = 0;
+				}
 				else
 				{
 					// Get index of closing bracket
@@ -386,7 +434,7 @@ int main(void)
 				// Check for command separator
 				if (message[close_idx+1] != ';')
 				{
-					uart_print(message[close_idx+1]);
+					display_error(missing_separator, sizeof(missing_separator));
 					sw_state = 0;
 					break;
 				}
@@ -401,71 +449,121 @@ int main(void)
 				__IO size_t len = param_length;
 				if (strncmp(command, on_cmd, len) == 0)
 				{
-					// Turn on LED
-					led_action = 1;
-				}
-				else if (strncmp(command, off_cmd, len) == 0)
-				{
-					// Turn off LED
-					led_action = 0;
-				}
-				else if (strncmp(command, blink_cmd, len-1) == 0)
-				{
-					// Check if delay is a digit
-					if (!(message[close_idx-1] >= 0x30 && message[close_idx-1] <= 0x39))
-					{
-						// Print error message
-						for (uint8_t y=0; y<26; y++)
-							uart_print(error_message[y]);
+					// Store last command in a separate array
+					for (uint8_t y=0; y<7; y++)
+						single_command[y] = message[close_idx-6+y];
 
-						// Reset sw_state
-						sw_state = 0;
+					// Validate last command
+					temp_check = validate_command(single_command);
+					if (temp_check == 1)
+					{
+						uart_print('@');
+
+						// Turn on LED
+						led_action = 1;
 					}
 					else
 					{
+						error_found = 1;
+						sw_state = 0;
+					}
+				}
+				else if (strncmp(command, off_cmd, len) == 0)
+				{
+					// Store last command in a separate array
+					for (uint8_t y=0; y<8; y++)
+						single_command[y] = message[close_idx-7+y];
+
+					// Validate last command
+					temp_check = validate_command(single_command);
+					if (temp_check == 1)
+					{
+						uart_print('@');
+
+						// Turn off LED
+						led_action = 0;
+					}
+					else
+					{
+						error_found = 1;
+						sw_state = 0;
+					}
+				}
+				else if (strncmp(command, blink_cmd, len-1) == 0)
+				{
+					// Store last command in a separate array
+					for (uint8_t y=0; y<12; y++)
+						single_command[y] = message[close_idx-11+y];
+
+					// Validate last command
+					temp_check = validate_command(single_command);
+					if (temp_check == 1)
+					{
+						uart_print('@');
+
 						// Enable LED blink
 						blink_setup = 1;
 						led_action = 2;
+					}
+					else
+					{
+						error_found = 1;
+						sw_state = 0;
 					}
 				}
 				else if (strncmp(command, delay_cmd, len-4) == 0)
 				{
 					// Check if delay is a digit
 					for (uint8_t y=0; y<4; y++)
-						if (!(message[close_idx-4+y] >= 0x30 && message[close_idx-4+y] <= 0x39))
-						{
-							// Print error message
-							for (uint8_t y=0; y<26; y++)
-								uart_print(error_message[y]);
-
-							// Reset sw_state
-							sw_state = 0;
-						}
-						else
-						{
+						if (message[close_idx-4+y] >= 0x30 && message[close_idx-4+y] <= 0x39)
 							// Assign delay to temporary array
 							temp[y] = message[close_idx-4+y];
+						else
+							break;
 
-							// Enable the delay
-							led_action = 3;
-						}
+					// Store last command in a separate array
+					for (uint8_t y=0; y<18; y++)
+						single_command[y] = message[close_idx-17+y];
+
+					// Validate last command
+					temp_check = validate_command(single_command);
+					if (temp_check == 1)
+					{
+						uart_print('@');
+
+						// Enable the delay
+						led_action = 3;
+					}
+					else
+					{
+						error_found = 1;
+						sw_state = 0;
+					}
 				}
 				else
-				{
-					// DEBUG: Print '#' on error
-					uart_print('#');
-					uart_print('\r');
-					uart_print('\n');
-				}
+					error_found = 1;
 
 				// Replace bracket chars at the current opening and closing indexes
 				message[open_idx] = '#';
 				message[close_idx] = '#';
 
+				// Clear the single_command array
+				for (uint8_t y=0; y<BUFFER_LENGTH; y++)
+					single_command[y] = '\0';
+
 				// Reset sw_state
 				sw_state = 0;
 				break;
 			} /* sw_state switch end */
+
+			// Display error alert
+			if (error_found == 1)
+			{
+				while (message[i] != ';')
+					i++;
+				if (message[i] == ';')
+					display_error(invalid_command, sizeof(invalid_command));
+			}
 
 			// Diode control switch
 			switch (led_action)
@@ -499,11 +597,11 @@ int main(void)
 				break;
 			} /* control switch end */
 		} /* for loop end */
-	}
+	} /* if statement end */
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	if (blink_ms != 0)
+	if (blink_ms != 0 && (led_action == 2 || led_action == 3))
 	{
 		// Blink LED with delay
 		HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
