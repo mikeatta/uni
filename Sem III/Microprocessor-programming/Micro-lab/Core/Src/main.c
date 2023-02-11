@@ -86,7 +86,7 @@ __IO uint16_t param_length;
 
 char command[BUFFER_LENGTH];
 
-__IO uint8_t error_found = 0;
+__IO uint8_t error_found;
 
 char single_command[BUFFER_LENGTH];
 
@@ -351,6 +351,8 @@ int main(void)
 			// Enter the switch statement when first character is found
 			if ((sw_state == 0 && message[i] == 'L') || (sw_state == 0 && message[i] == 'I'))
 				sw_state = 1;
+			else if (sw_state == 0 && (message[i] != ';' && message[i] != '#' && message[i] != ','))
+				error_found = 1;
 
 			switch (sw_state)
 			{
@@ -457,7 +459,7 @@ int main(void)
 					temp_check = validate_command(single_command);
 					if (temp_check == 1)
 					{
-						uart_print('@');
+						error_found = 0;
 
 						// Turn on LED
 						led_action = 1;
@@ -478,7 +480,7 @@ int main(void)
 					temp_check = validate_command(single_command);
 					if (temp_check == 1)
 					{
-						uart_print('@');
+						error_found = 0;
 
 						// Turn off LED
 						led_action = 0;
@@ -499,7 +501,7 @@ int main(void)
 					temp_check = validate_command(single_command);
 					if (temp_check == 1)
 					{
-						uart_print('@');
+						error_found = 0;
 
 						// Enable LED blink
 						blink_setup = 1;
@@ -529,7 +531,7 @@ int main(void)
 					temp_check = validate_command(single_command);
 					if (temp_check == 1)
 					{
-						uart_print('@');
+						error_found = 0;
 
 						// Enable the delay
 						led_action = 3;
@@ -540,8 +542,6 @@ int main(void)
 						sw_state = 0;
 					}
 				}
-				else
-					error_found = 1;
 
 				// Replace bracket chars at the current opening and closing indexes
 				message[open_idx] = '#';
