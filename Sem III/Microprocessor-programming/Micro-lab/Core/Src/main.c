@@ -21,8 +21,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stdlib.h"
 #include "stdio.h"
+#include "stdlib.h"
+#include "stdarg.h"
 #include "math.h"
 #include "string.h"
 /* USER CODE END Includes */
@@ -54,6 +55,11 @@ uint8_t rx_buffer[BUFFER_LENGTH];
 __IO uint8_t rx_empty = 0;
 __IO uint8_t rx_busy = 0;
 
+// --- Transmission buffer ---
+uint8_t tx_buffer[BUFFER_LENGTH];
+__IO uint8_t tx_empty = 0;
+__IO uint8_t tx_busy = 0;
+
 // --- Message buffer ---
 char message[BUFFER_LENGTH];
 __IO uint8_t message_length = 0;
@@ -73,6 +79,7 @@ uint16_t loop_delay;
 char temp[4];
 
 // --- Command validation ---
+char temp_command[BUFFER_LENGTH];
 char single_command[BUFFER_LENGTH];
 char *command_separator;
 __IO uint8_t error_found;
@@ -101,6 +108,7 @@ uint8_t char_is_endmessage(char c)
 	else return 0;
 }
 
+// Reception
 uint8_t rx_has_data()
 {
 	if(rx_empty == rx_busy)
@@ -125,6 +133,34 @@ void increase_rx_busy()
 	if(rx_busy >= BUFFER_LENGTH)
 	{
 		rx_busy = 0;
+	}
+}
+
+// Transmission
+uint8_t tx_has_data()
+{
+	if(tx_empty == tx_busy)
+	{
+		return 0;
+	}
+	else return 1;
+}
+
+void increase_tx_empty()
+{
+	tx_empty++;
+	if(tx_empty >= BUFFER_LENGTH)
+	{
+		tx_empty = 0;
+	}
+}
+
+void increase_tx_busy()
+{
+	tx_busy++;
+	if(tx_busy >= BUFFER_LENGTH)
+	{
+		tx_busy = 0;
 	}
 }
 
@@ -174,6 +210,45 @@ uint16_t get_message(char *array)
 	return 0;
 }
 
+// Send response from STM
+void send_response(char *message, ...)
+{
+	// Store STM return message
+	char response[BUFFER_LENGTH];
+	uint16_t idx;
+
+	va_list arglist;
+	va_start(arglist, message);
+	vsprintf(response, message, arglist);
+	va_end(arglist);
+
+	// Set index to the first empty space in transmission buffer
+	idx = tx_empty;
+
+	// Send response to the transmission buffer
+	for (uint16_t i=0; i<strlen(response); i++)
+	{
+		tx_buffer[idx] = response[i];
+		idx++;
+
+		if (idx >= BUFFER_LENGTH)
+			idx = 0;
+	}
+	__disable_irq();
+
+	// Check if there is no more data to transmit
+	if (tx_has_data() == 0 && (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_TXE) == SET))
+	{
+		tx_empty = idx;
+		HAL_UART_Transmit_IT(&huart3, &tx_buffer[tx_busy], 1);
+		increase_tx_busy();
+	}
+	else
+		tx_empty = idx;
+
+	__enable_irq();
+}
+
 void turn_on_led()
 {
 	HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_SET);
@@ -191,13 +266,6 @@ uint16_t calculate_delay(uint8_t blink_hz)
 	delay_f = ceil(delay_f);
 	uint16_t delay_ms = (uint16_t)delay_f;
 	return delay_ms;
-}
-
-void display_error(char *error_info, size_t error_length)
-{
-	for (uint8_t i=0; i<error_length-1; i++)
-		uart_print(error_info[i]);
-	error_found = 0;
 }
 
 uint8_t validate_command(char *single_command_message)
@@ -326,7 +394,7 @@ int main(void)
 			{
 				while (i < message_length)
 					i++;
-				display_error(missing_separator, sizeof(missing_separator));
+				send_response(missing_separator);
 			}
 
 			// Enter the switch statement when first character is found
@@ -405,6 +473,7 @@ int main(void)
 				for (uint16_t y=open_idx+1; y<close_idx; y++)
 				{
 					command[j] = message[y];
+					temp_command[j] = command[j];
 					j++;
 					command_length = j;
 				}
@@ -419,16 +488,22 @@ int main(void)
 				// Check for command separator
 				if (message[close_idx+1] != ';')
 				{
-					display_error(missing_separator, sizeof(missing_separator));
+					send_response(missing_separator);
 					sw_state = 0;
 					break;
 				}
 
-				// Test CRC validation
-				for (uint8_t y=0; y<param_length; y++)
-					uart_print(command[y]);
-				uart_print('\r');
-				uart_print('\n');
+				// Print executed command
+				char CMD[] = "COMMAND: ";
+				char NEWLINE[] = "\r\n";
+
+				send_response(CMD);
+				send_response(temp_command);
+				send_response(NEWLINE);
+
+				// Clear temp array
+				for (uint8_t y=0; y<command_length; y++)
+					temp_command[y] = '\0';
 
 				// Compare char arrays and execute the command
 				__IO size_t len = param_length;
@@ -539,6 +614,7 @@ int main(void)
 					single_command[y] = '\0';
 
 				// Reset sw_state
+				i = i-1;
 				sw_state = 0;
 				break;
 			} /* sw_state switch end */
@@ -549,7 +625,8 @@ int main(void)
 				while (message[i] != ';')
 					i++;
 				if (message[i] == ';')
-					display_error(invalid_command, sizeof(invalid_command));
+					send_response(invalid_command);
+				error_found = 0;
 			}
 
 			// Diode control switch
@@ -704,6 +781,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+// Reception callback
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	// Send character to terminal
@@ -720,6 +798,22 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 		// Await next character
 		HAL_UART_Receive_IT(&huart3, &character, 1);
+	}
+}
+
+// Transmission callback
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->Instance == USART3)
+	{
+		if(tx_has_data() == 1)
+		{
+			static uint8_t tmp;
+			tmp = tx_buffer[tx_busy];
+
+			increase_tx_busy();
+			HAL_UART_Transmit_IT(huart, &tmp, 1);
+		}
 	}
 }
 /* USER CODE END 4 */
