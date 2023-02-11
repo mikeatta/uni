@@ -382,6 +382,7 @@ int main(void)
 				// Reset sw_state if opening bracket was not found
 				if (open_bracket == NULL)
 				{
+					i = i+1;
 					error_found = 1;
 					sw_state = 0;
 				}
@@ -400,6 +401,7 @@ int main(void)
 				// Reset sw_state if closing bracket was not found
 				if (close_bracket == NULL)
 				{
+					i = i+1;
 					error_found = 1;
 					sw_state = 0;
 				}
@@ -459,6 +461,7 @@ int main(void)
 					temp_check = validate_command(single_command);
 					if (temp_check == 1)
 					{
+						i = i+param_length;
 						error_found = 0;
 
 						// Turn on LED
@@ -480,6 +483,7 @@ int main(void)
 					temp_check = validate_command(single_command);
 					if (temp_check == 1)
 					{
+						i = i+param_length;
 						error_found = 0;
 
 						// Turn off LED
@@ -501,6 +505,7 @@ int main(void)
 					temp_check = validate_command(single_command);
 					if (temp_check == 1)
 					{
+						i = i+param_length;
 						error_found = 0;
 
 						// Enable LED blink
@@ -531,6 +536,7 @@ int main(void)
 					temp_check = validate_command(single_command);
 					if (temp_check == 1)
 					{
+						i = i+param_length;
 						error_found = 0;
 
 						// Enable the delay
