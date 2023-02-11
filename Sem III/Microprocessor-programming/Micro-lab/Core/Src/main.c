@@ -69,30 +69,14 @@ __IO uint8_t delay;
 __IO uint16_t blink_ms;
 
 // --- Delay function ---
-//__IO uint8_t delay_active;
 uint16_t loop_delay;
 char temp[4];
 
-// DEBUG
-uint16_t idx;
-
-char *open_bracket;
-__IO uint16_t open_idx;
-
-char *close_bracket;
-__IO uint16_t close_idx;
-
-__IO uint16_t param_length;
-
-char command[BUFFER_LENGTH];
-
-__IO uint8_t error_found;
-
+// --- Command validation ---
 char single_command[BUFFER_LENGTH];
-
 char *command_separator;
-
-uint8_t temp_check;
+__IO uint8_t error_found;
+__IO uint8_t temp_check;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -301,20 +285,17 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   // Parameter variables
-//  char *open_bracket;
-//  uint16_t open_idx;
-//
-//  char *close_bracket;
-//  uint16_t close_idx;
-//
-//  uint16_t param_length;
-	static uint16_t command_length;
+  char *open_bracket;
+  uint16_t open_idx;
 
-  // Temporary command array
-//  uint8_t command[BUFFER_LENGTH];
+  char *close_bracket;
+  uint16_t close_idx;
+
+  __IO uint16_t param_length;
+  static uint16_t command_length;
 
   // LED command parameters
-//  __IO uint8_t led_action;
+  __IO uint8_t led_action;
   char on_cmd[] = "ON";
   char off_cmd[] = "OFF";
   char blink_cmd[] = "BLINK,";
