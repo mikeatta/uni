@@ -493,13 +493,13 @@ int main(void)
 					break;
 				}
 
-				// Print executed command
-				char CMD[] = "COMMAND: ";
-				char NEWLINE[] = "\r\n";
-
-				send_response(CMD);
-				send_response(temp_command);
-				send_response(NEWLINE);
+//				// Print executed command
+//				char CMD[] = "COMMAND: ";
+//				char NEWLINE[] = "\r\n";
+//
+//				send_response(CMD);
+//				send_response(temp_command);
+//				send_response(NEWLINE);
 
 				// Clear temp array
 				for (uint8_t y=0; y<command_length; y++)
@@ -626,6 +626,7 @@ int main(void)
 					i++;
 				if (message[i] == ';')
 					send_response(invalid_command);
+				HAL_Delay(5);
 				error_found = 0;
 			}
 
