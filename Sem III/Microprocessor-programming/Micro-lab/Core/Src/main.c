@@ -674,6 +674,9 @@ int main(void)
 		HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
 		HAL_Delay(blink_ms);
 	}
+	else if (led_action != 2 || led_action != 3)
+		// Disable LED blink with other commands
+		blink_ms = 0;
 
 	// Start the delay
 	HAL_Delay(loop_delay);
