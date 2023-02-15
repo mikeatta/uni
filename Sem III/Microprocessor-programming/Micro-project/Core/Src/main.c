@@ -36,7 +36,7 @@
 /* USER CODE BEGIN PD */
 // Set max length of data field in the frame
 #define MAX_DATA_LENGTH 512
-#define BUFFER_LENGTH 30
+#define BUFFER_LENGTH 60
 /* BUFFER LENGTH FOR DEBUGGING */
 /* USER CODE END PD */
 
@@ -62,7 +62,7 @@ uint8_t sender[3];
 uint8_t receiver[3];
 char command_chars[3];
 static uint16_t command_length;
-uint8_t data[512];
+char data[512];
 uint8_t checksum[3];
 
 // --- Command variables ---
@@ -77,6 +77,9 @@ __IO uint16_t rx_busy = 0;
 uint8_t tx_buffer[BUFFER_LENGTH];
 __IO uint16_t tx_empty = 0;
 __IO uint16_t tx_busy = 0;
+
+// --- DEBUG ---
+uint8_t sw_state = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -96,7 +99,15 @@ void uart_print(unsigned char x)
 	while(!((USART3->ISR)&USART_ISR_TC)){;}
 }
 
-// --- Reception ---
+uint8_t char_is_framestart(char c)
+{
+	if (c == '#')
+	{
+		return 1;
+	}
+	else return 0;
+}
+
 uint8_t char_is_endmessage(char c)
 {
 	if (c == '\r' || c == '\n')
@@ -106,6 +117,7 @@ uint8_t char_is_endmessage(char c)
 	else return 0;
 }
 
+// --- Reception ---
 uint8_t rx_has_data()
 {
 	if(rx_empty == rx_busy)
@@ -182,7 +194,7 @@ uint8_t get_char()
 }
 
 // Get message from the reception buffer
-uint16_t get_message(uint8_t *array)
+uint16_t get_message(char *array)
 {
 	static uint8_t tmp_arr[BUFFER_LENGTH];
 	static uint16_t idx = 0;
@@ -262,6 +274,9 @@ uint8_t analyze_frame(char *message)
 	// Store last analyzed char position
 	uint16_t collection_index = 0;
 
+	// Save frame-check state
+	uint8_t sw_state = 0;
+
 	// Check for '#' and ';' characters in received message
 	char *frame_begin;
 	char *frame_end;
@@ -275,111 +290,146 @@ uint8_t analyze_frame(char *message)
 		return 0;
 	}
 
-	// Skip any character before '#' is found
-	while (message[collection_index] != '#')
-		collection_index++;
+	uint8_t check_finished = 0;
 
-	// Get frame start char ( '#' )
-	while (message[collection_index] == '#')
-		collection_index++;
-
-	// Get sender
-	for (uint8_t i=0; i<3; i++)
+	while (check_finished != 1)
 	{
-		if (char_is_frame_start_end(message[collection_index]) == 1 || message[collection_index] == ' ')
+		switch (sw_state)
 		{
-			// Send [CHECKSENDER] message
-			char CHECKSENDER[] = "CHECKSENDER\r\n";
-			return_message(CHECKSENDER);
-			return 0;
-		}
+		case 0:
+			// Skip any character before '#' is found
+			while (message[collection_index] != '#')
+				collection_index++;
 
-		sender[i] = message[collection_index];
-		collection_index++;
-	}
+			// Get frame start char ( '#' )
+			while (message[collection_index] == '#')
+				collection_index++;
 
-	// Get receiver
-	for (uint8_t i=0; i<3; i++)
-	{
-		if (char_is_frame_start_end(message[collection_index]) == 1 || message[collection_index] == ' ')
-		{
-			// Send [CHECKRECEIVER] message
-			char CHECKRECEIVER[] = "CHECKRECEIVER\r\n";
-			return_message(CHECKRECEIVER);
-			return 0;
-		}
+			// Change sw_state
+			sw_state = 1;
 
-		receiver[i] = message[collection_index];
-		collection_index++;
-	}
+		case 1:
+			// Get sender
+			for (uint8_t i=0; i<3; i++)
+			{
+				if (char_is_frame_start_end(message[collection_index]) == 1 || message[collection_index] == ' ')
+				{
+					// Send [CHECKSENDER] message
+					char CHECKSENDER[] = "CHECKSENDER\r\n";
+					return_message(CHECKSENDER);
+					return 0;
+				}
 
-	// Get command length
-	for (uint8_t i=0; i<3; i++)
-	{
-		if (!(message[collection_index] >= 0x30 && message[collection_index] <= 0x39))
-		{
-			// Send [CHECKLENGTH] message
-			char CHECKLENGTH[] = "CHECKLENGTH\r\n";
-			return_message(CHECKLENGTH);
-			return 0;
-		}
+				sender[i] = message[collection_index];
+				collection_index++;
+			}
 
-		command_chars[i] = message[collection_index];
-		collection_index++;
-	}
+			// Change sw_state
+			sw_state = 2;
+			break;
 
-	// Get data field length as integer value
-	// Use length to get characters from 'data' array in next step
-	command_length = atoi(command_chars);
+		case 2:
+			// Get receiver
+			for (uint8_t i=0; i<3; i++)
+			{
+				if (char_is_frame_start_end(message[collection_index]) == 1 || message[collection_index] == ' ')
+				{
+					// Send [CHECKRECEIVER] message
+					char CHECKRECEIVER[] = "CHECKRECEIVER\r\n";
+					return_message(CHECKRECEIVER);
+					return 0;
+				}
 
-	// Check declared message length
-	if (command_length == 0)
-	{
-		// Send [FRAMEEMPTY] message
-		char FRAMEEMPTY[] = "FRAMEEMPTY\r\n";
-		return_message(FRAMEEMPTY);
-		return 0;
-	}
-	else if (command_length > MAX_DATA_LENGTH)
-	{
-		// Send [DATAOVERFLOW] message
-		char DATAOVERFLOW[] = "DATAOVERFLOW\r\n";
-		return_message(DATAOVERFLOW);
-		return 0;
-	}
+				receiver[i] = message[collection_index];
+				collection_index++;
+			}
 
-	// Pass command length to the variable outside the function
-	data_len = command_length;
+			// Change sw_state
+			sw_state = 3;
+			break;
 
-	// Get data
-	for (uint16_t i=0; i<command_length; i++)
-	{
-		if (char_is_frame_start_end(message[collection_index]) == 1)
-		{
-			// Send [CHECKDATA] message
-			char CHECKDATA[] = "CHECKDATA\r\n";
-			return_message(CHECKDATA);
-			return 0;
-		}
+		case 3:
+			// Get command length
+			for (uint8_t i=0; i<3; i++)
+			{
+				if (!(message[collection_index] >= 0x30 && message[collection_index] <= 0x39))
+				{
+					// Send [CHECKLENGTH] message
+					char CHECKLENGTH[] = "CHECKLENGTH\r\n";
+					return_message(CHECKLENGTH);
+					return 0;
+				}
 
-		data[i] = message[collection_index];
-		collection_index++;
-	}
+				command_chars[i] = message[collection_index];
+				collection_index++;
+			}
 
-	// Get checksum
-	for (uint8_t i=0; i<3; i++)
-	{
-		if (!(message[collection_index] >= 0x30 && message[collection_index] <= 0x39))
-		{
-			// Send [CHECKCSUM] message
-			char CHECKCSUM[] = "CHECKCSUM\r\n";
-			return_message(CHECKCSUM);
-			return 0;
-		}
+			// Get data field length as integer value
+			// Use length to get characters from 'data' array in next step
+			command_length = atoi(command_chars);
 
-		checksum[i] = message[collection_index];
-		collection_index++;
-	}
+			// Check declared message length
+			if (command_length == 0)
+			{
+				// Send [FRAMEEMPTY] message
+				char FRAMEEMPTY[] = "FRAMEEMPTY\r\n";
+				return_message(FRAMEEMPTY);
+				return 0;
+			}
+			else if (command_length > MAX_DATA_LENGTH)
+			{
+				// Send [DATAOVERFLOW] message
+				char DATAOVERFLOW[] = "DATAOVERFLOW\r\n";
+				return_message(DATAOVERFLOW);
+				return 0;
+			}
+
+			// Pass command length to the variable outside the function
+			data_len = command_length;
+
+			// Change sw_state
+			sw_state = 4;
+			break;
+
+		case 4:
+			// Get data
+			for (uint16_t i=0; i<command_length; i++)
+			{
+				if (char_is_frame_start_end(message[collection_index]) == 1)
+				{
+					// Send [CHECKDATA] message
+					char CHECKDATA[] = "CHECKDATA\r\n";
+					return_message(CHECKDATA);
+					return 0;
+				}
+
+				data[i] = message[collection_index];
+				collection_index++;
+			}
+
+			// Change sw_state
+			sw_state = 5;
+			break;
+
+		case 5:
+			// Get checksum
+			for (uint8_t i=0; i<3; i++)
+			{
+				if (!(message[collection_index] >= 0x30 && message[collection_index] <= 0x39))
+				{
+					// Send [CHECKCSUM] message
+					char CHECKCSUM[] = "CHECKCSUM\r\n";
+					return_message(CHECKCSUM);
+					return 0;
+				}
+
+				checksum[i] = message[collection_index];
+				collection_index++;
+			}
+			check_finished = 1;
+			break;
+		} /* switch end */
+	} /* while end */
 
 	// Get frame end char ( ';' )
 	if (message[collection_index] == ';')
@@ -389,7 +439,7 @@ uint8_t analyze_frame(char *message)
 }
 
 // Execute command
-void execute_command(uint8_t *frame_command, uint16_t frame_command_length)
+void execute_command(char *frame_command, uint16_t frame_command_length)
 {
 //	uint8_t frameoverflow[] = "FRMOVERFLOW\r\n";
 //	uint8_t frameempty[] = "FRMEMPTY\r\n";
@@ -456,10 +506,9 @@ int main(void)
 	  if (message_length > 0 && analyze_frame(message) == 1)
 	  {
 		  // Print received message
-		  for (uint16_t i=0; i<command_length; i++)
-			  uart_print(data[i]);
-		  uart_print('\r');
-		  uart_print('\n');
+		  return_message(data);
+		  return_message("\r");
+		  return_message("\n");
 
 		  // Run sent command
 		  execute_command(data, data_len);
