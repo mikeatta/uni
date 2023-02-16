@@ -272,10 +272,10 @@ void return_message(char *message, ...)
 uint8_t analyze_frame(char *message)
 {
 	// Store last analyzed char position
-	uint16_t collection_index = 0;
+	__IO uint16_t collection_index = 0;
 
 	// Save frame-check state
-	uint8_t sw_state = 0;
+	__IO uint8_t sw_state = 0;
 
 	// Check for '#' and ';' characters in received message
 	char *frame_begin;
@@ -290,9 +290,9 @@ uint8_t analyze_frame(char *message)
 		return 0;
 	}
 
-	uint8_t check_finished = 0;
+	uint8_t frame_collected = 0;
 
-	while (check_finished != 1)
+	while (frame_collected != 1)
 	{
 		switch (sw_state)
 		{
@@ -307,6 +307,7 @@ uint8_t analyze_frame(char *message)
 
 			// Change sw_state
 			sw_state = 1;
+			break;
 
 		case 1:
 			// Get sender
@@ -317,15 +318,25 @@ uint8_t analyze_frame(char *message)
 					// Send [CHECKSENDER] message
 					char CHECKSENDER[] = "CHECKSENDER\r\n";
 					return_message(CHECKSENDER);
-					return 0;
+//					return_message(message[collection_index]);
+//					return 0;
 				}
-
-				sender[i] = message[collection_index];
-				collection_index++;
+				else if (i == 2)
+				{
+					sender[i] = message[collection_index];
+					collection_index++;
+					sw_state = 2;
+				}
+				else
+				{
+					sender[i] = message[collection_index];
+					collection_index++;
+				}
 			}
 
-			// Change sw_state
-			sw_state = 2;
+			if (sw_state == 1)
+				// Reset sw_state
+				sw_state = 0;
 			break;
 
 		case 2:
@@ -337,15 +348,26 @@ uint8_t analyze_frame(char *message)
 					// Send [CHECKRECEIVER] message
 					char CHECKRECEIVER[] = "CHECKRECEIVER\r\n";
 					return_message(CHECKRECEIVER);
-					return 0;
+//					return_message(message[collection_index]);
+//					return 0;
+				}
+				else if (i == 2)
+				{
+					receiver[i] = message[collection_index];
+					collection_index++;
+					sw_state = 3;
+				}
+				else
+				{
+					receiver[i] = message[collection_index];
+					collection_index++;
 				}
 
-				receiver[i] = message[collection_index];
-				collection_index++;
 			}
 
-			// Change sw_state
-			sw_state = 3;
+			if (sw_state == 2)
+				// Reset sw_state
+				sw_state = 0;
 			break;
 
 		case 3:
@@ -357,11 +379,19 @@ uint8_t analyze_frame(char *message)
 					// Send [CHECKLENGTH] message
 					char CHECKLENGTH[] = "CHECKLENGTH\r\n";
 					return_message(CHECKLENGTH);
-					return 0;
+//					return 0;
 				}
-
-				command_chars[i] = message[collection_index];
-				collection_index++;
+				else if (i == 2)
+				{
+					command_chars[i] = message[collection_index];
+					collection_index++;
+					sw_state = 4;
+				}
+				else
+				{
+					command_chars[i] = message[collection_index];
+					collection_index++;
+				}
 			}
 
 			// Get data field length as integer value
@@ -387,8 +417,9 @@ uint8_t analyze_frame(char *message)
 			// Pass command length to the variable outside the function
 			data_len = command_length;
 
-			// Change sw_state
-			sw_state = 4;
+			if (sw_state == 3)
+				// Reset sw_state
+				sw_state = 0;
 			break;
 
 		case 4:
@@ -400,15 +431,24 @@ uint8_t analyze_frame(char *message)
 					// Send [CHECKDATA] message
 					char CHECKDATA[] = "CHECKDATA\r\n";
 					return_message(CHECKDATA);
-					return 0;
+//					return 0;
 				}
-
-				data[i] = message[collection_index];
-				collection_index++;
+				else if (i == (command_length-1))
+				{
+					data[i] = message[collection_index];
+					collection_index++;
+					sw_state = 5;
+				}
+				else
+				{
+					data[i] = message[collection_index];
+					collection_index++;
+				}
 			}
 
-			// Change sw_state
-			sw_state = 5;
+			if (sw_state == 4)
+				// Reset sw_state
+				sw_state = 0;
 			break;
 
 		case 5:
@@ -420,22 +460,45 @@ uint8_t analyze_frame(char *message)
 					// Send [CHECKCSUM] message
 					char CHECKCSUM[] = "CHECKCSUM\r\n";
 					return_message(CHECKCSUM);
-					return 0;
+//					return 0;
 				}
-
-				checksum[i] = message[collection_index];
-				collection_index++;
+				else if (i == 2)
+				{
+					checksum[i] = message[collection_index];
+					collection_index++;
+					sw_state = 6;
+				}
+				else
+				{
+					checksum[i] = message[collection_index];
+					collection_index++;
+				}
 			}
-			check_finished = 1;
+
+			if (sw_state == 5)
+				// Reset sw_state
+				sw_state = 0;
+			break;
+
+		case 6:
+			// Get frame end char ( ';' )
+			if (message[collection_index] == ';')
+			{
+				frame_collected = 1;
+				break;
+			}
+
+			if (sw_state == 6)
+				// Reset sw_state
+				sw_state = 0;
 			break;
 		} /* switch end */
 	} /* while end */
 
-	// Get frame end char ( ';' )
-	if (message[collection_index] == ';')
+	if (frame_collected == 1)
 		return 1;
-	// Otherwise return 0
-	else return 0;
+	else
+		return 0;
 }
 
 // Execute command
