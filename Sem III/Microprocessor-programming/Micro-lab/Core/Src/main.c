@@ -272,8 +272,13 @@ void timer_delay(uint16_t ms)
 
 uint16_t calculate_delay(uint8_t blink_hz)
 {
-	float delay_f = 1000.0;
-	delay_f = delay_f / blink_hz;
+	float delay_f = 1800.0;
+
+	if (blink_hz == 1)
+		delay_f = delay_f / blink_hz;
+	else
+		delay_f = delay_f / (blink_hz * 1.8);
+
 	delay_f = ceil(delay_f);
 	uint16_t delay_ms = (uint16_t)delay_f;
 	return delay_ms;
@@ -359,7 +364,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_Base_Start_IT(&htim3);
+  HAL_TIM_Base_Start(&htim3);
   HAL_UART_Receive_IT(&huart3, &character, 1);
   /* USER CODE END 2 */
 
@@ -683,16 +688,15 @@ int main(void)
 	{
 		// Blink LED with delay
 		HAL_GPIO_TogglePin(LED_Blue_GPIO_Port, LED_Blue_Pin);
-		uint16_t test_delay = 1;
-		timer_delay(test_delay);
+		timer_delay(blink_ms);
 	}
 	// Command: LED[ON] / LED[OFF]
 	else if (led_action != 2 || led_action != 3)
 		// Disable LED blink with other commands
 		blink_ms = 0;
-	else
-		// Start the delay
-		timer_delay(loop_delay);
+
+	// Set the delay
+	timer_delay(loop_delay);
   }
   /* USER CODE END 3 */
 }
