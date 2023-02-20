@@ -163,6 +163,15 @@ void increase_tx_busy()
 	}
 }
 
+void timer_delay(uint16_t ms)
+{
+	// Reset timer counter
+	__HAL_TIM_SET_COUNTER(&htim3,0);
+
+	// Wait for set period to pass
+	while (__HAL_TIM_GET_COUNTER(&htim3) < ms);
+}
+
 // Get single character from the reception buffer
 uint8_t get_char()
 {
@@ -248,7 +257,7 @@ void send_response(char *message, ...)
 	__enable_irq();
 
 	// Wait after re-enabling interrupts
-	HAL_Delay(5);
+	timer_delay(5);
 }
 
 void turn_on_led()
@@ -259,15 +268,6 @@ void turn_on_led()
 void turn_off_led()
 {
 	HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
-}
-
-void timer_delay(uint16_t ms)
-{
-	// Reset timer counter
-	__HAL_TIM_SET_COUNTER(&htim3,0);
-
-	// Wait for set period to pass
-	while (__HAL_TIM_GET_COUNTER(&htim3) < ms);
 }
 
 uint16_t calculate_delay(uint8_t blink_hz)
