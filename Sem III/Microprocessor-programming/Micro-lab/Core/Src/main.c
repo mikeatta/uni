@@ -317,6 +317,17 @@ uint8_t validate_command(char *single_command_message)
 
 	return command_valid;
 }
+
+void clear_array(char *array, uint16_t array_length)
+{
+	uint16_t idx = 0;
+	while (idx < array_length)
+	{
+		array[idx] = '\0';
+		idx++;
+	}
+	array_length = 0;
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -678,7 +689,13 @@ int main(void)
 				loop_delay = atoi(temp);
 				break;
 			} /* control switch end */
+
+			// Set the delay
+			timer_delay(loop_delay);
 		} /* for loop end */
+
+		// Clear the message array processing the commands
+		clear_array(message, message_length);
 	} /* if statement end */
     /* USER CODE END WHILE */
 
