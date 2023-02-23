@@ -383,10 +383,6 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uart_print('>');
-  uart_print('\r');
-  uart_print('\n');
-
   // Parameter variables
   char *open_bracket;
   uint16_t open_idx;
@@ -698,6 +694,9 @@ int main(void)
 
 			// Set the delay
 			timer_delay(loop_delay);
+
+			// Refresh watchdog timer
+			HAL_IWDG_Refresh(&hiwdg);
 		} /* for loop end */
 
 		// Clear the message array processing the commands
@@ -721,7 +720,9 @@ int main(void)
 	// Set the delay
 	timer_delay(loop_delay);
 
-	// Refresh IWDG counter
+	HAL_Delay(5000);
+
+	// Refresh watchdog timer
 	HAL_IWDG_Refresh(&hiwdg);
   }
   /* USER CODE END 3 */
