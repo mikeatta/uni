@@ -39,7 +39,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define BUFFER_LENGTH 50
+#define BUFFER_LENGTH 100
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -719,8 +719,6 @@ int main(void)
 
 	// Set the delay
 	timer_delay(loop_delay);
-
-	HAL_Delay(5000);
 
 	// Refresh watchdog timer
 	HAL_IWDG_Refresh(&hiwdg);
