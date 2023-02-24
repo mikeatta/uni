@@ -36,7 +36,7 @@
 /* USER CODE BEGIN PD */
 // Set max length of data field in the frame
 #define MAX_DATA_LENGTH 512
-#define BUFFER_LENGTH 60
+#define BUFFER_LENGTH 100
 /* BUFFER LENGTH FOR DEBUGGING */
 /* USER CODE END PD */
 
