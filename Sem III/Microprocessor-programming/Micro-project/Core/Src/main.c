@@ -183,6 +183,13 @@ uint8_t char_is_frame_start_end(char c)
 	else return 0;
 }
 
+// Clear array
+void clear_array(char *array, uint16_t array_length)
+{
+	for (uint16_t i=0; i<=array_length; i++)
+		array[i] = '\000';
+}
+
 // Get single character from the reception buffer
 uint8_t get_char()
 {
@@ -290,9 +297,9 @@ uint8_t analyze_frame(char *message)
 		return 0;
 	}
 
-	uint8_t frame_collected = 0;
+	uint8_t frame_complete = 0;
 
-	while (frame_collected != 1)
+	while (frame_complete != 1)
 	{
 		switch (sw_state)
 		{
@@ -398,26 +405,18 @@ uint8_t analyze_frame(char *message)
 			// Use length to get characters from 'data' array in next step
 			command_length = atoi(command_chars);
 
-			// Check declared message length
-			if (command_length == 0)
-			{
-				// Send [FRAMEEMPTY] message
-				char FRAMEEMPTY[] = "FRAMEEMPTY\r\n";
-				return_message(FRAMEEMPTY);
-				return 0;
-			}
-			else if (command_length > MAX_DATA_LENGTH)
+			if (command_length > MAX_DATA_LENGTH)
 			{
 				// Send [DATAOVERFLOW] message
 				char DATAOVERFLOW[] = "DATAOVERFLOW\r\n";
 				return_message(DATAOVERFLOW);
-				return 0;
+//				return 0;
 			}
 
 			// Pass command length to the variable outside the function
 			data_len = command_length;
 
-			if (sw_state == 3)
+			if (sw_state == 3 || command_length > MAX_DATA_LENGTH)
 				// Reset sw_state
 				sw_state = 0;
 			break;
@@ -484,18 +483,25 @@ uint8_t analyze_frame(char *message)
 			// Get frame end char ( ';' )
 			if (message[collection_index] == ';')
 			{
-				frame_collected = 1;
+				// Mark frame as complete
+				frame_complete = 1;
 				break;
 			}
 
 			if (sw_state == 6)
+			{
+				// Clear data array
+				clear_array(data, data_len);
+
 				// Reset sw_state
 				sw_state = 0;
+			}
+
 			break;
 		} /* switch end */
 	} /* while end */
 
-	if (frame_collected == 1)
+	if (frame_complete == 1)
 		return 1;
 	else
 		return 0;
@@ -568,13 +574,25 @@ int main(void)
 	  // Analyze frame if message had any content
 	  if (message_length > 0 && analyze_frame(message) == 1)
 	  {
-		  // Print received message
-		  return_message(data);
-		  return_message("\r");
-		  return_message("\n");
+		  // On empty frame
+		  if (data_len == 0)
+		  {
+			  // Send [FRAMEEMPTY] message
+			  char FRAMEEMPTY[] = "FRAMEEMPTY\r\n";
+			  return_message(FRAMEEMPTY);
+			  break;
+		  }
+		  // On frame with content
+		  else
+		  {
+			  // Print received message
+			  return_message(data);
+			  return_message("\r");
+			  return_message("\n");
 
-		  // Run sent command
-		  execute_command(data, data_len);
+			  // Run sent command
+			  execute_command(data, data_len);
+		  }
 	  }
 
 
