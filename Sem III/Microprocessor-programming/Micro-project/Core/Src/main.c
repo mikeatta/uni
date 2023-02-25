@@ -446,8 +446,13 @@ uint8_t analyze_frame(char *message)
 			}
 
 			if (sw_state == 4)
+			{
+				// Clear data array
+				clear_array(data, data_len);
+
 				// Reset sw_state
 				sw_state = 0;
+			}
 			break;
 
 		case 5:
@@ -475,8 +480,13 @@ uint8_t analyze_frame(char *message)
 			}
 
 			if (sw_state == 5)
+			{
+				// Clear data array
+				clear_array(data, data_len);
+
 				// Reset sw_state
 				sw_state = 0;
+			}
 			break;
 
 		case 6:
