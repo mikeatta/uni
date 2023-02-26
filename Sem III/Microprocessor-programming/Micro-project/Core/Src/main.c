@@ -66,7 +66,7 @@ char data[512];
 uint8_t checksum[3];
 
 // --- Command variables ---
-uint16_t data_len;
+__IO uint16_t data_len = 0;
 
 // --- Reception Buffer ---
 uint8_t rx_buffer[BUFFER_LENGTH];
@@ -80,6 +80,7 @@ __IO uint16_t tx_busy = 0;
 
 // --- DEBUG ---
 uint8_t sw_state = 0;
+__IO uint8_t frame_complete = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -184,10 +185,15 @@ uint8_t char_is_frame_start_end(char c)
 }
 
 // Clear array
-void clear_array(char *array, uint16_t array_length)
+uint16_t clear_array(char *array, uint16_t array_length)
 {
+	// Reset array content
 	for (uint16_t i=0; i<=array_length; i++)
 		array[i] = '\000';
+
+	// Reset array length
+	array_length = 0;
+	return array_length;
 }
 
 // Get single character from the reception buffer
@@ -293,11 +299,12 @@ uint8_t analyze_frame(char *message)
 
 	if (frame_begin == NULL || frame_end == NULL)
 	{
-		uart_print('%');
+		return_message("NOFRAMESTARTEND\r\n");
 		return 0;
 	}
 
-	uint8_t frame_complete = 0;
+	// Set frame status to incomplete
+	frame_complete = 0;
 
 	while (frame_complete != 1)
 	{
@@ -306,11 +313,21 @@ uint8_t analyze_frame(char *message)
 		case 0:
 			// Skip any character before '#' is found
 			while (message[collection_index] != '#')
-				collection_index++;
+			{
+				if (message[collection_index] == '\0')
+					return 0;
+				else
+					collection_index++;
+			}
 
 			// Get frame start char ( '#' )
 			while (message[collection_index] == '#')
-				collection_index++;
+			{
+				if (message[collection_index+1] == ';' && message[collection_index+2] == '\0')
+					return 0;
+				else
+					collection_index++;
+			}
 
 			// Change sw_state
 			sw_state = 1;
@@ -506,7 +523,6 @@ uint8_t analyze_frame(char *message)
 				// Reset sw_state
 				sw_state = 0;
 			}
-
 			break;
 		} /* switch end */
 	} /* while end */
@@ -590,21 +606,27 @@ int main(void)
 			  // Send [FRAMEEMPTY] message
 			  char FRAMEEMPTY[] = "FRAMEEMPTY\r\n";
 			  return_message(FRAMEEMPTY);
-			  break;
 		  }
 		  // On frame with content
 		  else
 		  {
-			  // Print received message
+			  // Print command message
 			  return_message(data);
-			  return_message("\r");
-			  return_message("\n");
+			  return_message("\r\n");
 
 			  // Run sent command
 			  execute_command(data, data_len);
-		  }
-	  }
 
+			  // Clear data array
+			  data_len = clear_array(data, data_len);
+		  }
+
+		  // Reset message array and message length
+		  message_length = clear_array(message, command_length);
+	  }
+	  else if (message_length > 0 && analyze_frame(message) == 0)
+		  // Send [Error] message
+		  return_message("Error\r\n");
 
     /* USER CODE END WHILE */
 
@@ -715,6 +737,7 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
