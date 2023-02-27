@@ -299,7 +299,7 @@ uint8_t analyze_frame(char *message)
 
 	if (frame_begin == NULL || frame_end == NULL)
 	{
-		return_message("NOFRAMESTARTEND\r\n");
+		return_message("NOFRAMEFOUND\r\n");
 		return 0;
 	}
 
@@ -342,6 +342,8 @@ uint8_t analyze_frame(char *message)
 					// Send [CHECKSENDER] message
 					char CHECKSENDER[] = "CHECKSENDER\r\n";
 					return_message(CHECKSENDER);
+					while (i<3)
+						i++;
 //					return_message(message[collection_index]);
 //					return 0;
 				}
@@ -372,6 +374,9 @@ uint8_t analyze_frame(char *message)
 					// Send [CHECKRECEIVER] message
 					char CHECKRECEIVER[] = "CHECKRECEIVER\r\n";
 					return_message(CHECKRECEIVER);
+					while (i<3)
+						i++;
+
 //					return_message(message[collection_index]);
 //					return 0;
 				}
@@ -403,6 +408,9 @@ uint8_t analyze_frame(char *message)
 					// Send [CHECKLENGTH] message
 					char CHECKLENGTH[] = "CHECKLENGTH\r\n";
 					return_message(CHECKLENGTH);
+					while (i<3)
+						i++;
+
 //					return 0;
 				}
 				else if (i == 2)
@@ -447,6 +455,9 @@ uint8_t analyze_frame(char *message)
 					// Send [CHECKDATA] message
 					char CHECKDATA[] = "CHECKDATA\r\n";
 					return_message(CHECKDATA);
+					while (i<command_length)
+						i++;
+
 //					return 0;
 				}
 				else if (i == (command_length-1))
@@ -481,6 +492,9 @@ uint8_t analyze_frame(char *message)
 					// Send [CHECKCSUM] message
 					char CHECKCSUM[] = "CHECKCSUM\r\n";
 					return_message(CHECKCSUM);
+					while (i<3)
+						i++;
+
 //					return 0;
 				}
 				else if (i == 2)
@@ -622,11 +636,17 @@ int main(void)
 		  }
 
 		  // Reset message array and message length
-		  message_length = clear_array(message, command_length);
+		  message_length = clear_array(message, message_length);
 	  }
 	  else if (message_length > 0 && analyze_frame(message) == 0)
+	  {
 		  // Send [Error] message
 		  return_message("Error\r\n");
+
+		  // Reset message array and message length
+		  message_length = clear_array(message, message_length);
+	  }
+
 
     /* USER CODE END WHILE */
 
