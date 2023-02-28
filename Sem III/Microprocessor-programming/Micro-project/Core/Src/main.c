@@ -81,6 +81,7 @@ __IO uint16_t tx_busy = 0;
 // --- DEBUG ---
 uint8_t sw_state = 0;
 __IO uint8_t frame_complete = 0;
+__IO uint8_t valid_frame_found = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -299,7 +300,7 @@ uint8_t analyze_frame(char *message)
 
 	if (frame_begin == NULL || frame_end == NULL)
 	{
-		return_message("NOFRAMEFOUND\r\n");
+		return_message("NOFRAMECHARS\r\n");
 		return 0;
 	}
 
@@ -448,6 +449,12 @@ uint8_t analyze_frame(char *message)
 
 		case 4:
 			// Get data
+			if (command_length == 0)
+			{
+				sw_state = 5;
+				break;
+			}
+
 			for (uint16_t i=0; i<command_length; i++)
 			{
 				if (char_is_frame_start_end(message[collection_index]) == 1)
@@ -612,17 +619,20 @@ int main(void)
 		  message_length = get_message(message);
 
 	  // Analyze frame if message had any content
-	  if (message_length > 0 && analyze_frame(message) == 1)
+	  if (message_length > 0)
 	  {
+		  // Check if valid frame was found
+		  valid_frame_found = analyze_frame(message);
+
 		  // On empty frame
-		  if (data_len == 0)
+		  if (valid_frame_found == 1 && data_len == 0)
 		  {
 			  // Send [FRAMEEMPTY] message
 			  char FRAMEEMPTY[] = "FRAMEEMPTY\r\n";
 			  return_message(FRAMEEMPTY);
 		  }
 		  // On frame with content
-		  else
+		  else if (valid_frame_found == 1 && data_len > 0)
 		  {
 			  // Print command message
 			  return_message(data);
@@ -634,14 +644,15 @@ int main(void)
 			  // Clear data array
 			  data_len = clear_array(data, data_len);
 		  }
+		  // If no correct frame was found
+		  else
+		  {
+			  // Send [Error] message
+			  return_message("Error\r\n");
 
-		  // Reset message array and message length
-		  message_length = clear_array(message, message_length);
-	  }
-	  else if (message_length > 0 && analyze_frame(message) == 0)
-	  {
-		  // Send [Error] message
-		  return_message("Error\r\n");
+			  // Reset message array and message length
+			  message_length = clear_array(message, message_length);
+		  }
 
 		  // Reset message array and message length
 		  message_length = clear_array(message, message_length);
