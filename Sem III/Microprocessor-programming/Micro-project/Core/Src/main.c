@@ -58,12 +58,19 @@ __IO uint16_t message_length;
 __IO uint16_t message_idx;
 
 // --- Frame content ---
-uint8_t sender[3];
-uint8_t receiver[3];
+char sender[3];
+char receiver[3];
 char command_chars[3];
-static uint16_t command_length;
 char data[512];
-uint8_t checksum[3];
+char checksum[3];
+
+// --- Frame validation ---
+__IO uint8_t sw_state = 0;
+__IO uint8_t frame_complete = 0;
+__IO uint8_t valid_frame_found = 0;
+__IO uint16_t command_length = 0;
+__IO uint16_t checksum_value = 0;
+__IO uint16_t command_checksum = 0;
 
 // --- Command variables ---
 __IO uint16_t data_len = 0;
@@ -79,9 +86,7 @@ __IO uint16_t tx_empty = 0;
 __IO uint16_t tx_busy = 0;
 
 // --- DEBUG ---
-uint8_t sw_state = 0;
-__IO uint8_t frame_complete = 0;
-__IO uint8_t valid_frame_found = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -480,6 +485,11 @@ uint8_t analyze_frame(char *message)
 				}
 			}
 
+			// Convert command to checksum value
+			for (uint16_t i=0; i<command_length; i++)
+				command_checksum += data[i];
+			command_checksum %= 1000;
+
 			if (sw_state == 4)
 			{
 				// Clear data array
@@ -516,6 +526,9 @@ uint8_t analyze_frame(char *message)
 					collection_index++;
 				}
 			}
+
+			// Convert array content to checksum value
+			checksum_value = atoi(checksum);
 
 			if (sw_state == 5)
 			{
