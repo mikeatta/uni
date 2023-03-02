@@ -312,6 +312,10 @@ uint8_t analyze_frame(char *message)
 	// Set frame status to incomplete
 	frame_complete = 0;
 
+	// Reset checksum variables
+	command_checksum = 0;
+	checksum_value = 0;
+
 	while (frame_complete != 1)
 	{
 		switch (sw_state)
@@ -529,6 +533,17 @@ uint8_t analyze_frame(char *message)
 
 			// Convert array content to checksum value
 			checksum_value = atoi(checksum);
+
+			// Compare the checksum values
+			if (command_checksum != checksum_value)
+			{
+				// Send [CHECKCSUM] message
+				char WRONGCSUM[] = "WRONGCSUM\r\n";
+				return_message(WRONGCSUM);
+
+				// Reset sw_state in next if-statement
+				sw_state = 5;
+			}
 
 			if (sw_state == 5)
 			{
