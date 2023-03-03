@@ -21,11 +21,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
-#include <stdarg.h>
-#include <string.h>
-#include <stdio.h>
-
+#include "stdio.h"
+#include "stdlib.h"
+#include "stdarg.h"
+#include "string.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -35,10 +34,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
-// Length == 300 + 10% margin
-#define buffer_length 330
-
+// Set max length of data field in the frame
+#define MAX_DATA_LENGTH 512
+#define BUFFER_LENGTH 100
+/* BUFFER LENGTH FOR DEBUGGING */
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -51,26 +50,43 @@
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
+uint8_t character;
 
-// Amount of characters in the frame
-__IO uint8_t frame_length;
+// --- Message array ----
+char message[BUFFER_LENGTH];
+__IO uint16_t message_length;
+__IO uint16_t message_idx;
 
-// Array for received characters
-__IO uint8_t frame[buffer_length];
+// --- Frame content ---
+char sender[3];
+char receiver[3];
+char command_chars[3];
+char data[512];
+char checksum[3];
 
-__IO uint8_t frame_idx;
+// --- Frame validation ---
+__IO uint8_t sw_state = 0;
+__IO uint8_t frame_complete = 0;
+__IO uint8_t valid_frame_found = 0;
+__IO uint16_t command_length = 0;
+__IO uint16_t checksum_value = 0;
+__IO uint16_t command_checksum = 0;
 
-// Transmission buffer
-uint8_t buffer_rx[buffer_length];
-__IO uint16_t rx_empty;
-__IO uint16_t rx_busy;
+// --- Command variables ---
+__IO uint16_t data_len = 0;
 
-// Collection buffer
-uint8_t buffer_tx[buffer_length];
-__IO uint16_t tx_empty;
-__IO uint16_t tx_busy;
+// --- Reception Buffer ---
+uint8_t rx_buffer[BUFFER_LENGTH];
+__IO uint16_t rx_empty = 0;
+__IO uint16_t rx_busy = 0;
 
-__IO uint8_t test_char;
+// --- Transmission Buffer ---
+uint8_t tx_buffer[BUFFER_LENGTH];
+__IO uint16_t tx_empty = 0;
+__IO uint16_t tx_busy = 0;
+
+// --- DEBUG ---
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -83,184 +99,510 @@ static void MX_USART3_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-/* --- TRANSMISSION --- */
-
-// Check transmission buffer state
-uint8_t tx_has_data()
+// Print single character to terminal
+void uart_print(unsigned char x)
 {
-	if(tx_empty == tx_busy)
-		return 0;
-	else
+	USART3->TDR = (x);
+	while(!((USART3->ISR)&USART_ISR_TC)){;}
+}
+
+uint8_t char_is_framestart(char c)
+{
+	if (c == '#')
+	{
 		return 1;
+	}
+	else return 0;
 }
 
-void increment_tx_empty()
+uint8_t char_is_endmessage(char c)
 {
-	tx_empty++;
-
-	// Reset tx_empty back to idx 0, if value >= buffer_length
-	if(tx_empty >= buffer_length)
-		tx_empty = 0;
+	if (c == '\r' || c == '\n')
+	{
+		return 1;
+	}
+	else return 0;
 }
 
-void increment_tx_busy()
-{
-	tx_busy++;
-
-	// Reset tx_busy back to idx 0, if value >= buffer_length
-	if(tx_busy >= buffer_length)
-		tx_busy = 0;
-}
-
-/* --- COLLECTION --- */
-
-// Check collection buffer state
+// --- Reception ---
 uint8_t rx_has_data()
 {
 	if(rx_empty == rx_busy)
+	{
 		return 0;
-	else
-		return 1;
+	}
+	else return 1;
 }
 
-void increment_rx_empty()
+void increase_rx_empty()
 {
 	rx_empty++;
-
-	// Reset rx_empty back to idx 0, if value >= buffer_length
-	if(rx_empty >= buffer_length)
+	if(rx_empty >= BUFFER_LENGTH)
+	{
 		rx_empty = 0;
+	}
 }
 
-void increment_rx_busy()
+void increase_rx_busy()
 {
 	rx_busy++;
-
-	// Reset rx_busy back to idx 0, if value >= buffer_length
-	if(rx_busy >= buffer_length)
+	if(rx_busy >= BUFFER_LENGTH)
+	{
 		rx_busy = 0;
+	}
 }
 
-// Check for end-of-line characters
-uint8_t is_end_of_line(char c)
+// --- Transmission ---
+uint8_t tx_has_data()
 {
-	// If char is LF or CR
-	if(c == 13 || c == 10)
-		return 1;
-	else
+	if(tx_empty == tx_busy)
+	{
 		return 0;
+	}
+	else return 1;
 }
 
-// Get single character from collection buffer
+void increase_tx_empty()
+{
+	tx_empty++;
+	if(rx_busy >= BUFFER_LENGTH)
+	{
+		tx_empty = 0;
+	}
+}
+
+void increase_tx_busy()
+{
+	tx_busy++;
+	if(tx_busy >= BUFFER_LENGTH)
+	{
+		tx_busy = 0;
+	}
+}
+
+// Check for frame start and frame end characters
+uint8_t char_is_frame_start_end(char c)
+{
+	if (c == '#' || c == ';')
+	{
+		return 1;
+	}
+	else return 0;
+}
+
+// Clear array
+uint16_t clear_array(char *array, uint16_t array_length)
+{
+	// Reset array content
+	for (uint16_t i=0; i<=array_length; i++)
+		array[i] = '\000';
+
+	// Reset array length
+	array_length = 0;
+	return array_length;
+}
+
+// Get single character from the reception buffer
 uint8_t get_char()
 {
-	// Temporary char storage
 	uint8_t tmp;
 
-	// Check, if buffer has any data to collect
-	if(rx_has_data() == 1)
-	{
-		// Store character in tmp variable, increment busy idx
-		tmp = buffer_rx[rx_busy];
-		increment_rx_busy();
-		return tmp;
-	}
-	else
-	{
-		return 0;
-	}
+	tmp = rx_buffer[rx_busy];
+	increase_rx_busy();
+	return tmp;
 }
 
-// Get entire frame
-uint8_t get_frame(char *arr)
+// Get message from the reception buffer
+uint16_t get_message(char *array)
 {
-	// Temporary chars storage array
-	uint8_t tmp_arr[buffer_length];
-	uint8_t idx = 0;
-	uint8_t frame_length;
-	int i;
+	static uint8_t tmp_arr[BUFFER_LENGTH];
+	static uint16_t idx = 0;
+	__IO uint16_t message_length = 0;
 
-	// Check, if buffer has any data to collect
-	if(rx_has_data() == 1)
+	// Collect data from the reception buffer
+	while(rx_has_data() == 1)
 	{
-		// Assign character to tmp array
-		tmp_arr[idx] = buffer_rx[rx_busy];
+		tmp_arr[idx] = get_char();
 
-		// Check if current char is an end of line character
-		if(is_end_of_line(tmp_arr[idx]) == 1)
+		if (char_is_endmessage(tmp_arr[idx]))
 		{
-			tmp_arr[idx] = 0;
+			// Set character at endmessage index to null
+			tmp_arr[idx] = '\0';
 
-			for(i=0; i<=idx; i++)
+			// Assign collected data to passed array
+			for (uint8_t i=0; i<idx; i++)
 			{
-				arr[i] = tmp_arr[i];
+				array[i] = tmp_arr[i];
 			}
 
-			// Amount of characters stored
-			frame_length = idx;
-
-			// Reset idx
+			message_length = idx;
 			idx = 0;
-
-			return frame_length;
+			return message_length;
 		}
 		else
 		{
 			idx++;
-
-			if(idx >= buffer_length)
-				return 0;
+			if(idx>BUFFER_LENGTH) return 0;
 		}
 	}
 	return 0;
 }
 
-// Sending a frame
-void send_frame(char *input, ...)
+// Send response from STM
+void return_message(char *message, ...)
 {
-	// Data array
-	char tmp_arr[buffer_length];
-
+	// Store STM return message
+	char response[BUFFER_LENGTH];
 	uint16_t idx;
-	int i;
 
 	va_list arglist;
-	va_start(arglist, input);
-	vsprintf(tmp_arr, input, arglist);
+	va_start(arglist, message);
+	vsprintf(response, message, arglist);
 	va_end(arglist);
 
-	// Set pointer to the first empty idx of collection buffer
-	idx = rx_empty;
+	// Set index to the first empty space in transmission buffer
+	idx = tx_empty;
 
-	for(i=0; i<strlen(input); i++)
+	// Send response to the transmission buffer
+	for (uint16_t i=0; i<strlen(response); i++)
 	{
-		buffer_tx[idx] = input[i];
+		tx_buffer[idx] = response[i];
 		idx++;
-		idx %= buffer_length;
+
+		if (idx >= BUFFER_LENGTH)
+			idx = 0;
 	}
 	__disable_irq();
 
-	if(tx_has_data() == 0 && (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_TXE) == SET))
+	// Check if there is no more data to transmit
+	if (tx_has_data() == 0 && (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_TXE) == SET))
 	{
-		// Set idx to first empty field in transmission array == there is new data to send
 		tx_empty = idx;
-
-		// Transmit data
-		HAL_UART_Transmit_IT(&huart3, &buffer_tx[tx_busy], 1);
-
-		// Increment tx_busy idx
-		increment_tx_busy();
+		HAL_UART_Transmit_IT(&huart3, &tx_buffer[tx_busy], 1);
+		increase_tx_busy();
 	}
 	else
-	{
 		tx_empty = idx;
-	}
 
-	// Enable interrupts
 	__enable_irq();
 }
 
+// Analyze frame content
+uint8_t analyze_frame(char *message)
+{
+	// Store last analyzed char position
+	__IO uint16_t collection_index = 0;
+
+	// Save frame-check state
+	__IO uint8_t sw_state = 0;
+
+	// Check for '#' and ';' characters in received message
+	char *frame_begin;
+	char *frame_end;
+
+	frame_begin = strchr(message, '#');
+	frame_end = strchr(message, ';');
+
+	if (frame_begin == NULL || frame_end == NULL)
+	{
+		return_message("NOFRAMECHARS\r\n");
+		return 0;
+	}
+
+	// Set frame status to incomplete
+	frame_complete = 0;
+
+	// Reset checksum variables
+	command_checksum = 0;
+	checksum_value = 0;
+
+	while (frame_complete != 1)
+	{
+		switch (sw_state)
+		{
+		case 0:
+			// Skip any character before '#' is found
+			while (message[collection_index] != '#')
+			{
+				if (message[collection_index] == '\0')
+					return 0;
+				else
+					collection_index++;
+			}
+
+			// Get frame start char ( '#' )
+			while (message[collection_index] == '#')
+			{
+				if (message[collection_index+1] == ';' && message[collection_index+2] == '\0')
+					return 0;
+				else
+					collection_index++;
+			}
+
+			// Change sw_state
+			sw_state = 1;
+			break;
+
+		case 1:
+			// Get sender
+			for (uint8_t i=0; i<3; i++)
+			{
+				if (char_is_frame_start_end(message[collection_index]) == 1 || message[collection_index] == ' ')
+				{
+					// Send [CHECKSENDER] message
+					char CHECKSENDER[] = "CHECKSENDER\r\n";
+					return_message(CHECKSENDER);
+					while (i<3)
+						i++;
+//					return_message(message[collection_index]);
+//					return 0;
+				}
+				else if (i == 2)
+				{
+					sender[i] = message[collection_index];
+					collection_index++;
+					sw_state = 2;
+				}
+				else
+				{
+					sender[i] = message[collection_index];
+					collection_index++;
+				}
+			}
+
+			if (sw_state == 1)
+				// Reset sw_state
+				sw_state = 0;
+			break;
+
+		case 2:
+			// Get receiver
+			for (uint8_t i=0; i<3; i++)
+			{
+				if (char_is_frame_start_end(message[collection_index]) == 1 || message[collection_index] == ' ')
+				{
+					// Send [CHECKRECEIVER] message
+					char CHECKRECEIVER[] = "CHECKRECEIVER\r\n";
+					return_message(CHECKRECEIVER);
+					while (i<3)
+						i++;
+
+//					return_message(message[collection_index]);
+//					return 0;
+				}
+				else if (i == 2)
+				{
+					receiver[i] = message[collection_index];
+					collection_index++;
+					sw_state = 3;
+				}
+				else
+				{
+					receiver[i] = message[collection_index];
+					collection_index++;
+				}
+
+			}
+
+			if (sw_state == 2)
+				// Reset sw_state
+				sw_state = 0;
+			break;
+
+		case 3:
+			// Get command length
+			for (uint8_t i=0; i<3; i++)
+			{
+				if (!(message[collection_index] >= 0x30 && message[collection_index] <= 0x39))
+				{
+					// Send [CHECKLENGTH] message
+					char CHECKLENGTH[] = "CHECKLENGTH\r\n";
+					return_message(CHECKLENGTH);
+					while (i<3)
+						i++;
+
+//					return 0;
+				}
+				else if (i == 2)
+				{
+					command_chars[i] = message[collection_index];
+					collection_index++;
+					sw_state = 4;
+				}
+				else
+				{
+					command_chars[i] = message[collection_index];
+					collection_index++;
+				}
+			}
+
+			// Get data field length as integer value
+			// Use length to get characters from 'data' array in next step
+			command_length = atoi(command_chars);
+
+			if (command_length > MAX_DATA_LENGTH)
+			{
+				// Send [DATAOVERFLOW] message
+				char DATAOVERFLOW[] = "DATAOVERFLOW\r\n";
+				return_message(DATAOVERFLOW);
+//				return 0;
+			}
+
+			// Pass command length to the variable outside the function
+			data_len = command_length;
+
+			if (sw_state == 3 || command_length > MAX_DATA_LENGTH)
+				// Reset sw_state
+				sw_state = 0;
+			break;
+
+		case 4:
+			// Get data
+			if (command_length == 0)
+			{
+				sw_state = 5;
+				break;
+			}
+
+			for (uint16_t i=0; i<command_length; i++)
+			{
+				if (char_is_frame_start_end(message[collection_index]) == 1)
+				{
+					// Send [CHECKDATA] message
+					char CHECKDATA[] = "CHECKDATA\r\n";
+					return_message(CHECKDATA);
+					while (i<command_length)
+						i++;
+
+//					return 0;
+				}
+				else if (i == (command_length-1))
+				{
+					data[i] = message[collection_index];
+					collection_index++;
+					sw_state = 5;
+				}
+				else
+				{
+					data[i] = message[collection_index];
+					collection_index++;
+				}
+			}
+
+			// Convert command to checksum value
+			for (uint16_t i=0; i<command_length; i++)
+				command_checksum += data[i];
+			command_checksum %= 1000;
+
+			if (sw_state == 4)
+			{
+				// Clear data array
+				clear_array(data, data_len);
+
+				// Reset sw_state
+				sw_state = 0;
+			}
+			break;
+
+		case 5:
+			// Get checksum
+			for (uint8_t i=0; i<3; i++)
+			{
+				if (!(message[collection_index] >= 0x30 && message[collection_index] <= 0x39))
+				{
+					// Send [CHECKCSUM] message
+					char CHECKCSUM[] = "CHECKCSUM\r\n";
+					return_message(CHECKCSUM);
+					while (i<3)
+						i++;
+
+//					return 0;
+				}
+				else if (i == 2)
+				{
+					checksum[i] = message[collection_index];
+					collection_index++;
+					sw_state = 6;
+				}
+				else
+				{
+					checksum[i] = message[collection_index];
+					collection_index++;
+				}
+			}
+
+			// Convert array content to checksum value
+			checksum_value = atoi(checksum);
+
+			// Compare the checksum values
+			if (command_checksum != checksum_value)
+			{
+				// Send [CHECKCSUM] message
+				char WRONGCSUM[] = "WRONGCSUM\r\n";
+				return_message(WRONGCSUM);
+
+				// Reset sw_state in next if-statement
+				sw_state = 5;
+			}
+
+			if (sw_state == 5)
+			{
+				// Clear data array
+				clear_array(data, data_len);
+
+				// Reset sw_state
+				sw_state = 0;
+			}
+			break;
+
+		case 6:
+			// Get frame end char ( ';' )
+			if (message[collection_index] == ';')
+			{
+				// Mark frame as complete
+				frame_complete = 1;
+				break;
+			}
+
+			if (sw_state == 6)
+			{
+				// Clear data array
+				clear_array(data, data_len);
+
+				// Reset sw_state
+				sw_state = 0;
+			}
+			break;
+		} /* switch end */
+	} /* while end */
+
+	if (frame_complete == 1)
+		return 1;
+	else
+		return 0;
+}
+
+// Execute command
+void execute_command(char *frame_command, uint16_t frame_command_length)
+{
+//	uint8_t frameoverflow[] = "FRMOVERFLOW\r\n";
+//	uint8_t frameempty[] = "FRMEMPTY\r\n";
+//
+//	// Check if command is too long
+//	if (frame_command_length > 512)
+//	{
+//		for (uint16_t i=0; i<(sizeof(frameoverflow)-2); i++)
+//			uart_print(frameoverflow[i]);
+//	}
+//
+//	// Check whether command field was filled
+//	if (frame_command_length == 0)
+//	{
+//		// Return empty command message
+//		for (uint16_t i=0; i<(sizeof(frameempty)-2); i++)
+//			uart_print(frameempty[i]);
+//	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -293,24 +635,62 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-
-  for(int i=0; i<100; i++)
-  {
-	  buffer_rx[rx_empty] = i;
-	  rx_empty++;
-  }
-
-  HAL_UART_Receive_IT(&huart3, &buffer_rx[rx_empty], 1);
-
+  HAL_UART_Receive_IT(&huart3, &character, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  // Retrieve the message
+	  if (char_is_endmessage(character))
+		  message_length = get_message(message);
+
+	  // Analyze frame if message had any content
+	  if (message_length > 0)
+	  {
+		  // Check if valid frame was found
+		  valid_frame_found = analyze_frame(message);
+
+		  // On empty frame
+		  if (valid_frame_found == 1 && data_len == 0)
+		  {
+			  // Send [FRAMEEMPTY] message
+			  char FRAMEEMPTY[] = "FRAMEEMPTY\r\n";
+			  return_message(FRAMEEMPTY);
+		  }
+		  // On frame with content
+		  else if (valid_frame_found == 1 && data_len > 0)
+		  {
+			  // Print command message
+			  return_message(data);
+			  return_message("\r\n");
+
+			  // Run sent command
+			  execute_command(data, data_len);
+
+			  // Clear data array
+			  data_len = clear_array(data, data_len);
+		  }
+		  // If no correct frame was found
+		  else
+		  {
+			  // Send [Error] message
+			  return_message("Error\r\n");
+
+			  // Reset message array and message length
+			  message_length = clear_array(message, message_length);
+		  }
+
+		  // Reset message array and message length
+		  message_length = clear_array(message, message_length);
+	  }
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
   }
   /* USER CODE END 3 */
 }
@@ -385,7 +765,7 @@ static void MX_USART3_UART_Init(void)
 
   /* USER CODE END USART3_Init 1 */
   huart3.Instance = USART3;
-  huart3.Init.BaudRate = 9600;
+  huart3.Init.BaudRate = 115200;
   huart3.Init.WordLength = UART_WORDLENGTH_8B;
   huart3.Init.StopBits = UART_STOPBITS_1;
   huart3.Init.Parity = UART_PARITY_NONE;
@@ -415,12 +795,9 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5, GPIO_PIN_RESET);
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_Blue_GPIO_Port, LED_Blue_Pin, GPIO_PIN_RESET);
@@ -430,19 +807,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_button_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PD5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_5;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PD6 */
-  GPIO_InitStruct.Pin = GPIO_PIN_6;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LED_Blue_Pin */
   GPIO_InitStruct.Pin = LED_Blue_Pin;
@@ -454,41 +818,41 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+// Collection callback
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	// Print character to terminal
+	uart_print(character);
+
+	// Check for correct USART port
+	if(huart->Instance == USART3)
+	{
+		// Collect character to reception buffer
+		rx_buffer[rx_empty] = character;
+
+		// Increase rx_empty index
+		increase_rx_empty();
+
+		// Continue data collection
+		HAL_UART_Receive_IT(huart, &character, 1);
+	}
+}
 
 // Transmission callback
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-	// Check for correct huart port
-	if(huart == &huart3)
+	if(huart->Instance == USART3)
 	{
-		// Check, if collection buffer had and data to transmit
 		if(tx_has_data() == 1)
 		{
 			static uint8_t tmp;
-			tmp = buffer_tx[tx_busy];
+			tmp = tx_buffer[tx_busy];
 
-			// Increment busy idx
-			increment_tx_busy();
-
-			// Send character
+			increase_tx_busy();
 			HAL_UART_Transmit_IT(huart, &tmp, 1);
 		}
 	}
 }
-
-// Collection callback
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-	// Check for correct huart port
-	if(huart == &huart3)
-	{
-		increment_rx_empty();
-
-		// Continue data collection
-		HAL_UART_Receive_IT(huart, &buffer_rx[rx_empty], 1);
-	}
-}
-
 /* USER CODE END 4 */
 
 /**
