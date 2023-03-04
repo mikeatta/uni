@@ -39,11 +39,11 @@ public class Main {
 //        lab3.readImageAsHSV();
 //        lab3.applyThresholding();
 //        lab3.matrixOperations();
-        lab3.createHistogram();
+//        lab3.createHistogram();
 
         // Lab 7
-//        Lab7 lab7 = new Lab7();
-//        lab7.changeBackground();
+        Lab7 lab7 = new Lab7();
+        lab7.changeBackground(); // Exc 1 - Replace greenscreen background
     }
 
 }
