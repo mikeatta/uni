@@ -19,7 +19,7 @@ public class HelloController {
     // Declare the alert
     Alert a = new Alert(Alert.AlertType.NONE);
 
-    private void displayAlertWindow(ExceptionHandler ex) {
+    private void displayAlertWindow(CardExceptions ex) {
         // Create alert messages
         String exceptionClassName = "Exception: " + ex.getClass().getSimpleName();
         String exceptionErrorMessage = ex.storeMessage;
