@@ -21,3 +21,24 @@ function doUpload(uploader) {
         };
     }
 }
+
+// Exc 2 - Timer function
+function timer(action) {
+    var time = document.getElementById("timer-label");
+    var status = document.getElementById("timer-status");
+
+    if (action == 1) {
+        // Reset label
+        time.innerHTML = "";
+        status.innerHTML = "Timer running"
+        start = new Date();
+    }
+
+    if (action == 0 && start > 0) {
+        status.innerHTML = "Timer stopped"
+        stop = new Date();
+        sec = Math.abs(stop-start) / 1000;
+        start = 0;
+        time.innerHTML = sec;
+    }
+}

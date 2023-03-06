@@ -12,6 +12,16 @@
         <input type="file" id="upload" onchange="doUpload(this)"/>
         <textarea id="editor"></textarea>
     </div>
+
+    <!-- Exc 2 - Timer -->
+    <div id="exc-2-container">
+        <form name="f1">
+            <label id="timer-status"></label>
+            <label id="timer-label">Start timer</label>
+            <input type="button" value="start" onclick="timer(1)"/>
+            <input type="button" value="stop" onclick="timer(0)"/>
+        </form>
+    </div>
     <script src="./main.js"></script>
 </body>
 </html>
