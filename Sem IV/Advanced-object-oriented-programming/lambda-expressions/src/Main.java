@@ -1,6 +1,4 @@
-import java.util.function.BiFunction;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,14 +16,8 @@ public class Main {
 
         System.out.println("-----------------");
 
-        // Reference by method example
-        class CheckStringForChar {
-            private boolean searchForCharacter(Character c, String str) {
-                return str.contains(c.toString());
-            }
-        }
-        BiFunction<Character, String, Boolean> checkForCharacter = new CheckStringForChar()::searchForCharacter;
-        System.out.print("String contains char: ");
-        System.out.println(checkForCharacter.apply('c', "car"));
+        // Reference by static method example
+        Function<Integer, String> getBinary = Integer::toBinaryString;
+        System.out.println("Binary representation of number is: " + getBinary.apply(20));
     }
 }
