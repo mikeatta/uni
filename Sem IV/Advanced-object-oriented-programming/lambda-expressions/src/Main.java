@@ -19,5 +19,17 @@ public class Main {
         // Reference by static method example
         Function<Integer, String> getBinary = Integer::toBinaryString;
         System.out.println("Binary representation of number is: " + getBinary.apply(20));
+
+        System.out.println("-----------------");
+
+        // Reference by object's method example
+        class CheckForCharacter {
+            Boolean searchForCharacter(Character c, String str) {
+                return str.contains(c.toString());
+            }
+        }
+        CheckForCharacter checkForCharacter = new CheckForCharacter();
+        BiFunction<Character, String, Boolean> findChar = checkForCharacter::searchForCharacter;
+        System.out.println("String contains the character: " + findChar.apply('c', "char"));
     }
 }
