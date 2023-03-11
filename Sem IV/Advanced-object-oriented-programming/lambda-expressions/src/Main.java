@@ -24,13 +24,13 @@ public class Main {
 
         // Reference by object's method example
         class CheckForCharacter {
-            Boolean searchForCharacter(Character c, String str) {
+            boolean searchForCharacter(Character c, String str) {
                 return str.contains(c.toString());
             }
         }
         CheckForCharacter checkForCharacter = new CheckForCharacter();
-        BiFunction<Character, String, Boolean> findChar = checkForCharacter::searchForCharacter;
-        System.out.println("String contains the character: " + findChar.apply('c', "char"));
+        BiPredicate<Character, String> findChar = checkForCharacter::searchForCharacter;
+        System.out.println("String contains the character: " + findChar.test('c', "char"));
 
         System.out.println("-----------------");
 
