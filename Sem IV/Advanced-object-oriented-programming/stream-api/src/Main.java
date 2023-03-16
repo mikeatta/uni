@@ -1,5 +1,5 @@
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Main {
@@ -42,5 +42,23 @@ public class Main {
 
         personStream.sorted(Comparator.comparing(Person::getNick).thenComparing(Person::getAge))
                 .forEach(person -> System.out.println("Name: " + person.getNick() + " Age: " +  person.getAge()));
+
+        System.out.println("--------------");
+
+        // Remove 'Z' coordinate
+        System.out.println("Map XYZ point to XY point ");
+        PointXYZ pointXYZ1 = new PointXYZ(13, 7, 8);
+        PointXYZ pointXYZ2 = new PointXYZ(21, 4, 5);
+        PointXYZ pointXYZ3 = new PointXYZ(33, -13, 17);
+
+        ArrayList<PointXYZ> points3d = new ArrayList<>();
+        points3d.add(pointXYZ1);
+        points3d.add(pointXYZ2);
+        points3d.add(pointXYZ3);
+
+        Stream<PointXYZ> pointXYZStream = points3d.stream();
+        pointXYZStream.map(pointXYZ -> new PointXY(pointXYZ.getX(), pointXYZ.getY()))
+                .collect(Collectors.toCollection(ArrayList::new))
+                .forEach(pointXY -> System.out.println("X: " + pointXY.getX() + ", Y: " + pointXY.getY()));
     }
 }
