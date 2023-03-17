@@ -7,6 +7,10 @@ public class Person {
         this.age = age;
     }
 
+    public Person(String nick) {
+        this.nick = nick;
+    }
+
     public void setNick(String nick) {
         this.nick = nick;
     }
