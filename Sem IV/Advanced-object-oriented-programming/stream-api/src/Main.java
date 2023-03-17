@@ -60,5 +60,34 @@ public class Main {
         pointXYZStream.map(pointXYZ -> new PointXY(pointXYZ.getX(), pointXYZ.getY()))
                 .collect(Collectors.toCollection(ArrayList::new))
                 .forEach(pointXY -> System.out.println("X: " + pointXY.getX() + ", Y: " + pointXY.getY()));
+
+        System.out.println("--------------");
+
+        // Print all members of each group
+        System.out.println("Print out every member");
+        Person p1 = new Person("person1");
+        Person p2 = new Person("person2");
+        Person p3 = new Person("person3");
+        Person p4 = new Person("person4");
+        Person p5 = new Person("person5");
+        Person p6 = new Person("person6");
+
+        List<Person> personList1 = new ArrayList<>(), personList2 = new ArrayList<>();
+        personList1.add(p1);
+        personList1.add(p2);
+        personList1.add(p3);
+        personList2.add(p4);
+        personList2.add(p5);
+        personList2.add(p6);
+
+        Group eagles = new Group("Eagles", personList1);
+        Group bikers = new Group("Bikers", personList2);
+
+        List<Group> groups = Arrays.asList(eagles, bikers);
+        List<Person> allMembers = groups.stream()
+                .flatMap(group -> group.getMembers().stream())
+                .toList();
+
+        allMembers.forEach(person -> System.out.println(person.getNick()));
     }
 }
