@@ -46,7 +46,7 @@ public class Main {
         System.out.println("--------------");
 
         // Remove 'Z' coordinate
-        System.out.println("Map XYZ point to XY point ");
+        System.out.println("Map XYZ point to XY point:");
         PointXYZ pointXYZ1 = new PointXYZ(13, 7, 8);
         PointXYZ pointXYZ2 = new PointXYZ(21, 4, 5);
         PointXYZ pointXYZ3 = new PointXYZ(33, -13, 17);
@@ -64,7 +64,7 @@ public class Main {
         System.out.println("--------------");
 
         // Print all members of each group
-        System.out.println("Print out every member");
+        System.out.println("Print out every member:");
         Person p1 = new Person("person1");
         Person p2 = new Person("person2");
         Person p3 = new Person("person3");
@@ -89,5 +89,26 @@ public class Main {
                 .toList();
 
         allMembers.forEach(person -> System.out.println(person.getNick()));
+
+        System.out.println("--------------");
+
+        // Add and multiply collection elements using reduce
+        System.out.println("Add and multiply via reduce operation:");
+        Collection<Integer> integerCollection = new ArrayList<>();
+        integerCollection.add(1);
+        integerCollection.add(2);
+        integerCollection.add(3);
+        integerCollection.add(4);
+        integerCollection.add(5);
+        integerCollection.add(6);
+
+        // Reduce addition
+        Optional<Integer> integerCollectionSum = integerCollection.stream().reduce(Integer::sum);
+        System.out.println("A) Addition result: " + integerCollectionSum.get());
+
+        // Reduce multiplication
+        Integer integerCollectionMultiplication = integerCollection.stream()
+                        .reduce(1, (integer, integer2) -> integer * integer2);
+        System.out.println("B) Multiplication result: " + integerCollectionMultiplication);
     }
 }
