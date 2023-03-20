@@ -1,3 +1,5 @@
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -110,5 +112,25 @@ public class Main {
         Integer integerCollectionMultiplication = integerCollection.stream()
                         .reduce(1, (integer, integer2) -> integer * integer2);
         System.out.println("B) Multiplication result: " + integerCollectionMultiplication);
+
+        System.out.println("--------------");
+
+        // Compare parallelStream performance
+        List<String> performanceTest = new ArrayList<>();
+        for (int i = 0; i < 1000000; i++) performanceTest.add(UUID.randomUUID().toString());
+
+        System.out.println("A) Sequential processing");
+        Instant start = Instant.now();
+        performanceTest.stream().collect(Collectors.toList());
+        Instant stop = Instant.now();
+        long timeElapsed = Duration.between(start, stop).toMillis();
+        System.out.println("Time elapsed: " + timeElapsed + "ms");
+
+        System.out.println("B) Parallel processing");
+        start = Instant.now();
+        performanceTest.parallelStream().sorted().collect(Collectors.toList());
+        stop = Instant.now();
+        timeElapsed = Duration.between(start, stop).toMillis();
+        System.out.println("Time elapsed: " + timeElapsed + "ms");
     }
 }
