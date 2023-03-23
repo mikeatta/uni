@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" minWidth="360.0" prefWidth="360.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.client.HelloController">
+    <padding>
+        <Insets bottom="50.0" left="30.0" right="30.0" top="50.0" />
+    </padding>
+   <FlowPane alignment="CENTER" hgap="5.0" maxHeight="30.0" maxWidth="300.0" minHeight="25.0" minWidth="250.0" prefHeight="25.0" prefWidth="250.0">
+      <children>
+         <Label fx:id="answerLabel" text="Enter answer:" />
+         <TextField fx:id="answerTextField" promptText="Enter your answer" />
+      </children>
+   </FlowPane>
+   <Button fx:id="submitButton" maxHeight="75.0" maxWidth="350.0" minHeight="30.0" minWidth="150.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="250.0" text="Send answer &gt;&gt;" textAlignment="CENTER" />
+   <FlowPane alignment="CENTER" hgap="5.0" layoutX="40.0" layoutY="108.0" maxHeight="30.0" maxWidth="300.0" minHeight="25.0" minWidth="250.0" prefHeight="25.0" prefWidth="250.0">
+      <children>
+         <Label fx:id="nickLabel" text="Enter nick:" />
+         <TextField fx:id="nickTextField" promptText="Enter your nick" />
+      </children>
+   </FlowPane>
+</VBox>
