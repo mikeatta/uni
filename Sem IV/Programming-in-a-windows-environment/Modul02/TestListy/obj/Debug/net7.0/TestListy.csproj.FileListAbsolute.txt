@@ -1,0 +1,15 @@
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\bin\Debug\net7.0\TestListy.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\bin\Debug\net7.0\TestListy.deps.json
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\bin\Debug\net7.0\TestListy.runtimeconfig.json
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\bin\Debug\net7.0\TestListy.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\bin\Debug\net7.0\TestListy.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\obj\Debug\net7.0\TestListy.csproj.AssemblyReference.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\obj\Debug\net7.0\TestListy.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\obj\Debug\net7.0\TestListy.AssemblyInfoInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\obj\Debug\net7.0\TestListy.AssemblyInfo.cs
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\obj\Debug\net7.0\TestListy.csproj.CoreCompileInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\obj\Debug\net7.0\TestListy.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\obj\Debug\net7.0\refint\TestListy.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\obj\Debug\net7.0\TestListy.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\obj\Debug\net7.0\TestListy.genruntimeconfig.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\TestListy\obj\Debug\net7.0\ref\TestListy.dll
