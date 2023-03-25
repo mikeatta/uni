@@ -15,7 +15,7 @@ Console.WriteLine("\n***Kopiowanie głębokie***\n");
 Adres adr = new Adres(13);
 Osoba os2 = new Osoba(10, "Jacek", "Wiśniewski", adr);
 Osoba klon2 = new Osoba(os2);
-Console.WriteLine("\nOryginał drugi: {0}", os2.ZwrocInformacjeOsobowe());
+Console.WriteLine("Oryginał drugi: {0}", os2.ZwrocInformacjeOsobowe());
 Console.WriteLine("Klon drugi: {0}", klon2.ZwrocInformacjeOsobowe());
 Console.WriteLine("\n***Zmieniamy drugiego klona***\n");
 klon2.ZmienDaneOsobowe();

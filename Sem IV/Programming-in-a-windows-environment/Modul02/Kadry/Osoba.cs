@@ -72,7 +72,7 @@ public class Adres
 
     public void ZmienAdres()
     {
-        Console.WriteLine("Podaj nazwę miejscowości: ");
+        Console.Write("Podaj nazwę miejscowości: ");
         miejscowosc = Console.ReadLine();
         
         Console.Write("Podaj kod: ");
@@ -88,7 +88,7 @@ public class Adres
         
         Console.Write("Czy jest numer mieszkania <t/n>: ");
         char c = Console.ReadKey().KeyChar;
-        if (c == 't')
+        if (c is 't' or 'T')
         {
             Console.WriteLine();
             int i;
@@ -99,7 +99,11 @@ public class Adres
             
             numerMieszkania = i;
         }
-        else numerMieszkania = null;
+        else
+        {
+            Console.WriteLine();
+            numerMieszkania = null;
+        }
     }
 }
 
