@@ -121,7 +121,7 @@ public class Main {
 
         System.out.println("A) Sequential processing");
         Instant start = Instant.now();
-        performanceTest.stream().collect(Collectors.toList());
+        performanceTest.stream().sorted().collect(Collectors.toList());
         Instant stop = Instant.now();
         long timeElapsed = Duration.between(start, stop).toMillis();
         System.out.println("Time elapsed: " + timeElapsed + "ms");
