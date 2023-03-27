@@ -1,0 +1,15 @@
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\bin\Debug\net7.0\Database.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\bin\Debug\net7.0\Database.deps.json
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\bin\Debug\net7.0\Database.runtimeconfig.json
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\bin\Debug\net7.0\Database.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\bin\Debug\net7.0\Database.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\obj\Debug\net7.0\Database.csproj.AssemblyReference.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\obj\Debug\net7.0\Database.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\obj\Debug\net7.0\Database.AssemblyInfoInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\obj\Debug\net7.0\Database.AssemblyInfo.cs
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\obj\Debug\net7.0\Database.csproj.CoreCompileInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\obj\Debug\net7.0\Database.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\obj\Debug\net7.0\refint\Database.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\obj\Debug\net7.0\Database.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\obj\Debug\net7.0\Database.genruntimeconfig.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Database\obj\Debug\net7.0\ref\Database.dll
