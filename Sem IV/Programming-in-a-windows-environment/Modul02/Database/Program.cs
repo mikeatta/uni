@@ -40,6 +40,13 @@ Console.WriteLine("\nContents of cloneClone tree:");
 cloneOfClone.DodajElement(new global::Osoba.Osoba(
     "Mark", "Paul", new Data(1988, 07, 30)));
 cloneOfClone.PrintAll();
+Console.ReadKey();
 
-Drzewo newClone = cloneOfClone.DeepCopy();
-newClone.PrintAll();
+Console.WriteLine("\n*** Create and modify a shallow copy ***");
+Drzewo shallowClone = clone.ShallowCopy();
+shallowClone.DodajElement(new global::Osoba.Osoba(
+    "Jeff", "Pearson", new Data(1976, 11, 3)));
+Console.WriteLine("\nClone tree:");
+clone.PrintAll();
+Console.WriteLine("\nShallow copy tree:");
+shallowClone.PrintAll();

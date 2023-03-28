@@ -105,6 +105,8 @@ namespace Drzewa
                 korzen.WypiszWezel();
         }
 
+        public Drzewo ShallowCopy() { return (Drzewo)this.MemberwiseClone(); }
+        
         public Drzewo DeepCopy()
         {
             Drzewo copy = (Drzewo)this.MemberwiseClone();
