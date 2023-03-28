@@ -19,3 +19,27 @@ Console.WriteLine("Original tree:");
 og.PrintAll();
 Console.WriteLine("\nCopy of tree:");
 clone.PrintAll();
+Console.ReadKey();
+
+Console.WriteLine("\n*** Copying using CopySharedPersonData method ***");
+Drzewo cloneOfClone = clone.CopySharedPersonData();
+
+clone.DodajElement(new global::Osoba.Osoba(
+    "Jack", "Adams", new Data(1969, 04, 12)));
+
+// Original tree
+Console.WriteLine("Contents of original tree:");
+og.PrintAll();
+// Copy of original
+Console.WriteLine("\nContents of clone tree:");
+clone.DodajElement(new global::Osoba.Osoba(
+    "Hugo", "Brown", new Data(1940, 08, 23)));
+clone.PrintAll();
+// Copy of clone of original
+Console.WriteLine("\nContents of cloneClone tree:");
+cloneOfClone.DodajElement(new global::Osoba.Osoba(
+    "Mark", "Paul", new Data(1988, 07, 30)));
+cloneOfClone.PrintAll();
+
+Drzewo newClone = cloneOfClone.DeepCopy();
+newClone.PrintAll();

@@ -1,4 +1,5 @@
 using Osoba;
+using Osoba = Osoba.Osoba;
 
 namespace Drzewa
 {
@@ -15,7 +16,7 @@ namespace Drzewa
             DodajElement(nowaOsoba);
         }
 
-        public Drzewo(List<Osoba.Osoba> osoby)
+        public Drzewo(List<global::Osoba.Osoba> osoby)
         {
             foreach (var os in osoby)
             {
@@ -108,6 +109,18 @@ namespace Drzewa
         {
             Drzewo copy = (Drzewo)this.MemberwiseClone();
             copy.korzen = new Wezel { Dane = korzen.Dane };
+            return copy;
+        }
+
+        public Drzewo CopySharedPersonData()
+        {
+            Drzewo copy = (Drzewo)this.MemberwiseClone();
+            copy.korzen = new Wezel
+            {
+                Dane = korzen.Dane,
+                Lewy = korzen.Lewy,
+                Prawy = korzen.Prawy
+            };
             return copy;
         }
     }
