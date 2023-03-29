@@ -1,5 +1,4 @@
 using Osoba;
-using Osoba = Osoba.Osoba;
 
 namespace Drzewa
 {
@@ -124,6 +123,11 @@ namespace Drzewa
                 Prawy = korzen.Prawy
             };
             return copy;
+        }
+
+        internal static void ValidateCopiedObject(Drzewo copiedObject)
+        {
+            _ = copiedObject ?? throw new ArgumentException("Parameter cannot be null", nameof(copiedObject));
         }
     }
 

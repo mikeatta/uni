@@ -8,6 +8,7 @@ Console.WriteLine("Pre-copy state:");
 og.PrintAll();
 
 Drzewo clone = og.DeepCopy();
+Drzewo.ValidateCopiedObject(clone);
 Console.WriteLine("\nTree clone contents:");
 clone.PrintAll();
 
@@ -23,6 +24,7 @@ Console.ReadKey();
 
 Console.WriteLine("\n*** Copying using CopySharedPersonData method ***");
 Drzewo cloneOfClone = clone.CopySharedPersonData();
+Drzewo.ValidateCopiedObject(cloneOfClone);
 
 clone.DodajElement(new global::Osoba.Osoba(
     "Jack", "Adams", new Data(1969, 04, 12)));
@@ -44,6 +46,7 @@ Console.ReadKey();
 
 Console.WriteLine("\n*** Create and modify a shallow copy ***");
 Drzewo shallowClone = clone.ShallowCopy();
+Drzewo.ValidateCopiedObject(shallowClone);
 shallowClone.DodajElement(new global::Osoba.Osoba(
     "Jeff", "Pearson", new Data(1976, 11, 3)));
 Console.WriteLine("\nClone tree:");
