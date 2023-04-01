@@ -40,21 +40,22 @@ public class HelloController implements Initializable {
             System.out.println("Error launching server");
         }
 
-        server.receiveAnswerFromUser(vBox);
+        server.receiveAnswerFromUser(serverLogs);
     }
 
-    public static void addLabel(String answerFromClient, VBox vBox) {
-        HBox hBox = new HBox();
-        hBox.setAlignment(Pos.CENTER_LEFT);
-
-        Text text = new Text(answerFromClient);
-        TextFlow textFlow = new TextFlow(text);
-        hBox.getChildren().add(textFlow);
+    public static void addLabel(String answerFromClient, TextArea textArea) {
+//        HBox hBox = new HBox();
+//        hBox.setAlignment(Pos.CENTER_LEFT);
+//
+//        Text text = new Text(answerFromClient);
+//        TextFlow textFlow = new TextFlow(text);
+//        hBox.getChildren().add(textFlow);
 
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                vBox.getChildren().add(hBox);
+//                vBox.getChildren().add(hBox);
+                textArea.setText(answerFromClient);
             }
         });
     }

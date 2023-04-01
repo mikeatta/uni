@@ -1,5 +1,6 @@
 package com.example.quizzapp;
 
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 
 import java.io.*;
@@ -26,14 +27,14 @@ public class Server {
         }
     }
 
-    public void receiveAnswerFromUser(VBox vBox) {
+    public void receiveAnswerFromUser(TextArea textArea) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 while (socket.isConnected()) {
                     try {
                         String answerFromClient = bufferedReader.readLine();
-                        HelloController.addLabel(answerFromClient, vBox);
+                        HelloController.addLabel(answerFromClient, textArea);
                     } catch (IOException e) {
                         e.printStackTrace();
                         closeConnections(socket, bufferedReader, bufferedWriter);
