@@ -35,6 +35,7 @@ public class HelloController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
             server = new Server(new ServerSocket(5000));
+            System.out.println("Server started. Waiting for client to connect ...");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Error launching server");
@@ -43,19 +44,20 @@ public class HelloController implements Initializable {
         server.receiveAnswerFromUser(serverLogs);
     }
 
-    public static void addLabel(String answerFromClient, TextArea textArea) {
+    public static void addLabel(String answerFromClient, TextArea textArea, StringBuilder stringBuilder) {
 //        HBox hBox = new HBox();
 //        hBox.setAlignment(Pos.CENTER_LEFT);
 //
 //        Text text = new Text(answerFromClient);
 //        TextFlow textFlow = new TextFlow(text);
 //        hBox.getChildren().add(textFlow);
+        stringBuilder.append("\n" + answerFromClient);
 
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
 //                vBox.getChildren().add(hBox);
-                textArea.setText(answerFromClient);
+                textArea.setText(stringBuilder.toString());
             }
         });
     }

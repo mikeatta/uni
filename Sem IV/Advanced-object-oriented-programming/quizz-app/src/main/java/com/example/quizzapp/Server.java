@@ -27,6 +27,8 @@ public class Server {
         }
     }
 
+    private StringBuilder concatenateTextArea = new StringBuilder("");
+
     public void receiveAnswerFromUser(TextArea textArea) {
         new Thread(new Runnable() {
             @Override
@@ -34,7 +36,7 @@ public class Server {
                 while (socket.isConnected()) {
                     try {
                         String answerFromClient = bufferedReader.readLine();
-                        HelloController.addLabel(answerFromClient, textArea);
+                        HelloController.addLabel(answerFromClient, textArea, concatenateTextArea);
                     } catch (IOException e) {
                         e.printStackTrace();
                         closeConnections(socket, bufferedReader, bufferedWriter);
