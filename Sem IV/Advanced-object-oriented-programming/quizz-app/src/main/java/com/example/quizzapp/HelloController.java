@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class HelloController implements Initializable {
     @FXML
@@ -24,6 +26,7 @@ public class HelloController implements Initializable {
     @FXML
     private TextArea serverLogs;
 
+    private Product product;
     private Server server;
 
     @FXML
@@ -34,8 +37,8 @@ public class HelloController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
-            server = new Server(new ServerSocket(5000));
             System.out.println("Server started. Waiting for client to connect ...");
+            server = new Server(new ServerSocket(5000));
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Error launching server");
@@ -52,6 +55,13 @@ public class HelloController implements Initializable {
 //        TextFlow textFlow = new TextFlow(text);
 //        hBox.getChildren().add(textFlow);
         stringBuilder.append("\n" + answerFromClient);
+
+        BlockingQueue<Product> queue = new ArrayBlockingQueue<>(2);
+        Producer producer = new Producer(queue);
+        Consumer consumer = new Consumer(queue);
+
+        new Thread(producer).start();
+        new Thread(consumer).start();
 
         Platform.runLater(new Runnable() {
             @Override
