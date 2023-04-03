@@ -4,8 +4,9 @@ import java.util.concurrent.BlockingQueue;
 
 public class Consumer implements Runnable {
 
-    public BlockingQueue<Product> queue;
-    public Product product;
+    private BlockingQueue<Product> queue;
+    private StringCarrier stringCarrier = new StringCarrier();
+    private Product product = new Product(stringCarrier.getProductName());
 
     Consumer(BlockingQueue<Product> queue) {
         this.queue = queue;

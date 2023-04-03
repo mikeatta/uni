@@ -1,6 +1,8 @@
 package com.example.client;
 
 import com.example.quizzapp.Client;
+import com.example.quizzapp.Product;
+import com.example.quizzapp.StringCarrier;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -61,6 +63,9 @@ public class HelloController implements Initializable {
                     vBox.getChildren().add(hBox);
 
                     client.sendAnswerToServer(answerToSend);
+                    StringCarrier stringCarrier = new StringCarrier();
+                    stringCarrier.setProductName(answerToSend);
+                    System.out.println("Answer: " + answerToSend);
                     answerTextField.clear();
                 }
             }
