@@ -28,6 +28,7 @@ public class HelloController implements Initializable {
 
     private Product product;
     private Server server;
+    private String productName;
 
     @FXML
     protected void onHelloButtonClick() {
@@ -47,28 +48,36 @@ public class HelloController implements Initializable {
         server.receiveAnswerFromUser(serverLogs);
     }
 
-    public static void addLabel(String answerFromClient, TextArea textArea, StringBuilder stringBuilder) {
-//        HBox hBox = new HBox();
-//        hBox.setAlignment(Pos.CENTER_LEFT);
-//
-//        Text text = new Text(answerFromClient);
-//        TextFlow textFlow = new TextFlow(text);
-//        hBox.getChildren().add(textFlow);
-        stringBuilder.append("\n" + answerFromClient);
-
-        BlockingQueue<Product> queue = new ArrayBlockingQueue<>(2);
-        Producer producer = new Producer(queue);
-        Consumer consumer = new Consumer(queue);
-
-        new Thread(producer).start();
-        new Thread(consumer).start();
-
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-//                vBox.getChildren().add(hBox);
-                textArea.setText(stringBuilder.toString());
-            }
-        });
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
+
+    public String getProductName() {
+        return this.productName;
+    }
+//
+//    public static void addLabel(String answerFromClient, TextArea textArea, StringBuilder stringBuilder) {
+////        HBox hBox = new HBox();
+////        hBox.setAlignment(Pos.CENTER_LEFT);
+////
+////        Text text = new Text(answerFromClient);
+////        TextFlow textFlow = new TextFlow(text);
+////        hBox.getChildren().add(textFlow);
+//        stringBuilder.append("\n" + answerFromClient);
+//
+//        BlockingQueue<Product> queue = new ArrayBlockingQueue<>(2);
+//        Producer producer = new Producer(queue);
+//        Consumer consumer = new Consumer(queue);
+//
+//        new Thread(producer).start();
+//        new Thread(consumer).start();
+//
+//        Platform.runLater(new Runnable() {
+//            @Override
+//            public void run() {
+////                vBox.getChildren().add(hBox);
+//                textArea.setText(stringBuilder.toString());
+//            }
+//        });
+//    }
 }

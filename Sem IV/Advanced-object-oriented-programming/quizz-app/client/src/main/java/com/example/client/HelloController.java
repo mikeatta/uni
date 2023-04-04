@@ -1,20 +1,14 @@
 package com.example.client;
 
 import com.example.quizzapp.Client;
-import com.example.quizzapp.Product;
-import com.example.quizzapp.StringCarrier;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -53,18 +47,16 @@ public class HelloController implements Initializable {
             public void handle(ActionEvent actionEvent) {
                 String answerToSend = answerTextField.getText();
                 if (!answerToSend.isEmpty()) {
-                    HBox hBox = new HBox();
-                    hBox.setAlignment(Pos.CENTER_LEFT);
-
-                    Text text = new Text(answerToSend);
-                    TextFlow textFlow = new TextFlow(text);
-
-                    hBox.getChildren().add(textFlow);
-                    vBox.getChildren().add(hBox);
+//                    HBox hBox = new HBox();
+//                    hBox.setAlignment(Pos.CENTER_LEFT);
+//
+//                    Text text = new Text(answerToSend);
+//                    TextFlow textFlow = new TextFlow(text);
+//
+//                    hBox.getChildren().add(textFlow);
+//                    vBox.getChildren().add(hBox);
 
                     client.sendAnswerToServer(answerToSend);
-                    StringCarrier stringCarrier = new StringCarrier();
-                    stringCarrier.setProductName(answerToSend);
                     System.out.println("Answer: " + answerToSend);
                     answerTextField.clear();
                 }
