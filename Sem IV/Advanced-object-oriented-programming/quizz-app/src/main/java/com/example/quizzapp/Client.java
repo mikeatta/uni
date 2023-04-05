@@ -20,9 +20,11 @@ public class Client {
         }
     }
 
-    public void sendAnswerToServer(String answerToSend) {
+    public void sendAnswerToServer(String clientAnswer, String clientNick) {
         try {
-            bufferedWriter.write(answerToSend);
+            bufferedWriter.write(clientNick);
+            bufferedWriter.newLine();
+            bufferedWriter.write(clientAnswer);
             bufferedWriter.newLine();
             bufferedWriter.flush();
         } catch (IOException e) {

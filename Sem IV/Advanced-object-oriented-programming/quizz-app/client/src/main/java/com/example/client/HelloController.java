@@ -17,20 +17,13 @@ import java.util.ResourceBundle;
 
 public class HelloController implements Initializable {
     @FXML
-    private Label welcomeText;
-    @FXML
     private Button sendButton;
     @FXML
     private TextField answerTextField;
     @FXML
-    private VBox vBox;
+    private TextField nickTextField;
 
     private Client client;
-
-    @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
-    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -46,19 +39,11 @@ public class HelloController implements Initializable {
             @Override
             public void handle(ActionEvent actionEvent) {
                 String answerToSend = answerTextField.getText();
+                String nickToSend = nickTextField.getText();
                 if (!answerToSend.isEmpty()) {
-//                    HBox hBox = new HBox();
-//                    hBox.setAlignment(Pos.CENTER_LEFT);
-//
-//                    Text text = new Text(answerToSend);
-//                    TextFlow textFlow = new TextFlow(text);
-//
-//                    hBox.getChildren().add(textFlow);
-//                    vBox.getChildren().add(hBox);
-
-                    client.sendAnswerToServer(answerToSend);
-                    System.out.println("Answer: " + answerToSend);
+                    client.sendAnswerToServer(answerToSend, nickToSend);
                     answerTextField.clear();
+                    nickTextField.clear();
                 }
             }
         });

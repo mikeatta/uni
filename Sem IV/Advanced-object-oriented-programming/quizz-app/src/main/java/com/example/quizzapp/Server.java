@@ -1,7 +1,6 @@
 package com.example.quizzapp;
 
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.VBox;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -17,7 +16,6 @@ public class Server {
     private BufferedWriter bufferedWriter;
 
     private BlockingQueue<Product> queue = new ArrayBlockingQueue<>(2);
-    Consumer consumer = new Consumer(queue);
 
     public Server(ServerSocket serverSocket) {
         try {
@@ -25,7 +23,6 @@ public class Server {
             this.socket = serverSocket.accept();
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            new Thread(consumer).start();
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Error starting server");
@@ -33,9 +30,11 @@ public class Server {
         }
     }
 
-    private StringBuilder concatenateTextArea = new StringBuilder("");
-
     public void receiveAnswerFromUser(TextArea textArea) {
+
+        Consumer consumer = new Consumer(queue, textArea);
+        new Thread(consumer).start();
+
         new Thread(new Runnable() {
 
             HelloController hc = new HelloController();
@@ -44,12 +43,18 @@ public class Server {
             public void run() {
                 while (socket.isConnected()) {
                     try {
-                        String answerFromClient = bufferedReader.readLine();
-//                        System.out.println("@ Server | Received: " + answerFromClient);
-                        Producer producer = new Producer(queue, new Product(answerFromClient));
+                        String clientMessage = bufferedReader.readLine();
+                        Producer producer = new Producer(queue, new Product(clientMessage));
+//                        System.out.println("nick: " + clientNick);
+//                        product = new Product(clientNick);
+
+//                        String clientAnswer = bufferedReader.readLine();
+//                        System.out.println("answer: " + clientAnswer);
+////                        product = new Product(clientAnswer);
+//                        producer = new Producer(queue, new Product(clientAnswer));
+
                         new Thread(producer).start();
-//                        hc.setProductName(answerFromClient);
-//                        HelloController.addLabel(answerFromClient, textArea, concatenateTextArea);
+
                     } catch (IOException e) {
                         e.printStackTrace();
                         closeConnections(socket, bufferedReader, bufferedWriter);
@@ -81,7 +86,6 @@ class Producer implements Runnable {
 
     private BlockingQueue<Product> queue;
     private Product product;
-    private HelloController hc = new HelloController();
 
     Producer(BlockingQueue<Product> queue, Product product) {
         this.queue = queue;
@@ -90,7 +94,6 @@ class Producer implements Runnable {
 
     @Override
     public void run() {
-//        product = new Product();
         try {
             Thread.sleep(500);
             queue.put(product);
@@ -105,17 +108,23 @@ class Consumer implements Runnable {
 
     private BlockingQueue<Product> queue;
     private Product product;
+    private TextArea textArea;
 
-    Consumer(BlockingQueue<Product> queue) {
+    Consumer(BlockingQueue<Product> queue, TextArea textArea) {
         this.queue = queue;
+        this.textArea = textArea;
     }
 
     @Override
     public void run() {
+
+        StringBuilder clientMessage = new StringBuilder();
+
         try {
-            while(!(product = queue.take()).getProduct().equals("null")) {
-                Thread.sleep(1500);
-                System.out.println("Received: " + product.getProduct());
+            while((product = queue.take()).getProduct() != null) {
+                Thread.sleep(1000);
+                clientMessage.append(product.getProduct());
+                HelloController.displayClientAnswer(clientMessage, textArea);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
