@@ -26,7 +26,12 @@ public class HelloController implements Initializable {
             System.out.println("Error launching server");
         }
 
-        server.receiveAnswerFromUser(serverLogs);
+        try {
+            server.loadQuestion(serverLogs);
+            server.receiveAnswerFromUser(serverLogs);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     public static void displayClientAnswer(StringBuilder clientMessage, TextArea textArea) {
 

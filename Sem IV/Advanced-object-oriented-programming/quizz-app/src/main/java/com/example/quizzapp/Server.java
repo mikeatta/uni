@@ -1,10 +1,13 @@
 package com.example.quizzapp;
 
+import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -28,6 +31,16 @@ public class Server {
             System.out.println("Error starting server");
             closeConnections(socket, bufferedReader, bufferedWriter);
         }
+    }
+
+    public void loadQuestion(TextArea questionSheet) throws IOException {
+
+        String questionFilePath = "src/main/java/com/example/quizzapp/questions.txt";
+
+        String question = Files.readAllLines(Path.of(questionFilePath)).get(0);
+
+        Platform.runLater(() -> questionSheet.appendText(question + "\n"));
+
     }
 
     public void receiveAnswerFromUser(TextArea textArea) {
