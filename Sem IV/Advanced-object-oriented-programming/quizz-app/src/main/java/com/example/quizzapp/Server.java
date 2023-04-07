@@ -19,6 +19,8 @@ public class Server {
     private BufferedWriter bufferedWriter;
 
     private BlockingQueue<Product> queue = new ArrayBlockingQueue<>(2);
+    protected String questionFilePath = "src/main/java/com/example/quizzapp/questions.txt";
+    protected static int line = 0;
 
     public Server(ServerSocket serverSocket) {
         try {
@@ -37,15 +39,15 @@ public class Server {
 
         String questionFilePath = "src/main/java/com/example/quizzapp/questions.txt";
 
-        String question = Files.readAllLines(Path.of(questionFilePath)).get(0);
+        String question = Files.readAllLines(Path.of(questionFilePath)).get(line);
+        System.out.println("Reading line: " + line);
 
         Platform.runLater(() -> questionSheet.appendText(question + "\n"));
-
     }
 
     public void receiveAnswerFromUser(TextArea textArea) {
 
-        Consumer consumer = new Consumer(queue, textArea);
+        Consumer consumer = new Consumer(queue, textArea, this);
         new Thread(consumer).start();
 
         new Thread(new Runnable() {
@@ -122,24 +124,45 @@ class Consumer implements Runnable {
     private BlockingQueue<Product> queue;
     private Product product;
     private TextArea textArea;
+    private Server server;
 
-    Consumer(BlockingQueue<Product> queue, TextArea textArea) {
+    Consumer(BlockingQueue<Product> queue, TextArea textArea, Server server) {
         this.queue = queue;
         this.textArea = textArea;
+        this.server = server;
+    }
+
+    private String loadAnswer() throws IOException {
+
+        String answer = Files.readAllLines(Path.of(server.questionFilePath)).get(server.line);
+
+        answer = answer.substring(answer.indexOf("|") + 1);
+        System.out.println("Question answer: " + answer);
+
+        return answer;
     }
 
     @Override
     public void run() {
 
-        StringBuilder clientMessage = new StringBuilder();
+        StringBuilder clientMessage;
 
         try {
+
             while((product = queue.take()).getProduct() != null) {
+
                 Thread.sleep(1000);
-                clientMessage.append(product.getProduct());
-                HelloController.displayClientAnswer(clientMessage, textArea);
+
+                if (product.getProduct().equals(loadAnswer())) {
+                    clientMessage = new StringBuilder("Client answer: " + product.getProduct());
+                    queue.clear();
+                    Server.line += 1;
+                    HelloController.displayClientAnswer(clientMessage, textArea);
+                } else {
+                    textArea.appendText("Incorrect answer received!\n");
+                }
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
     }

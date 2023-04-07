@@ -14,7 +14,7 @@ public class HelloController implements Initializable {
     @FXML
     public TextArea serverLogs;
 
-    private Server server;
+    private static Server server;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -33,10 +33,12 @@ public class HelloController implements Initializable {
             e.printStackTrace();
         }
     }
-    public static void displayClientAnswer(StringBuilder clientMessage, TextArea textArea) {
+    public static void displayClientAnswer(StringBuilder clientMessage, TextArea textArea) throws IOException {
 
         clientMessage.append("\n");
 
-        Platform.runLater(() -> textArea.setText(clientMessage.toString()));
+        Platform.runLater(() -> textArea.appendText(clientMessage.toString()));
+
+        server.loadQuestion(textArea);
     }
 }
