@@ -19,7 +19,7 @@ public class Server {
     private BufferedWriter bufferedWriter;
 
     private BlockingQueue<Product> queue = new ArrayBlockingQueue<>(2);
-    protected String questionFilePath = "src/main/java/com/example/quizzapp/questions.txt";
+    protected static String questionFilePath = "src/main/java/com/example/quizzapp/questions.txt";
     protected static int line = 0;
 
     public Server(ServerSocket serverSocket) {
@@ -37,8 +37,6 @@ public class Server {
 
     public void loadQuestion(TextArea questionSheet) throws IOException {
 
-        String questionFilePath = "src/main/java/com/example/quizzapp/questions.txt";
-
         String question = Files.readAllLines(Path.of(questionFilePath)).get(line);
         System.out.println("Reading line: " + line);
 
@@ -47,7 +45,7 @@ public class Server {
 
     public void receiveAnswerFromUser(TextArea textArea) {
 
-        Consumer consumer = new Consumer(queue, textArea, this);
+        Consumer consumer = new Consumer(queue, textArea);
         new Thread(consumer).start();
 
         new Thread(new Runnable() {
@@ -124,22 +122,17 @@ class Consumer implements Runnable {
     private BlockingQueue<Product> queue;
     private Product product;
     private TextArea textArea;
-    private Server server;
 
-    Consumer(BlockingQueue<Product> queue, TextArea textArea, Server server) {
+    Consumer(BlockingQueue<Product> queue, TextArea textArea) {
         this.queue = queue;
         this.textArea = textArea;
-        this.server = server;
     }
 
     private String loadAnswer() throws IOException {
 
-        String answer = Files.readAllLines(Path.of(server.questionFilePath)).get(server.line);
+        String answer = Files.readAllLines(Path.of(Server.questionFilePath)).get(Server.line);
 
-        answer = answer.substring(answer.indexOf("|") + 1);
-        System.out.println("Question answer: " + answer);
-
-        return answer;
+        return answer.substring(answer.indexOf("|") + 1);
     }
 
     @Override

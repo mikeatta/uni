@@ -35,7 +35,7 @@ public class HelloController implements Initializable {
     }
     public static void displayClientAnswer(StringBuilder clientMessage, TextArea textArea) throws IOException {
 
-        clientMessage.append("\n");
+        clientMessage.append("\n\n");
 
         Platform.runLater(() -> textArea.appendText(clientMessage.toString()));
 
