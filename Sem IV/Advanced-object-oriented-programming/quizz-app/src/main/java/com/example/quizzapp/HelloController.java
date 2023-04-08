@@ -1,6 +1,5 @@
 package com.example.quizzapp;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
@@ -37,8 +36,10 @@ public class HelloController implements Initializable {
 
         clientMessage.append("\n\n");
 
-        Platform.runLater(() -> textArea.appendText(clientMessage.toString()));
+        textArea.appendText(clientMessage.toString());
 
-        server.loadQuestion(textArea);
+        if (Server.line < Server.amountOfLines) {
+            server.loadQuestion(textArea);
+        }
     }
 }

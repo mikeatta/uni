@@ -20,6 +20,16 @@ public class Server {
 
     private BlockingQueue<Product> queue = new ArrayBlockingQueue<>(2);
     protected static String questionFilePath = "src/main/java/com/example/quizzapp/questions.txt";
+    protected static int amountOfLines;
+
+    static {
+        try {
+            amountOfLines = (int) Files.lines(Path.of(questionFilePath)).count();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     protected static int line = 0;
 
     public Server(ServerSocket serverSocket) {
@@ -128,6 +138,14 @@ class Consumer implements Runnable {
         this.textArea = textArea;
     }
 
+    private void displayGameEndMessage() {
+
+        textArea.appendText("""
+                All questions have been answered!
+                Thanks for playing!
+                """);
+    }
+
     private String loadAnswer() throws IOException {
 
         String answer = Files.readAllLines(Path.of(Server.questionFilePath)).get(Server.line);
@@ -146,13 +164,23 @@ class Consumer implements Runnable {
 
                 Thread.sleep(1000);
 
-                if (product.getProduct().equals(loadAnswer())) {
-                    clientMessage = new StringBuilder("Client answer: " + product.getProduct());
-                    queue.clear();
-                    Server.line += 1;
-                    HelloController.displayClientAnswer(clientMessage, textArea);
-                } else {
-                    textArea.appendText("Incorrect answer received!\n");
+                if (Server.line < Server.amountOfLines) {
+
+                    if (product.getProduct().equals(loadAnswer())) {
+
+                        clientMessage = new StringBuilder("Client answer: " + product.getProduct());
+
+                        queue.clear();
+                        Server.line += 1;
+
+                        HelloController.displayClientAnswer(clientMessage, textArea);
+
+                        if (Server.line == Server.amountOfLines) {
+                            displayGameEndMessage();
+                        }
+                    } else {
+                        textArea.appendText("Incorrect answer received!\n");
+                    }
                 }
             }
         } catch (InterruptedException | IOException e) {
