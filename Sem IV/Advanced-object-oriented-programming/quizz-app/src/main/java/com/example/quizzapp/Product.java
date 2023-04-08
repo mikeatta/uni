@@ -1,14 +1,16 @@
 package com.example.quizzapp;
 
+import javafx.util.Pair;
+
 public class Product {
 
-    private String product;
+    private Pair<String, String> stringPair;
 
-    public Product(String product) {
-        this.product = product;
+    public Product(Pair<String, String> stringPair) {
+        this.stringPair = stringPair;
     }
 
-    public String getProduct() {
-        return this.product;
+    public Pair<String, String> getProduct() {
+        return this.stringPair;
     }
 }

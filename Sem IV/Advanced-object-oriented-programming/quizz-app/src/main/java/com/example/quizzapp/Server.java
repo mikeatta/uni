@@ -2,12 +2,14 @@ package com.example.quizzapp;
 
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
+import javafx.util.Pair;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -60,21 +62,16 @@ public class Server {
 
         new Thread(new Runnable() {
 
-            HelloController hc = new HelloController();
-
             @Override
             public void run() {
                 while (socket.isConnected()) {
                     try {
-                        String clientMessage = bufferedReader.readLine();
-                        Producer producer = new Producer(queue, new Product(clientMessage));
-//                        System.out.println("nick: " + clientNick);
-//                        product = new Product(clientNick);
+                        String clientNick = bufferedReader.readLine();
+                        String clientAnswer = bufferedReader.readLine();
 
-//                        String clientAnswer = bufferedReader.readLine();
-//                        System.out.println("answer: " + clientAnswer);
-////                        product = new Product(clientAnswer);
-//                        producer = new Producer(queue, new Product(clientAnswer));
+                        Pair<String, String> nickAnswerPair = new Pair<>(clientNick, clientAnswer);
+
+                        Producer producer = new Producer(queue, new Product(nickAnswerPair));
 
                         new Thread(producer).start();
 
@@ -166,9 +163,13 @@ class Consumer implements Runnable {
 
                 if (Server.line < Server.amountOfLines) {
 
-                    if (product.getProduct().equals(loadAnswer())) {
+                    if (product.getProduct().getValue().equals(loadAnswer())) {
 
-                        clientMessage = new StringBuilder("Client answer: " + product.getProduct());
+                        clientMessage = new StringBuilder(MessageFormat.format(
+                                "Client ''{0}'' answered: {1}",
+                                product.getProduct().getKey(),
+                                product.getProduct().getValue()
+                        ));
 
                         queue.clear();
                         Server.line += 1;
