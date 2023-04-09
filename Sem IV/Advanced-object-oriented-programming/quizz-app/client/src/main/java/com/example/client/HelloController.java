@@ -38,7 +38,7 @@ public class HelloController implements Initializable {
             public void handle(ActionEvent actionEvent) {
                 String answerToSend = answerTextField.getText();
                 String nickToSend = nickTextField.getText();
-                if (!answerToSend.isEmpty()) {
+                if (!answerToSend.isEmpty() && !nickToSend.isEmpty()) {
                     client.sendAnswerToServer(answerToSend, nickToSend);
                     answerTextField.clear();
                     nickTextField.clear();
