@@ -1,6 +1,5 @@
 package com.example.quizzapp;
 
-import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 import javafx.util.Pair;
 
@@ -50,9 +49,8 @@ public class Server {
     public void loadQuestion(TextArea questionSheet) throws IOException {
 
         String question = Files.readAllLines(Path.of(questionFilePath)).get(line);
-        System.out.println("Reading line: " + line);
 
-        Platform.runLater(() -> questionSheet.appendText(question + "\n"));
+        questionSheet.appendText(question + "\n");
     }
 
     public void receiveAnswerFromUser(TextArea textArea) {
@@ -166,7 +164,7 @@ class Consumer implements Runnable {
                     if (product.getProduct().getValue().equals(loadAnswer())) {
 
                         clientMessage = new StringBuilder(MessageFormat.format(
-                                "Client ''{0}'' answered: {1}",
+                                "Client ''{0}'' correctly answered: {1}",
                                 product.getProduct().getKey(),
                                 product.getProduct().getValue()
                         ));
