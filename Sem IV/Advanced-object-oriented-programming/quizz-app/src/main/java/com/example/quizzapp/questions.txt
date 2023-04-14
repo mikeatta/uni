@@ -1,3 +1,3 @@
-Test question one. Please answer 'q1'.|q1
-Test question two. Please answer 'q2'.|q2
-Test question three. Please answer 'q3'.|q3
+What is the abbreviation of Politechnika Bydgoska?|PBS
+What is the best programming language?|Java
+What is the capital city of Poland?|Warsaw
