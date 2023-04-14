@@ -51,8 +51,9 @@ public class Server {
         String question = Files.readAllLines(Path.of(questionFilePath)).get(line);
 
         question = question.substring(0, question.indexOf("|"));
+        question = (line + 1) + ") " + question + "\n";
 
-        questionSheet.appendText(question + "\n");
+        questionSheet.appendText(question);
     }
 
     public void receiveAnswerFromUser(TextArea textArea) {
