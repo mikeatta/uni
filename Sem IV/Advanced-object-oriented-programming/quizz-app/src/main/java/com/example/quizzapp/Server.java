@@ -1,10 +1,14 @@
 package com.example.quizzapp;
 
 import javafx.scene.control.TextArea;
+import javafx.util.Pair;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -16,6 +20,18 @@ public class Server {
     private BufferedWriter bufferedWriter;
 
     private BlockingQueue<Product> queue = new ArrayBlockingQueue<>(2);
+    protected static String questionFilePath = "src/main/java/com/example/quizzapp/questions.txt";
+    protected static int amountOfLines;
+
+    static {
+        try {
+            amountOfLines = (int) Files.lines(Path.of(questionFilePath)).count();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected static int line = 0;
 
     public Server(ServerSocket serverSocket) {
         try {
@@ -30,6 +46,16 @@ public class Server {
         }
     }
 
+    public void loadQuestion(TextArea questionSheet) throws IOException {
+
+        String question = Files.readAllLines(Path.of(questionFilePath)).get(line);
+
+        question = question.substring(0, question.indexOf("|"));
+        question = (line + 1) + ") " + question + "\n";
+
+        questionSheet.appendText(question);
+    }
+
     public void receiveAnswerFromUser(TextArea textArea) {
 
         Consumer consumer = new Consumer(queue, textArea);
@@ -37,21 +63,16 @@ public class Server {
 
         new Thread(new Runnable() {
 
-            HelloController hc = new HelloController();
-
             @Override
             public void run() {
                 while (socket.isConnected()) {
                     try {
-                        String clientMessage = bufferedReader.readLine();
-                        Producer producer = new Producer(queue, new Product(clientMessage));
-//                        System.out.println("nick: " + clientNick);
-//                        product = new Product(clientNick);
+                        String clientNick = bufferedReader.readLine();
+                        String clientAnswer = bufferedReader.readLine();
 
-//                        String clientAnswer = bufferedReader.readLine();
-//                        System.out.println("answer: " + clientAnswer);
-////                        product = new Product(clientAnswer);
-//                        producer = new Producer(queue, new Product(clientAnswer));
+                        Pair<String, String> nickAnswerPair = new Pair<>(clientNick, clientAnswer);
+
+                        Producer producer = new Producer(queue, new Product(nickAnswerPair));
 
                         new Thread(producer).start();
 
@@ -115,18 +136,56 @@ class Consumer implements Runnable {
         this.textArea = textArea;
     }
 
+    private void displayGameEndMessage() {
+
+        textArea.appendText("""
+                All questions have been answered!
+                Thanks for playing!
+                """);
+    }
+
+    private String loadAnswer() throws IOException {
+
+        String answer = Files.readAllLines(Path.of(Server.questionFilePath)).get(Server.line);
+
+        return answer.substring(answer.indexOf("|") + 1);
+    }
+
     @Override
     public void run() {
 
-        StringBuilder clientMessage = new StringBuilder();
+        StringBuilder clientMessage;
 
         try {
+
             while((product = queue.take()).getProduct() != null) {
+
                 Thread.sleep(1000);
-                clientMessage.append(product.getProduct());
-                HelloController.displayClientAnswer(clientMessage, textArea);
+
+                if (Server.line < Server.amountOfLines) {
+
+                    if (product.getProduct().getValue().equals(loadAnswer())) {
+
+                        clientMessage = new StringBuilder(MessageFormat.format(
+                                "Client ''{0}'' correctly answered: {1}",
+                                product.getProduct().getKey(),
+                                product.getProduct().getValue()
+                        ));
+
+                        queue.clear();
+                        Server.line += 1;
+
+                        HelloController.displayClientAnswer(clientMessage, textArea);
+
+                        if (Server.line == Server.amountOfLines) {
+                            displayGameEndMessage();
+                        }
+                    } else {
+                        textArea.appendText("Incorrect answer received!\n");
+                    }
+                }
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
     }

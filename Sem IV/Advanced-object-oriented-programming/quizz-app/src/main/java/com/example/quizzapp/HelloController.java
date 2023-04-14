@@ -1,6 +1,5 @@
 package com.example.quizzapp;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
@@ -14,7 +13,7 @@ public class HelloController implements Initializable {
     @FXML
     public TextArea serverLogs;
 
-    private Server server;
+    private static Server server;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -26,12 +25,21 @@ public class HelloController implements Initializable {
             System.out.println("Error launching server");
         }
 
-        server.receiveAnswerFromUser(serverLogs);
+        try {
+            server.loadQuestion(serverLogs);
+            server.receiveAnswerFromUser(serverLogs);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    public static void displayClientAnswer(StringBuilder clientMessage, TextArea textArea) {
+    public static void displayClientAnswer(StringBuilder clientMessage, TextArea textArea) throws IOException {
 
-        clientMessage.append("\n");
+        clientMessage.append("\n\n");
 
-        Platform.runLater(() -> textArea.setText(clientMessage.toString()));
+        textArea.appendText(clientMessage.toString());
+
+        if (Server.line < Server.amountOfLines) {
+            server.loadQuestion(textArea);
+        }
     }
 }

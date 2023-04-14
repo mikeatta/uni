@@ -8,5 +8,5 @@
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
-   <TextArea fx:id="serverLogs" prefHeight="200.0" prefWidth="250.0" />
+   <TextArea fx:id="serverLogs" editable="false" prefHeight="200.0" prefWidth="250.0" wrapText="true" />
 </VBox>

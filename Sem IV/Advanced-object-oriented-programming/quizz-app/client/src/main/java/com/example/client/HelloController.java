@@ -6,9 +6,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -40,7 +38,7 @@ public class HelloController implements Initializable {
             public void handle(ActionEvent actionEvent) {
                 String answerToSend = answerTextField.getText();
                 String nickToSend = nickTextField.getText();
-                if (!answerToSend.isEmpty()) {
+                if (!answerToSend.isEmpty() && !nickToSend.isEmpty()) {
                     client.sendAnswerToServer(answerToSend, nickToSend);
                     answerTextField.clear();
                     nickTextField.clear();
