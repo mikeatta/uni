@@ -4,7 +4,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 public class HelloController {
     @FXML
@@ -30,12 +32,18 @@ public class HelloController {
     }
 
     @FXML
-    private void createClassObject() {
+    private void createClassObject() throws ClassNotFoundException, NoSuchMethodException,
+            InvocationTargetException, InstantiationException, IllegalAccessException {
 
         String className = getClassName();
 
-        Song song = new Song(".", "", ".", ".", ".", ".");
-        Field[] fields = song.getClass().getDeclaredFields();
+        Class<?> reflectionClass = Class.forName(className);
+        Constructor<?> constructor = reflectionClass.getDeclaredConstructor(String.class,
+                String.class, String.class, String.class, String.class, String.class);
+
+        Object reflectionObject = constructor.newInstance("Title", "Tempo", "Rhythm", "Album", "Performer", "Lyrics");
+
+        Field[] fields = reflectionObject.getClass().getDeclaredFields();
 
         for (Field field : fields) {
             System.out.println(field.getName());
