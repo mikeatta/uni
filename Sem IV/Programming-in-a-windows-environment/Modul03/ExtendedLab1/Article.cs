@@ -23,7 +23,7 @@ namespace ExtendedLab1
             Amount = amount;
             PriceTotalNetto = priceTotalNetto;
             PriceTotalBrutto = priceTotalBrutto;
-            TaxPercent = (int)((priceTotalBrutto / (double)priceTotalNetto) * 10);
+            TaxPercent = (int)((priceTotalNetto / (double)priceTotalBrutto) * 10);
         }
 
         public String GetName()

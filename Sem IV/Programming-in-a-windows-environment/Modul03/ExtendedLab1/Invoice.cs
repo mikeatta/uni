@@ -8,20 +8,32 @@ namespace ExtendedLab1
         private DateTime _saleDate;
         private int _daysUntilPaymentDue;
         private DateTime _paymentDueDate;
-        private int _totalPriceNetto;
         private int _totalPriceBrutto;
+        private int _totalPriceNetto;
         private static String _invoiceNumber;
+
         private List<Article> _articles = new List<Article>();
 
-        public Invoice(String invoiceNumber, DateTime paymentDueDate, int daysUntilPaymentDue,
-            DateTime saleDate, int totalPriceBrutto, int totalPriceNetto)
+        public Invoice(String invoiceNumber, DateTime paymentDueDate, DateTime saleDate,
+            int totalPriceBrutto, int totalPriceNetto)
         {
             _invoiceNumber = invoiceNumber;
             _paymentDueDate = paymentDueDate;
-            _daysUntilPaymentDue = daysUntilPaymentDue;
+            _daysUntilPaymentDue = (paymentDueDate - DateTime.Today).Days;
             _saleDate = saleDate;
             _totalPriceBrutto = totalPriceBrutto;
             _totalPriceNetto = totalPriceNetto;
+        }
+
+        public void GetInvoiceInfo()
+        {
+            Console.Write(
+                $"Invoice number: {_invoiceNumber}\n" +
+                $"Sale date: {_saleDate}\n" +
+                $"Payment due on (date): {_paymentDueDate}\n" +
+                $"Payment due in (days): {_daysUntilPaymentDue}\n" +
+                $"Price (netto): {_totalPriceNetto}\n" +
+                $"Price (brutto): {_totalPriceBrutto}\n");
         }
 
         public void AddArticle(Article article)
