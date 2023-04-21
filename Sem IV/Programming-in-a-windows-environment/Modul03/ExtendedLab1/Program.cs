@@ -9,8 +9,7 @@ namespace ExtendedLab1
             DateTime paymentDue = new DateTime(2023, 05, 20);
             DateTime saleDate = new DateTime(2023, 04, 20);
 
-            Invoice invoice = new Invoice("INV-23-04-001", paymentDue, saleDate,
-                57, 40);
+            Invoice invoice = new Invoice("INV-23-04-001", paymentDue, saleDate);
             
             Article article = new Article("Test item", "Unit", 17, 10,
                 1, 17, 10);
@@ -27,6 +26,9 @@ namespace ExtendedLab1
                 2, 40, 30));
 
             invoice.GetAllArticlesInfo();
+            Console.WriteLine("\n************\n");
+
+            invoice.GetInvoiceInfo();
         }
     }
 }
