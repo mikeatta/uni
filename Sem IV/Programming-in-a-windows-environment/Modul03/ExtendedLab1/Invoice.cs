@@ -22,11 +22,13 @@ namespace ExtendedLab1
             _saleDate = saleDate;
         }
 
-        // TODO: Calculate total value of every article on the list
         public void GetInvoiceInfo()
         {
             if (_articles.Count > 0)
             {
+                CalculateTotalPriceBrutto();
+                CalculateTotalPriceNetto();
+
                 Console.Write(
                     $"Invoice number: {_invoiceNumber}\n" +
                     $"Sale date: {_saleDate}\n" +
@@ -41,33 +43,25 @@ namespace ExtendedLab1
             }
         }
 
-        private int CalculateTotalPriceBrutto()
+        private void CalculateTotalPriceBrutto()
         {
-            int totalBruttoPriceSum = 0;
             foreach (Article article in _articles)
             {
-                totalBruttoPriceSum += article.GetPriceTotalBrutto();
+                _totalPriceBrutto += article.GetPriceTotalBrutto();
             }
-
-            return totalBruttoPriceSum;
         }
 
-        private int CalculateTotalPriceNetto()
+        private void CalculateTotalPriceNetto()
         {
-            int totalPriceNettoSum = 0;
             foreach (Article article in _articles)
             {
-                totalPriceNettoSum += article.GetPriceTotalNetto();
+                _totalPriceNetto += article.GetPriceTotalNetto();
             }
-
-            return totalPriceNettoSum;
         }
 
         public void AddArticle(Article article)
         {
             _articles.Add(article);
-            _totalPriceBrutto = CalculateTotalPriceBrutto();
-            _totalPriceNetto = CalculateTotalPriceNetto();
         }
 
         public Article GetArticle(int articleIndex)
