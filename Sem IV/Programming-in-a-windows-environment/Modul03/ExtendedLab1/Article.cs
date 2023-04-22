@@ -14,16 +14,16 @@ namespace ExtendedLab1
         private int TaxPercent { set; get; }
 
         public Article(String name, String unit, int pricePerUnitNetto, int pricePerUnitBrutto,
-            int amount, int priceTotalNetto, int priceTotalBrutto)
+            int amount)
         {
             Name = name;
             Unit = unit;
             PricePerUnitNetto = pricePerUnitNetto;
             PricePerUnitBrutto = pricePerUnitBrutto;
             Amount = amount;
-            PriceTotalNetto = priceTotalNetto;
-            PriceTotalBrutto = priceTotalBrutto;
-            TaxPercent = (int)((priceTotalNetto / (double)priceTotalBrutto) * 10);
+            PriceTotalNetto = amount * pricePerUnitNetto;
+            PriceTotalBrutto = amount * pricePerUnitBrutto;
+            TaxPercent = (int)((PriceTotalNetto / (double)pricePerUnitBrutto) * 10);
         }
 
         public String GetName()
