@@ -6,15 +6,15 @@ namespace ExtendedLab1
     {
         private String Name { set; get; }
         private String Unit { set; get; }
-        private int PricePerUnitNetto { set; get; }
-        private int PricePerUnitBrutto { set; get; }
-        private int Amount { set; get; }
-        private int PriceTotalNetto { set; get; }
-        private int PriceTotalBrutto { set; get; }
-        private int TaxPercent { set; get; }
+        private double PricePerUnitNetto { set; get; }
+        private double PricePerUnitBrutto { set; get; }
+        private double Amount { set; get; }
+        private double PriceTotalNetto { set; get; }
+        private double PriceTotalBrutto { set; get; }
+        private double TaxPercent { set; get; }
 
-        public Article(String name, String unit, int pricePerUnitNetto, int pricePerUnitBrutto,
-            int amount)
+        public Article(String name, String unit, double pricePerUnitNetto, double pricePerUnitBrutto,
+            double amount)
         {
             Name = name;
             Unit = unit;
@@ -23,7 +23,7 @@ namespace ExtendedLab1
             Amount = amount;
             PriceTotalNetto = amount * pricePerUnitNetto;
             PriceTotalBrutto = amount * pricePerUnitBrutto;
-            TaxPercent = (int)((PriceTotalNetto / (double)pricePerUnitBrutto) * 10);
+            TaxPercent = ((pricePerUnitNetto / pricePerUnitBrutto) * 10);
         }
 
         public String GetName()
@@ -36,32 +36,32 @@ namespace ExtendedLab1
             return Unit;
         }
 
-        public int GetPricePerUnitNetto()
+        public double GetPricePerUnitNetto()
         {
             return PricePerUnitNetto;
         }
 
-        public int GetPricePerUnitBrutto()
+        public double GetPricePerUnitBrutto()
         {
             return PricePerUnitBrutto;
         }
 
-        public int GetAmount()
+        public double GetAmount()
         {
             return Amount;
         }
 
-        public int GetPriceTotalNetto()
+        public double GetPriceTotalNetto()
         {
             return PriceTotalNetto;
         }
 
-        public int GetPriceTotalBrutto()
+        public double GetPriceTotalBrutto()
         {
             return PriceTotalBrutto;
         }
 
-        public int GetTaxPercent()
+        public double GetTaxPercent()
         {
             return TaxPercent;
         }

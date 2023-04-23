@@ -8,8 +8,8 @@ namespace ExtendedLab1
         private DateTime _saleDate;
         private int _daysUntilPaymentDue;
         private DateTime _paymentDueDate;
-        private int _totalPriceBrutto;
-        private int _totalPriceNetto;
+        private double _totalPriceBrutto;
+        private double _totalPriceNetto;
         private static String _invoiceNumber;
 
         private List<Article> _articles = new List<Article>();
@@ -34,8 +34,8 @@ namespace ExtendedLab1
                     $"Sale date: {_saleDate}\n" +
                     $"Payment due on (date): {_paymentDueDate}\n" +
                     $"Payment due in (days): {_daysUntilPaymentDue}\n" +
-                    $"Price (netto): {_totalPriceNetto}\n" +
-                    $"Price (brutto): {_totalPriceBrutto}\n");
+                    $"Price (netto): {_totalPriceNetto:F}\n" +
+                    $"Price (brutto): {_totalPriceBrutto:F}\n");
             }
             else
             {
@@ -78,9 +78,9 @@ namespace ExtendedLab1
                 $"Price Per Unit (Netto): {_articles[articleIndex].GetPricePerUnitNetto()}\n" +
                 $"Price Per Unit (Brutto): {_articles[articleIndex].GetPricePerUnitBrutto()}\n" +
                 $"Amount: {_articles[articleIndex].GetAmount()}\n" +
-                $"Total price (Netto): {_articles[articleIndex].GetPriceTotalNetto()}\n" +
-                $"Total price (Brutto): {_articles[articleIndex].GetPriceTotalBrutto()}\n" +
-                $"Tax percent: {_articles[articleIndex].GetTaxPercent()}%\n");
+                $"Total price (Netto): {_articles[articleIndex].GetPriceTotalNetto():F}\n" +
+                $"Total price (Brutto): {_articles[articleIndex].GetPriceTotalBrutto():F}\n" +
+                $"Tax percent: {_articles[articleIndex].GetTaxPercent():F}%\n");
         }
 
         public void GetAllArticlesInfo()
