@@ -20,6 +20,10 @@ namespace ExtendedLab1
             invoice.GetAllArticlesInfo();
             Console.WriteLine("************\n");
 
+            invoice.GetArticle("Gas");
+            invoice.GetArticle("Tires");
+            Console.WriteLine("************\n");
+
             invoice.GetInvoiceInfo();
         }
     }

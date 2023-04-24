@@ -26,6 +26,9 @@ namespace ExtendedLab1
             TaxPercent = ((pricePerUnitNetto / pricePerUnitBrutto) * 10);
         }
 
+        public Article()
+        {}
+
         public String GetName()
         {
             return Name;

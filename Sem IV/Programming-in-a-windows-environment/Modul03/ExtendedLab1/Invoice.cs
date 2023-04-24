@@ -8,8 +8,8 @@ namespace ExtendedLab1
         private DateTime _saleDate;
         private int _daysUntilPaymentDue;
         private DateTime _paymentDueDate;
-        private double _totalPriceBrutto;
         private double _totalPriceNetto;
+        private double _totalPriceBrutto;
         private static String _invoiceNumber;
 
         private List<Article> _articles = new List<Article>();
@@ -67,6 +67,42 @@ namespace ExtendedLab1
         public Article GetArticle(int articleIndex)
         {
             return _articles[articleIndex];
+        }
+
+        // TODO: Find article by name and display article's attributes
+        public void GetArticle(String articleName)
+        {
+            Article foundArticle = LookupArticleByName(articleName);
+
+            if (foundArticle == null)
+            {
+                Console.WriteLine("Lookup article: No article found under that name");
+            }
+            else
+            {
+                Console.Write(
+                    $"Lookup article: '{foundArticle.GetName()}'\n" +
+                    $"Unit type: {foundArticle.GetUnit()}\n" +
+                    $"Price Per Unit (Netto): {foundArticle.GetPricePerUnitNetto():F}\n" +
+                    $"Price Per Unit (Brutto): {foundArticle.GetPriceTotalBrutto():F}\n" +
+                    $"Amount: {foundArticle.GetAmount():F}\n");
+            }
+
+            Console.WriteLine("");
+        }
+
+        public Article LookupArticleByName(String articleName)
+        {
+            int index = 0;
+            foreach (Article article in _articles)
+            {
+                if (article.GetName().Equals(articleName))
+                {
+                    return _articles[index];
+                }
+            }
+
+            return null;
         }
 
         public void GetArticleInfo(int articleIndex)
