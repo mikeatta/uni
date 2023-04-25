@@ -11,11 +11,11 @@ namespace ExtendedLab1
 
             Invoice invoice = new Invoice("INV-23-04-001", paymentDue, saleDate);
 
-            Article article = new Article("Gas", "Liter", 6.54, 1.12, 48.76);
+            Article article = new Article("Gas", "Liter", 1.12, 6.54, 48.76);
 
             invoice.AddArticle(article);
 
-            invoice.AddArticle(new Article("Lamp", "Unit", 30, 21, 4));
+            invoice.AddArticle(new Article("Lamp", "Unit", 21, 30, 4));
 
             invoice.GetAllArticlesInfo();
             Console.WriteLine("************\n");

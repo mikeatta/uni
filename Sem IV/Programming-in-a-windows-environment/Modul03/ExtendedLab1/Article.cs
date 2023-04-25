@@ -23,7 +23,7 @@ namespace ExtendedLab1
             Amount = amount;
             PriceTotalNetto = amount * pricePerUnitNetto;
             PriceTotalBrutto = amount * pricePerUnitBrutto;
-            TaxPercent = ((pricePerUnitNetto / pricePerUnitBrutto) * 10);
+            TaxPercent = ((PriceTotalBrutto - PriceTotalNetto) * 100) / PriceTotalNetto;
         }
 
         public Article()

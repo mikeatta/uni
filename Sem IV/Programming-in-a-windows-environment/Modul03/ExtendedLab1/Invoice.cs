@@ -26,8 +26,8 @@ namespace ExtendedLab1
         {
             if (_articles.Count > 0)
             {
-                CalculateTotalPriceBrutto();
                 CalculateTotalPriceNetto();
+                CalculateTotalPriceBrutto();
 
                 Console.Write(
                     $"Invoice number: {_invoiceNumber}\n" +
@@ -69,7 +69,6 @@ namespace ExtendedLab1
             return _articles[articleIndex];
         }
 
-        // TODO: Find article by name and display article's attributes
         public void GetArticle(String articleName)
         {
             Article foundArticle = LookupArticleByName(articleName);
@@ -83,7 +82,7 @@ namespace ExtendedLab1
                 Console.Write(
                     $"Lookup article: '{foundArticle.GetName()}'\n" +
                     $"Unit type: {foundArticle.GetUnit()}\n" +
-                    $"Price Per Unit (Netto): {foundArticle.GetPricePerUnitNetto():F}\n" +
+                    $"Price Per Unit (Netto): {foundArticle.GetPriceTotalNetto():F}\n" +
                     $"Price Per Unit (Brutto): {foundArticle.GetPriceTotalBrutto():F}\n" +
                     $"Amount: {foundArticle.GetAmount():F}\n");
             }
