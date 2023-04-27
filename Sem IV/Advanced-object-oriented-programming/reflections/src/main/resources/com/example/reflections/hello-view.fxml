@@ -11,13 +11,11 @@
 
     <Label fx:id="welcomeText" />
     <Button onAction="#onHelloButtonClick" text="Hello!" />
-   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-      <children>
-         <TextField fx:id="classNameField" promptText="Enter class name" />
-         <Button fx:id="createObjectButton" mnemonicParsing="false" onAction="#createClassObject" text="Create Object" />
-         <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveChanges" text="Save changes" />
-      </children>
-   </HBox>
+    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+        <TextField fx:id="classNameField" promptText="Enter class name"/>
+        <Button fx:id="createObjectButton" mnemonicParsing="false" onAction="#createClassObject" text="Create Object"/>
+        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveChanges" text="Save changes"/>
+    </HBox>
    <VBox fx:id="objectPropertyMenu" prefHeight="200.0" prefWidth="100.0" spacing="3.0" />
    <TextArea fx:id="objectPropertyInfo" prefHeight="200.0" prefWidth="200.0" />
 </VBox>
