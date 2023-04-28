@@ -20,6 +20,8 @@ public class HelloController {
     @FXML
     private VBox objectPropertyMenu;
 
+    private Object reflectionObject = null;
+
     @FXML
     protected void onHelloButtonClick() {
         welcomeText.setText("Welcome to JavaFX Application!");
@@ -47,21 +49,45 @@ public class HelloController {
         Constructor<?> constructor = reflectionClass.getDeclaredConstructor(String.class,
                 String.class, String.class, String.class, String.class, String.class);
 
-        Object reflectionObject = constructor.newInstance("Default Title", "Default Tempo",
+        reflectionObject = constructor.newInstance("Default Title", "Default Tempo",
                 "Default Rhythm", "Default Album", "Default Performer", "Default Lyrics");
 
-        createObjectPropertiesMenu(reflectionObject);
+        createObjectPropertiesMenu();
     }
 
     @FXML
-    private void saveChanges() {}
+    private void saveChanges() throws ClassNotFoundException,
+            InvocationTargetException, IllegalAccessException {
+
+        String className = getClassName();
+
+        Class<?> reflectionClass = Class.forName(className);
+        Field[] fields = reflectionClass.getDeclaredFields();
+        Method[] methods = reflectionClass.getDeclaredMethods();
+
+        for (Field field : fields) {
+            for (Method method : methods) {
+
+                // Set new property value
+                if (formatMethodName("set", field.getName()).equals(method.getName())) {
+                    method.invoke(reflectionObject, "New value");
+                }
+
+                // Get new property
+                if (formatMethodName("get", field.getName()).equals(method.getName())) {
+                    System.out.println(method.getName() + " --> "
+                            + method.invoke(reflectionObject));
+                }
+            }
+        }
+    }
 
     @FXML
-    private void createObjectPropertiesMenu(Object reflectObject)
+    private void createObjectPropertiesMenu()
             throws InvocationTargetException, IllegalAccessException {
 
-        Field[] fields = reflectObject.getClass().getDeclaredFields();
-        Method[] methods = reflectObject.getClass().getDeclaredMethods();
+        Field[] fields = reflectionObject.getClass().getDeclaredFields();
+        Method[] methods = reflectionObject.getClass().getDeclaredMethods();
 
         for (Field field : fields) {
 
@@ -75,8 +101,8 @@ public class HelloController {
 
             for (Method method : methods) {
                 if (formatMethodName("get", field.getName()).equals(method.getName())) {
-                    value.setText((String)method.invoke(reflectObject));
-                    valueLong.setText((String)method.invoke(reflectObject));
+                    value.setText((String)method.invoke(reflectionObject));
+                    valueLong.setText((String)method.invoke(reflectionObject));
                     description.setText("<-- " + field.getName());
                 }
             }
