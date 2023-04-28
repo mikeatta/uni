@@ -47,8 +47,8 @@ public class HelloController {
         Constructor<?> constructor = reflectionClass.getDeclaredConstructor(String.class,
                 String.class, String.class, String.class, String.class, String.class);
 
-        Object reflectionObject = constructor.newInstance("Test Title", "Test Tempo",
-                "Test Rhythm", "Test Album", "Test Performer", "Test Lyrics");
+        Object reflectionObject = constructor.newInstance("Default Title", "Default Tempo",
+                "Default Rhythm", "Default Album", "Default Performer", "Default Lyrics");
 
         createObjectPropertiesMenu(reflectionObject);
     }
@@ -56,9 +56,9 @@ public class HelloController {
     @FXML
     private void saveChanges() {}
 
-    // TODO: Add and format TextArea and a Label
     @FXML
-    private void createObjectPropertiesMenu(Object reflectObject) {
+    private void createObjectPropertiesMenu(Object reflectObject)
+            throws InvocationTargetException, IllegalAccessException {
 
         Field[] fields = reflectObject.getClass().getDeclaredFields();
         Method[] methods = reflectObject.getClass().getDeclaredMethods();
@@ -74,9 +74,9 @@ public class HelloController {
             description.setMaxWidth(100);
 
             for (Method method : methods) {
-                if (formatMethodName(method.getName()).equals(field.getName())) {
-                    value.setText(method.getName());
-                    valueLong.setText(method.getName());
+                if (formatMethodName("get", field.getName()).equals(method.getName())) {
+                    value.setText((String)method.invoke(reflectObject));
+                    valueLong.setText((String)method.invoke(reflectObject));
                     description.setText("<-- " + field.getName());
                 }
             }
@@ -89,7 +89,13 @@ public class HelloController {
         }
     }
 
-    private String formatMethodName(String methodName) {
-        return methodName.substring(3).toLowerCase();
+    private String formatMethodName(String prefix, String fieldName) {
+
+        // Capitalize first character of the field name
+        String formattedMethodName = fieldName.substring(0, 1).toUpperCase()
+                + fieldName.substring(1);
+
+        formattedMethodName = prefix + formattedMethodName;
+        return formattedMethodName;
     }
 }
