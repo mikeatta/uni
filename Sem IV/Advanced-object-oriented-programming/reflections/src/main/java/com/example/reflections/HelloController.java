@@ -1,10 +1,7 @@
 package com.example.reflections;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import java.lang.reflect.Constructor;
@@ -70,16 +67,21 @@ public class HelloController {
 
                 // Set new property value
                 if (formatMethodName("set", field.getName()).equals(method.getName())) {
-                    method.invoke(reflectionObject, "New value");
-                }
 
-                // Get new property
-                if (formatMethodName("get", field.getName()).equals(method.getName())) {
-                    System.out.println(method.getName() + " --> "
-                            + method.invoke(reflectionObject));
+                    TextInputControl child;
+
+                    if (!field.getName().equals("lyrics")) {
+                        child = (TextField) objectPropertyMenu.lookup("#" + field.getName());
+                    } else {
+                        child = (TextArea) objectPropertyMenu.lookup("#" + field.getName());
+                    }
+
+                    method.invoke(reflectionObject, child.getText());
                 }
             }
         }
+
+        displayObjectProperties(fields, methods);
     }
 
     @FXML
@@ -98,6 +100,9 @@ public class HelloController {
             value.setMaxWidth(300);
             valueLong.setMaxWidth(300);
             description.setMaxWidth(100);
+
+            value.setId(field.getName());
+            valueLong.setId(field.getName());
 
             for (Method method : methods) {
                 if (formatMethodName("get", field.getName()).equals(method.getName())) {
@@ -123,5 +128,18 @@ public class HelloController {
 
         formattedMethodName = prefix + formattedMethodName;
         return formattedMethodName;
+    }
+
+    private void displayObjectProperties(Field[] objectFields, Method[] objectMethods)
+            throws InvocationTargetException, IllegalAccessException {
+
+        for (Field field : objectFields) {
+            for (Method method : objectMethods) {
+                if (formatMethodName("get", field.getName()).equals(method.getName())) {
+                    System.out.println(method.getName() + " --> "
+                            + method.invoke(reflectionObject));
+                }
+            }
+        }
     }
 }
