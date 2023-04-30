@@ -16,6 +16,8 @@ public class HelloController {
     private TextField classNameField;
     @FXML
     private VBox objectPropertyMenu;
+    @FXML
+    private TextArea objectPropertyInfo;
 
     private Object reflectionObject = null;
 
@@ -133,13 +135,19 @@ public class HelloController {
     private void displayObjectProperties(Field[] objectFields, Method[] objectMethods)
             throws InvocationTargetException, IllegalAccessException {
 
+        StringBuilder objectProperties = new StringBuilder();
+
         for (Field field : objectFields) {
             for (Method method : objectMethods) {
-                if (formatMethodName("get", field.getName()).equals(method.getName())) {
-                    System.out.println(method.getName() + " --> "
-                            + method.invoke(reflectionObject));
+                if (formatMethodName("get", field.getName())
+                        .equals(method.getName())) {
+                    objectProperties.append(field.getName()).append(" = ")
+                            .append(method.invoke(reflectionObject))
+                            .append("\n");
                 }
             }
         }
+
+        objectPropertyInfo.setText(objectProperties.toString());
     }
 }
