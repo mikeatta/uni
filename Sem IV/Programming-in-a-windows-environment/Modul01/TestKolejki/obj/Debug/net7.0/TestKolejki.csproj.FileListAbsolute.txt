@@ -1,0 +1,15 @@
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\bin\Debug\net7.0\TestKolejki.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\bin\Debug\net7.0\TestKolejki.deps.json
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\bin\Debug\net7.0\TestKolejki.runtimeconfig.json
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\bin\Debug\net7.0\TestKolejki.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\bin\Debug\net7.0\TestKolejki.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\obj\Debug\net7.0\TestKolejki.csproj.AssemblyReference.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\obj\Debug\net7.0\TestKolejki.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\obj\Debug\net7.0\TestKolejki.AssemblyInfoInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\obj\Debug\net7.0\TestKolejki.AssemblyInfo.cs
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\obj\Debug\net7.0\TestKolejki.csproj.CoreCompileInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\obj\Debug\net7.0\TestKolejki.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\obj\Debug\net7.0\refint\TestKolejki.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\obj\Debug\net7.0\TestKolejki.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\obj\Debug\net7.0\TestKolejki.genruntimeconfig.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul01\TestKolejki\obj\Debug\net7.0\ref\TestKolejki.dll

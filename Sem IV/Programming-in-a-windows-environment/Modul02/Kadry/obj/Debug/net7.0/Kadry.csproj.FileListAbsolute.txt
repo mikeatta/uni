@@ -1,0 +1,15 @@
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\obj\Debug\net7.0\Kadry.csproj.AssemblyReference.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\obj\Debug\net7.0\Kadry.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\obj\Debug\net7.0\Kadry.AssemblyInfoInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\obj\Debug\net7.0\Kadry.AssemblyInfo.cs
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\obj\Debug\net7.0\Kadry.csproj.CoreCompileInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\bin\Debug\net7.0\Kadry.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\bin\Debug\net7.0\Kadry.deps.json
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\bin\Debug\net7.0\Kadry.runtimeconfig.json
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\bin\Debug\net7.0\Kadry.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\bin\Debug\net7.0\Kadry.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\obj\Debug\net7.0\Kadry.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\obj\Debug\net7.0\refint\Kadry.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\obj\Debug\net7.0\Kadry.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\obj\Debug\net7.0\Kadry.genruntimeconfig.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul02\Kadry\obj\Debug\net7.0\ref\Kadry.dll
