@@ -2,13 +2,13 @@ package com.example.reflections;
 
 public class Song {
     private String title;
-    private String tempo;
+    private Integer tempo;
     private String rhythm;
     private String album;
     private String performer;
     private String lyrics;
 
-    Song(String title, String tempo, String rhythm,
+    Song(String title, Integer tempo, String rhythm,
          String album, String performer, String lyrics) {
         this.title = title;
         this.tempo = tempo;
@@ -26,11 +26,11 @@ public class Song {
         return this.title;
     }
 
-    public void setTempo(String tempo) {
+    public void setTempo(Integer tempo) {
         this.tempo = tempo;
     }
 
-    public String getTempo() {
+    public Integer getTempo() {
         return this.tempo;
     }
 

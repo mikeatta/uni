@@ -46,9 +46,9 @@ public class HelloController {
 
         Class<?> reflectionClass = Class.forName(className);
         Constructor<?> constructor = reflectionClass.getDeclaredConstructor(String.class,
-                String.class, String.class, String.class, String.class, String.class);
+                Integer.class, String.class, String.class, String.class, String.class);
 
-        reflectionObject = constructor.newInstance("Default Title", "Default Tempo",
+        reflectionObject = constructor.newInstance("Default Title", 80,
                 "Default Rhythm", "Default Album", "Default Performer", "Default Lyrics");
 
         createObjectPropertiesMenu();
@@ -64,6 +64,8 @@ public class HelloController {
         Field[] fields = reflectionClass.getDeclaredFields();
         Method[] methods = reflectionClass.getDeclaredMethods();
 
+        objectPropertyInfo.clear();
+
         for (Field field : fields) {
             for (Method method : methods) {
 
@@ -78,7 +80,16 @@ public class HelloController {
                         child = (TextArea) objectPropertyMenu.lookup("#" + field.getName());
                     }
 
-                    method.invoke(reflectionObject, child.getText());
+                    // Try setting new property type
+                    String fieldType = field.getType().getSimpleName();
+
+                    try {
+                        Object childContent = convertFieldType(fieldType, child.getText());
+                        method.invoke(reflectionObject, childContent);
+                    } catch (IllegalArgumentException e) {
+                        objectPropertyInfo.setText("New value of "
+                                + field.getName() + " couldn't be set\n");
+                    }
                 }
             }
         }
@@ -108,8 +119,8 @@ public class HelloController {
 
             for (Method method : methods) {
                 if (formatMethodName("get", field.getName()).equals(method.getName())) {
-                    value.setText((String)method.invoke(reflectionObject));
-                    valueLong.setText((String)method.invoke(reflectionObject));
+                    value.setText(String.valueOf(method.invoke(reflectionObject)));
+                    valueLong.setText(String.valueOf(method.invoke(reflectionObject)));
                     description.setText("<-- " + field.getName());
                 }
             }
@@ -132,22 +143,39 @@ public class HelloController {
         return formattedMethodName;
     }
 
+    private Object convertFieldType(String simpleTypeName, String convertedElement) {
+
+        return switch (simpleTypeName) {
+            case "Boolean", "boolean" -> Boolean.valueOf(convertedElement);
+            case "Byte", "byte" -> Byte.valueOf(convertedElement);
+            case "Short", "short" -> Short.valueOf(convertedElement);
+            case "Integer", "int" -> Integer.valueOf(convertedElement);
+            case "Long", "long" -> Long.valueOf(convertedElement);
+            case "Float", "float" -> Float.valueOf(convertedElement);
+            case "Double", "double" -> Double.valueOf(convertedElement);
+            case "String", "string" -> String.valueOf(convertedElement);
+            case "Character", "char" -> convertedElement.charAt(0);
+            default -> convertedElement;
+        };
+    }
+
     private void displayObjectProperties(Field[] objectFields, Method[] objectMethods)
             throws InvocationTargetException, IllegalAccessException {
 
         StringBuilder objectProperties = new StringBuilder();
+        objectProperties.append(reflectionObject.getClass()
+                .getSimpleName()).append("\n");
 
         for (Field field : objectFields) {
             for (Method method : objectMethods) {
                 if (formatMethodName("get", field.getName())
                         .equals(method.getName())) {
                     objectProperties.append(field.getName()).append(" = ")
-                            .append(method.invoke(reflectionObject))
-                            .append("\n");
+                            .append(method.invoke(reflectionObject)).append("\n");
                 }
             }
         }
 
-        objectPropertyInfo.setText(objectProperties.toString());
+        objectPropertyInfo.appendText(objectProperties.toString());
     }
 }
