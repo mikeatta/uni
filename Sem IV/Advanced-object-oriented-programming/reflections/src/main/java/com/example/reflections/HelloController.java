@@ -11,8 +11,6 @@ import java.lang.reflect.Method;
 
 public class HelloController {
     @FXML
-    private Label welcomeText;
-    @FXML
     private TextField classNameField;
     @FXML
     private VBox objectPropertyMenu;
@@ -20,11 +18,6 @@ public class HelloController {
     private TextArea objectPropertyInfo;
 
     private Object reflectionObject = null;
-
-    @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
-    }
 
     @FXML
     protected String getClassName() {
