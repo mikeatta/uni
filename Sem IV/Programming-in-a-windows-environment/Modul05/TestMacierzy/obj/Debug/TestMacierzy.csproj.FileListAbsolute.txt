@@ -1,0 +1,10 @@
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\TestMacierzy\bin\Debug\TestMacierzy.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\TestMacierzy\bin\Debug\TestMacierzy.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\TestMacierzy\bin\Debug\Macierze.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\TestMacierzy\bin\Debug\Macierze.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\TestMacierzy\obj\Debug\TestMacierzy.csproj.AssemblyReference.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\TestMacierzy\obj\Debug\TestMacierzy.csproj.SuggestedBindingRedirects.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\TestMacierzy\obj\Debug\TestMacierzy.csproj.CoreCompileInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\TestMacierzy\obj\Debug\TestMacierzy.csproj.CopyComplete
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\TestMacierzy\obj\Debug\TestMacierzy.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\TestMacierzy\obj\Debug\TestMacierzy.pdb
