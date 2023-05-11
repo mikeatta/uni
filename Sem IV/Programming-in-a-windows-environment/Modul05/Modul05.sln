@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Macierze", "Macierze\Macier
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestMacierzy", "TestMacierzy\TestMacierzy.csproj", "{8F0C434F-A201-42BB-8C5F-660E216AC8C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zbiory", "Zbiory\Zbiory.csproj", "{91C7A671-F5B0-41F1-95F6-D4C99DD0C9CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestZbiory", "TestZbiory\TestZbiory.csproj", "{3DA94008-5BC3-4359-859C-742CDF76AFA1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{8F0C434F-A201-42BB-8C5F-660E216AC8C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F0C434F-A201-42BB-8C5F-660E216AC8C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F0C434F-A201-42BB-8C5F-660E216AC8C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91C7A671-F5B0-41F1-95F6-D4C99DD0C9CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91C7A671-F5B0-41F1-95F6-D4C99DD0C9CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91C7A671-F5B0-41F1-95F6-D4C99DD0C9CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91C7A671-F5B0-41F1-95F6-D4C99DD0C9CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DA94008-5BC3-4359-859C-742CDF76AFA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DA94008-5BC3-4359-859C-742CDF76AFA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DA94008-5BC3-4359-859C-742CDF76AFA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DA94008-5BC3-4359-859C-742CDF76AFA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

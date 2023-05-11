@@ -1,0 +1,7 @@
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\Zbiory\bin\Debug\Zbiory.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\Zbiory\bin\Debug\Zbiory.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\Zbiory\obj\Debug\Zbiory.csproj.AssemblyReference.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\Zbiory\obj\Debug\Zbiory.csproj.SuggestedBindingRedirects.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\Zbiory\obj\Debug\Zbiory.csproj.CoreCompileInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\Zbiory\obj\Debug\Zbiory.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul05\Zbiory\obj\Debug\Zbiory.pdb
