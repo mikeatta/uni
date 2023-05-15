@@ -3,7 +3,6 @@ package com.example.validationannotations;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
 
 public class HelloController {
 
@@ -23,16 +22,8 @@ public class HelloController {
 
     @FXML
     protected void validateField() {
-
         vinputText.registerValidator(myPatternValidator);
-
-        TextInputControl inputControl = validatedText;
-        myPatternValidator.validate(inputControl.getText());
-
-        if (myPatternValidator.isValid()) {
-            System.out.println("OK");
-        } else {
-            System.out.println(myPatternValidator.getMessage());
-        }
+        vinputText.setInputControl(validatedText);
+        vinputText.validateFieldContent();
     }
 }

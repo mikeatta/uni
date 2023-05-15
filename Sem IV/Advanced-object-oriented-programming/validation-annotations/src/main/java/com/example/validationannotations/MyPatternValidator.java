@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MyPatternValidator implements Validator {
+
     private boolean valid;
     private String message;
 

@@ -3,15 +3,27 @@ package com.example.validationannotations;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class VinputText extends HBox {
 
     private TextInputControl inputControl;
-    private List<Validator> validators = new ArrayList<>();
+    private Validator patternValidator;
 
     public void registerValidator(Validator validator) {
-        validators.add(validator);
+        this.patternValidator = validator;
+    }
+
+    public void setInputControl(TextInputControl field) {
+        inputControl = field;
+    }
+
+    public void validateFieldContent() {
+
+        patternValidator.validate(inputControl.getText());
+
+        if (patternValidator.isValid()) {
+            System.out.println("OK");
+        } else {
+            System.out.println(patternValidator.getMessage());
+        }
     }
 }
