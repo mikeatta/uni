@@ -14,10 +14,10 @@
     <Button onAction="#onHelloButtonClick" text="Hello!" />
    <HBox fx:id="validationContainer" alignment="CENTER" prefHeight="30.0" prefWidth="200.0" spacing="10.0">
       <children>
-         <ImageView fx:id="tooltip" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" />
+         <ImageView fx:id="imageView" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" />
          <TextField fx:id="validatedText" />
          <Label text="&lt;-- My validated field" />
       </children>
    </HBox>
-   <Button fx:id="confirmButton" mnemonicParsing="false" onAction="#validateField" text="Confirm" />
+   <Button fx:id="confirmButton" disable="true" mnemonicParsing="false" onAction="#validateField" text="Confirm" />
 </VBox>

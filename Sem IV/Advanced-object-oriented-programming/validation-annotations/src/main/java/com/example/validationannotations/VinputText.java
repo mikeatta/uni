@@ -7,6 +7,11 @@ public class VinputText extends HBox {
 
     private TextInputControl inputControl;
     private Validator patternValidator;
+    private final HelloController helloController;
+
+    public VinputText(HelloController helloController) {
+        this.helloController = helloController;
+    }
 
     public void registerValidator(Validator validator) {
         this.patternValidator = validator;
@@ -21,9 +26,19 @@ public class VinputText extends HBox {
         patternValidator.validate(inputControl.getText());
 
         if (patternValidator.isValid()) {
-            System.out.println("OK");
+            confirmValidation();
         } else {
-            System.out.println(patternValidator.getMessage());
+            rejectValidation();
         }
+    }
+
+    private void confirmValidation() {
+        helloController.getConfirmButton().setDisable(false);
+        System.out.println("Field content valid");
+    }
+
+    private void rejectValidation() {
+        helloController.getConfirmButton().setDisable(true);
+        System.out.println("Field content invalid");
     }
 }

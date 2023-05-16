@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MyPattern {
     String regex();
-    String message() default "The value is incorrect!";
+    String message();
 }
