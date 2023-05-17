@@ -15,7 +15,7 @@
    <HBox fx:id="validationContainer" alignment="CENTER" prefHeight="30.0" prefWidth="200.0" spacing="10.0">
       <children>
          <ImageView fx:id="imageView" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" />
-         <TextField fx:id="validatedText" />
+         <TextField fx:id="validatedText" onKeyTyped="#validateField" />
          <Label text="&lt;-- My validated field" />
       </children>
    </HBox>
