@@ -2,14 +2,11 @@ package com.example.validationannotations;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 
 public class HelloController {
 
-    @FXML
-    private Label welcomeText;
     @FXML
     private ImageView imageView;
     @FXML
@@ -20,11 +17,6 @@ public class HelloController {
 
     MyPatternValidator myPatternValidator = new MyPatternValidator();
     VinputText vinputText = new VinputText(this);
-
-    @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
-    }
 
     @FXML
     protected void validateField() {
