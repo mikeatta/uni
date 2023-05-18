@@ -32,4 +32,9 @@ public class HelloController {
     public Button getConfirmButton() {
         return this.confirmButton;
     }
+
+    public void initialize() {
+        // Set validation icon on startup
+        vinputText.setIcon();
+    }
 }

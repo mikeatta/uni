@@ -32,6 +32,12 @@ public class VinputText extends HBox {
         inputControl = field;
     }
 
+    public void setIcon() {
+        tooltip.setShowDelay(new Duration(0.3));
+        tooltip.setHideDelay(new Duration(1.0));
+        helloController.validateField();
+    }
+
     public void validateFieldContent() {
 
         patternValidator.validate(inputControl.getText());
@@ -51,7 +57,6 @@ public class VinputText extends HBox {
 
     private void rejectValidation() {
         Tooltip.install(helloController.getImageView(), tooltip);
-        tooltip.setShowDelay(new Duration(0.3));
         tooltip.setText(patternValidator.getMessage());
         helloController.getImageView().setImage(cross);
         helloController.getConfirmButton().setDisable(true);
