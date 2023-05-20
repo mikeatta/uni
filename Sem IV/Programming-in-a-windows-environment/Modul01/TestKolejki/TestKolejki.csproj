@@ -7,11 +7,4 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <ItemGroup>
-      <Compile Remove="Program.cs" />
-      <Compile Include="..\..\Instructions\Modul01\Program.cs">
-        <Link>Program.cs</Link>
-      </Compile>
-    </ItemGroup>
-
 </Project>
