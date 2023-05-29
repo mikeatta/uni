@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Notes Web App</title>
+</head>
+<body>
+    <div class="notes">
+        <div class="header">
+            <h2>The list of your notes:</h2>
+        </div>
+        <div class="content">
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>Importance</th>
+                        <th>Timestamp</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each = "note: ${notes}">
+                        <td th:text = "${note.importance}"></td>
+                        <td th:text = "${note.timestamp}"></td>
+                        <td th:text = "${note.text}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
