@@ -2,7 +2,8 @@ package com.example.webapp.entity;
 
 import jakarta.persistence.*;
 
-import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 @Entity
 @Table(name = "notes")
@@ -17,7 +18,7 @@ public class Note {
     private ImportanceEnum.Importance importance;
 
     @Column(name = "timestamp")
-    private Time timestamp;
+    private Timestamp timestamp;
 
     @Column(name = "text", nullable = false)
     private String text;
@@ -25,10 +26,15 @@ public class Note {
     public Note() {
     }
 
-    public Note(ImportanceEnum.Importance importance, Time timestamp, String text) {
+    public Note(ImportanceEnum.Importance importance, Timestamp timestamp, String text) {
         this.importance = importance;
         this.timestamp = timestamp;
         this.text = text;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        timestamp = Timestamp.from(Instant.now());
     }
 
     public Long getId() {
@@ -47,11 +53,11 @@ public class Note {
         this.importance = importance;
     }
 
-    public Time getTimestamp() {
+    public Timestamp getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Time timestamp) {
+    public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
 
