@@ -3,8 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Notes Web App</title>
+    <style>
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+    </style>
 </head>
 <body>
+    <div class="form">
+        <div class="header">
+            <h2>Add your note:</h2>
+        </div>
+        <div class="form">
+            <form action="/notes" method="post">
+                <div>
+                    <label for="importance">Importance: </label>
+                    <select id="importance" name="importance">
+                        <!--/*@thymesVar id="importance" type="com.example.webapp.entity.ImportanceEnum"*/-->
+                        <option th:each="importance : ${T(com.example.webapp.entity.ImportanceEnum.Importance).values()}"
+                                th:value="${importance}" th:text="${importance}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="note">Note text: </label>
+                    <input type="text" id="note" name="note"/>
+                </div>
+                <div>
+                    <button type="submit">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <div class="notes">
         <div class="header">
             <h2>The list of your notes:</h2>
@@ -19,7 +50,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each = "note: ${notes}">
+                    <tr th:each = "note : ${notes}">
                         <td th:text = "${note.importance}"></td>
                         <td th:text = "${note.timestamp}"></td>
                         <td th:text = "${note.text}"></td>

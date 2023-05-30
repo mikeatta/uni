@@ -2,7 +2,7 @@ package com.example.webapp.entity;
 
 public class ImportanceEnum {
 
-    private enum Importance {
+    public enum Importance {
         OPTIONAL,
         STANDARD,
         URGENT

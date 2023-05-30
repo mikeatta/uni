@@ -13,7 +13,8 @@ public class Note {
     private Long id;
 
     @Column(name = "importance")
-    private String importance;
+    @Enumerated(EnumType.STRING)
+    private ImportanceEnum.Importance importance;
 
     @Column(name = "timestamp")
     private Time timestamp;
@@ -24,7 +25,7 @@ public class Note {
     public Note() {
     }
 
-    public Note(String importance, Time timestamp, String text) {
+    public Note(ImportanceEnum.Importance importance, Time timestamp, String text) {
         this.importance = importance;
         this.timestamp = timestamp;
         this.text = text;
@@ -38,11 +39,11 @@ public class Note {
         this.id = id;
     }
 
-    public String getImportance() {
+    public ImportanceEnum.Importance getImportance() {
         return importance;
     }
 
-    public void setImportance(String importance) {
+    public void setImportance(ImportanceEnum.Importance importance) {
         this.importance = importance;
     }
 
