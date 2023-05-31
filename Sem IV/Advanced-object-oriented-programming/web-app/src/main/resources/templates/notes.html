@@ -17,7 +17,7 @@
             <h2>Add your note:</h2>
         </div>
         <div class="form">
-            <form action="/notes" method="post">
+            <form th:action="@{/notes}" th:object="${note}" method="post">
                 <div>
                     <label for="importance">Importance: </label>
                     <select id="importance" name="importance">
@@ -28,7 +28,7 @@
                 </div>
                 <div>
                     <label for="note">Note text: </label>
-                    <input type="text" id="note" name="note"/>
+                    <input th:field="*{text}" type="text" id="note" name="note"/>
                 </div>
                 <div>
                     <button type="submit">Add</button>
