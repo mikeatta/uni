@@ -1,6 +1,7 @@
 package com.example.webapp.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -21,6 +22,7 @@ public class Note {
     private Timestamp timestamp;
 
     @Column(name = "text", nullable = false)
+    @NotBlank(message = "Cannot submit empty note!")
     private String text;
 
     public Note() {

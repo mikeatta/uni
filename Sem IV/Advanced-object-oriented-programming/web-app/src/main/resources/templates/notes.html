@@ -9,6 +9,11 @@
             flex-direction: column;
             gap: 10px;
         }
+
+        .error-message {
+            color: red;
+            font-weight: bolder;
+        }
     </style>
 </head>
 <body>
@@ -29,6 +34,7 @@
                 <div>
                     <label for="note">Note text: </label>
                     <input th:field="*{text}" type="text" id="note" name="note"/>
+                    <span th:if="${#fields.hasErrors('text')}" th:errors="*{text}" class="error-message"></span>
                 </div>
                 <div>
                     <button type="submit">Add</button>
