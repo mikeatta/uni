@@ -22,7 +22,11 @@ public class ApiController {
 
     @GetMapping(value = "/students/{id}")
     public Object getStudent(@PathVariable long id) {
-        return studentRepo.findById(id).get();
+        if (studentRepo.findById(id).isPresent()) {
+            return studentRepo.findById(id).get();
+        }
+
+        return "Student with id of " + id + " not found...";
     }
 
     @PostMapping(value = "/students")
@@ -33,19 +37,27 @@ public class ApiController {
 
     @PutMapping(value = "/students/{id}")
     public String updateStudent(@PathVariable long id, @RequestBody Student student) {
-        Student updatedStudent = studentRepo.findById(id).get();
-        updatedStudent.setFirstName(student.getFirstName());
-        updatedStudent.setLastName(student.getLastName());
-        updatedStudent.setAge(student.getAge());
-        updatedStudent.setSemester(student.getSemester());
-        studentRepo.save(updatedStudent);
-        return "Updated student #" + id + "...";
+        if (studentRepo.findById(id).isPresent()) {
+            Student updatedStudent = studentRepo.findById(id).get();
+            updatedStudent.setFirstName(student.getFirstName());
+            updatedStudent.setLastName(student.getLastName());
+            updatedStudent.setAge(student.getAge());
+            updatedStudent.setSemester(student.getSemester());
+            studentRepo.save(updatedStudent);
+            return "Updated student #" + id + "...";
+        }
+
+        return "Student with id of " + id + " not found...";
     }
 
     @DeleteMapping(value = "/students/{id}")
     public String removeStudent(@PathVariable long id) {
-        Student deleteStudent = studentRepo.findById(id).get();
-        studentRepo.delete(deleteStudent);
-        return "Deleted student #" + id + "...";
+        if (studentRepo.findById(id).isPresent()) {
+            Student deleteStudent = studentRepo.findById(id).get();
+            studentRepo.delete(deleteStudent);
+            return "Deleted student #" + id + "...";
+        }
+
+        return "Student with id of " + id + " not found...";
     }
 }
