@@ -1,0 +1,5 @@
+C:\Users\Michal\AppData\Local\Temporary Projects\Samochody\bin\Release\Samochody.dll
+C:\Users\Michal\AppData\Local\Temporary Projects\Samochody\bin\Release\Samochody.pdb
+C:\Users\Michal\AppData\Local\Temporary Projects\Samochody\obj\Release\ResolveAssemblyReference.cache
+C:\Users\Michal\AppData\Local\Temporary Projects\Samochody\obj\Release\Samochody.dll
+C:\Users\Michal\AppData\Local\Temporary Projects\Samochody\obj\Release\Samochody.pdb
