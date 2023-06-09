@@ -1,53 +1,39 @@
 #include <stdio.h>
-#include <string.h>
-#include <ctype.h>
 
-int count_occurance(char *text, int *letters, int *numbers)
+#define ASCII_CHARS 256
+
+void create_histogram(const char* str, int histogram[])
 {
-    int i;
-    char temp[strlen(text)]; // temp array to store 'text' value
-    char *ptr = temp; // pointer to value of text
-    char *ptr_text = text; // pointer to text input
-    char symbol;
-    for(i=0; i<(strlen(text)-1); i++)
+    int i = 0;
+
+    for (i = 0; i < ASCII_CHARS; i++)
     {
-        *ptr = *ptr_text; // assigning value of text to temp pointer
-        symbol = *ptr;
-        if(islower(symbol))
-        {
-            *letters = 1;
-            letters++;
-        }
-        else if(isdigit(symbol))
-        {
-            *numbers = 1;
-            numbers++;
-        }
-        else break;
-        puts(ptr);
-        printf("Letter: %d\n", *letters);
-        printf("Number: %d\n", *numbers);
-        ptr_text++;
+        histogram[i] = 0;
     }
-    // int let = len(letters);
-    // int num = len(numbers);
-    // return let, num;
+
+    while (*str)
+    {
+        histogram[(int)*str]++;
+        str++;
+    }
 }
 
 int main()
 {
-    char text[100];
-    char *ptr = text;
-    int letters_arr[100], numbers_arr[100]; // arrays holding occurances
-    int *ptr_letters = letters_arr;
-    int *ptr_numbers = numbers_arr;
+    const char* str = "Hello world!";
+    int histogram[ASCII_CHARS];
 
-    puts("Enter text");
-    fgets(ptr, 100, stdin);
+    create_histogram(str, histogram);
 
-    count_occurance(ptr, ptr_letters, ptr_numbers);
+    printf("Character occurence histogram:\n");
+    printf("------------------------------\n");
+    for (int i = 0; i < ASCII_CHARS; i++)
+    {
+        if (histogram[i] > 0)
+        {
+            printf("%c : %d\n", (char)i, histogram[i]);
+        }
+    }
 
-    fputs(ptr, stdout);
-    printf("%d", letters_arr);
-    printf("%d", numbers_arr);
+    return 0;
 }
