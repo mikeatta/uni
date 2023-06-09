@@ -3,13 +3,18 @@
 #define LETTERS 26
 #define NUMBERS 10
 
-void create_letter_histogram(const char* str, int histogram[])
+void create_histogram(const char* str, int* letter_arr, int* number_arr)
 {
     int i = 0;
 
     for (i = 0; i < LETTERS; i++)
     {
-        histogram[i] = 0;
+        letter_arr[i] = 0;
+    }
+
+    for (i = 0; i < NUMBERS; i++)
+    {
+        number_arr[i] = 0;
     }
 
     while (*str)
@@ -17,27 +22,11 @@ void create_letter_histogram(const char* str, int histogram[])
         char ch = *str;
         if (ch >= 'a' && ch <= 'z')
         {
-            histogram[ch - 'a']++;
+            letter_arr[ch - 'a']++;
         }
-        str++;
-    }
-}
-
-void create_number_histogram(const char* str, int histogram[])
-{
-    int i = 0;
-
-    for (i = 0; i < NUMBERS; i++)
-    {
-        histogram[i] = 0;
-    }
-
-    while (*str)
-    {
-        char ch = *str;
-        if (ch >= '0' && ch <= '9')
+        else if (ch >= '0' && ch <= '9')
         {
-            histogram[ch - '0']++;
+            number_arr[ch - '0']++;
         }
         str++;
     }
@@ -47,10 +36,11 @@ int main()
 {
     const char* str = "Hello, world! 123";
     int letter_arr[LETTERS];
+    int* letter_ptr = letter_arr;
     int number_arr[NUMBERS];
+    int* number_ptr = number_arr;
 
-    create_letter_histogram(str, letter_arr);
-    create_number_histogram(str, number_arr);
+    create_histogram(str, letter_ptr, number_ptr);
 
     printf("Letter histogram:\n");
     printf("------------------------------\n");
