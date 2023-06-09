@@ -1,37 +1,42 @@
 #include <stdio.h>
 
-#define ASCII_CHARS 256
+#define LETTERS 26
 
 void create_histogram(const char* str, int histogram[])
 {
     int i = 0;
 
-    for (i = 0; i < ASCII_CHARS; i++)
+    for (i = 0; i < LETTERS; i++)
     {
         histogram[i] = 0;
     }
 
     while (*str)
     {
-        histogram[(int)*str]++;
+        char ch = *str;
+        if (ch >= 'a' && ch <= 'z')
+        {
+            histogram[ch - 'a']++;
+        }
         str++;
     }
 }
 
 int main()
 {
-    const char* str = "Hello world!";
-    int histogram[ASCII_CHARS];
+    const char* str = "Hello, world!";
+    int histogram[LETTERS];
 
     create_histogram(str, histogram);
 
     printf("Character occurence histogram:\n");
     printf("------------------------------\n");
-    for (int i = 0; i < ASCII_CHARS; i++)
+    for (int i = 0; i < LETTERS; i++)
     {
         if (histogram[i] > 0)
         {
-            printf("%c : %d\n", (char)i, histogram[i]);
+            char ch = 'a' + i;
+            printf("%c : %d\n", ch, histogram[i]);
         }
     }
 
