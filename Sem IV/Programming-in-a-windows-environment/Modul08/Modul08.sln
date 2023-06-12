@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sortowanie", "Sortowanie\So
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSortowania", "TestSortowania\TestSortowania.csproj", "{A217F91E-758C-49C4-A8D1-52547F045226}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drzewa", "Drzewa\Drzewa.csproj", "{E49FFFC0-735B-4B26-BDEB-7036A6DE15ED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDrzewa", "TestDrzewa\TestDrzewa.csproj", "{DFA22631-57A1-4038-9849-690DCBE6CD7F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{A217F91E-758C-49C4-A8D1-52547F045226}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A217F91E-758C-49C4-A8D1-52547F045226}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A217F91E-758C-49C4-A8D1-52547F045226}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E49FFFC0-735B-4B26-BDEB-7036A6DE15ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E49FFFC0-735B-4B26-BDEB-7036A6DE15ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E49FFFC0-735B-4B26-BDEB-7036A6DE15ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E49FFFC0-735B-4B26-BDEB-7036A6DE15ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFA22631-57A1-4038-9849-690DCBE6CD7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFA22631-57A1-4038-9849-690DCBE6CD7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFA22631-57A1-4038-9849-690DCBE6CD7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFA22631-57A1-4038-9849-690DCBE6CD7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

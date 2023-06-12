@@ -1,0 +1,6 @@
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\Drzewa\bin\Debug\Drzewa.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\Drzewa\bin\Debug\Drzewa.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\Drzewa\obj\Debug\Drzewa.csproj.AssemblyReference.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\Drzewa\obj\Debug\Drzewa.csproj.CoreCompileInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\Drzewa\obj\Debug\Drzewa.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\Drzewa\obj\Debug\Drzewa.pdb

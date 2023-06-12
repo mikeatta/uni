@@ -1,0 +1,10 @@
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestDrzewa\bin\Debug\TestDrzewa.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestDrzewa\bin\Debug\TestDrzewa.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestDrzewa\bin\Debug\Drzewa.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestDrzewa\bin\Debug\Drzewa.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestDrzewa\obj\Debug\TestDrzewa.csproj.AssemblyReference.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestDrzewa\obj\Debug\TestDrzewa.csproj.SuggestedBindingRedirects.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestDrzewa\obj\Debug\TestDrzewa.csproj.CoreCompileInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestDrzewa\obj\Debug\TestDrzewa.csproj.CopyComplete
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestDrzewa\obj\Debug\TestDrzewa.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestDrzewa\obj\Debug\TestDrzewa.pdb
