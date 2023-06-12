@@ -1,0 +1,10 @@
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestSortowania\bin\Debug\TestSortowania.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestSortowania\bin\Debug\TestSortowania.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestSortowania\bin\Debug\Sortowanie.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestSortowania\bin\Debug\Sortowanie.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestSortowania\obj\Debug\TestSortowania.csproj.AssemblyReference.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestSortowania\obj\Debug\TestSortowania.csproj.SuggestedBindingRedirects.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestSortowania\obj\Debug\TestSortowania.csproj.CoreCompileInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestSortowania\obj\Debug\TestSortowania.csproj.CopyComplete
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestSortowania\obj\Debug\TestSortowania.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul08\TestSortowania\obj\Debug\TestSortowania.pdb
