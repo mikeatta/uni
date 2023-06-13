@@ -1,0 +1,10 @@
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestFunkcjiStatycznych\bin\Debug\TestFunkcjiStatycznych.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestFunkcjiStatycznych\bin\Debug\TestFunkcjiStatycznych.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestFunkcjiStatycznych\bin\Debug\Statystyka.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestFunkcjiStatycznych\bin\Debug\Statystyka.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestFunkcjiStatycznych\obj\Debug\TestFunkcjiStatycznych.csproj.AssemblyReference.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestFunkcjiStatycznych\obj\Debug\TestFunkcjiStatycznych.csproj.SuggestedBindingRedirects.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestFunkcjiStatycznych\obj\Debug\TestFunkcjiStatycznych.csproj.CoreCompileInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestFunkcjiStatycznych\obj\Debug\TestFunkcjiStatycznych.csproj.CopyComplete
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestFunkcjiStatycznych\obj\Debug\TestFunkcjiStatycznych.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestFunkcjiStatycznych\obj\Debug\TestFunkcjiStatycznych.pdb
