@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Statystyka", "Statystyka\St
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestFunkcjiStatycznych", "TestFunkcjiStatycznych\TestFunkcjiStatycznych.csproj", "{76B09316-6058-4ED6-AA14-85493B5D9CDB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Konta", "Konta\Konta.csproj", "{5E3C045D-AED6-4FCF-8B97-6965A914BA7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestKonta", "TestKonta\TestKonta.csproj", "{C765B11C-A732-4ABD-8D76-461F499AFCDD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{76B09316-6058-4ED6-AA14-85493B5D9CDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76B09316-6058-4ED6-AA14-85493B5D9CDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76B09316-6058-4ED6-AA14-85493B5D9CDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E3C045D-AED6-4FCF-8B97-6965A914BA7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E3C045D-AED6-4FCF-8B97-6965A914BA7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E3C045D-AED6-4FCF-8B97-6965A914BA7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E3C045D-AED6-4FCF-8B97-6965A914BA7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C765B11C-A732-4ABD-8D76-461F499AFCDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C765B11C-A732-4ABD-8D76-461F499AFCDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C765B11C-A732-4ABD-8D76-461F499AFCDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C765B11C-A732-4ABD-8D76-461F499AFCDD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

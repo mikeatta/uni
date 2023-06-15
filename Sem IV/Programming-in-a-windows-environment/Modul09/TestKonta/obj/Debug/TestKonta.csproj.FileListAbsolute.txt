@@ -1,0 +1,10 @@
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestKonta\bin\Debug\TestKonta.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestKonta\bin\Debug\TestKonta.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestKonta\bin\Debug\Konta.dll
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestKonta\bin\Debug\Konta.pdb
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestKonta\obj\Debug\TestKonta.csproj.AssemblyReference.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestKonta\obj\Debug\TestKonta.csproj.SuggestedBindingRedirects.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestKonta\obj\Debug\TestKonta.csproj.CoreCompileInputs.cache
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestKonta\obj\Debug\TestKonta.csproj.CopyComplete
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestKonta\obj\Debug\TestKonta.exe
+C:\Users\micha\Documents\git\uni\Sem IV\Programming-in-a-windows-environment\Modul09\TestKonta\obj\Debug\TestKonta.pdb
