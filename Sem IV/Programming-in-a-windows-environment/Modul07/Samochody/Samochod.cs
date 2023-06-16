@@ -87,7 +87,7 @@ namespace Samochody
 
         public override int GetHashCode()
         {
-            return string.Format("{0} {1} {2} {3}", Model, Marka, RokProdukcji,
+            return string.Format("{0} {1} {2} {3} {4}", Model, Marka, RokProdukcji,
                 Silnik.NumerFabryczny, Silnik.Pojemnosc).GetHashCode();
         }
     }
