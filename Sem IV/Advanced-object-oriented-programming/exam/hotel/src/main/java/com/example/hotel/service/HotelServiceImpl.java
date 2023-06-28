@@ -4,7 +4,9 @@ import com.example.hotel.model.Hotel;
 import com.example.hotel.repo.HotelRepo;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class HotelServiceImpl implements HotelService {
@@ -16,8 +18,14 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
-    public int getTotalRooms() {
-        Optional<Hotel> hotel = hotelRepo.findById(0L);
-        return hotel.map(Hotel::getTotalRooms).orElse(0);
+    public Map<String, Integer> getTotalRoomsByHotel() {
+        List<Hotel> hotels = hotelRepo.findAllHotels();
+        Map<String, Integer> totalRoomsByHotel = new HashMap<>();
+
+        for (Hotel hotel : hotels) {
+            totalRoomsByHotel.put(hotel.getName(), hotel.getTotalRooms());
+        }
+
+        return totalRoomsByHotel;
     }
 }

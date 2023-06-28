@@ -1,7 +1,9 @@
 package com.example.hotel.service;
 
+import java.util.Map;
+
 public interface HotelService {
 
-    int getTotalRooms();
+    Map<String, Integer> getTotalRoomsByHotel();
 
 }

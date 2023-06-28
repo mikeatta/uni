@@ -7,10 +7,10 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Map;
+
 @Route("")
 public class HomeView extends VerticalLayout {
-
-    private final TextField totalRoomsLabel;
 
     @Autowired
     private HotelServiceImpl hotelService;
@@ -18,14 +18,19 @@ public class HomeView extends VerticalLayout {
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
-        int totalRooms = hotelService.getTotalRooms();
-        totalRoomsLabel.setValue("Total rooms: " + totalRooms);
-        totalRoomsLabel.setReadOnly(true);
+        Map<String, Integer> totalRoomsByHotel = hotelService.getTotalRoomsByHotel();
+
+        for (Map.Entry<String, Integer> hotel : totalRoomsByHotel.entrySet()) {
+            String locationName = hotel.getKey();
+            Integer totalRooms = hotel.getValue();
+            TextField textField = new TextField("Hotel name: " + locationName);
+            textField.setValue("Total rooms: " + totalRooms);
+            textField.setReadOnly(true);
+            add(textField);
+        }
     }
 
     public HomeView() {
-        totalRoomsLabel = new TextField();
-        add(totalRoomsLabel);
     }
 
 }
