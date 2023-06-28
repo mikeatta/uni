@@ -18,7 +18,7 @@ public class HomeView extends VerticalLayout {
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
-        Integer totalRooms = hotelService.getTotalRooms();
+        int totalRooms = hotelService.getTotalRooms();
         totalRoomsLabel.setValue("Total rooms: " + totalRooms);
         totalRoomsLabel.setReadOnly(true);
     }

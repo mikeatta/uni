@@ -1,7 +1,10 @@
 package com.example.hotel.service;
 
+import com.example.hotel.model.Hotel;
 import com.example.hotel.repo.HotelRepo;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class HotelServiceImpl implements HotelService {
@@ -13,8 +16,8 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
-    public Integer getTotalRooms() {
-        Integer totalRooms = hotelRepo.getTotalRoomCount();
-        return totalRooms != null ? totalRooms : 0;
+    public int getTotalRooms() {
+        Optional<Hotel> hotel = hotelRepo.findById(0L);
+        return hotel.map(Hotel::getTotalRooms).orElse(0);
     }
 }

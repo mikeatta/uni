@@ -18,4 +18,28 @@ public class Hotel {
 
     @Column
     private int totalRooms;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public int getTotalRooms() {
+        return totalRooms;
+    }
+
+    public void setTotalRooms(int totalRooms) {
+        this.totalRooms = totalRooms;
+    }
 }
