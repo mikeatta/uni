@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface HotelRepo extends JpaRepository<Hotel, Long> {
 
-    @Query("SELECT h FROM Hotel h")
-    List<Hotel> findAllHotels();
+    @Query("SELECT DISTINCT h FROM Hotel h LEFT JOIN FETCH h.rooms")
+    List<Hotel> findAllHotelsWithRooms();
 
 }

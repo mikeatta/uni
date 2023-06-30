@@ -19,11 +19,11 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     public Map<String, Integer> getTotalRoomsByHotel() {
-        List<Hotel> hotels = hotelRepo.findAllHotels();
+        List<Hotel> hotels = hotelRepo.findAllHotelsWithRooms();
         Map<String, Integer> totalRoomsByHotel = new HashMap<>();
 
         for (Hotel hotel : hotels) {
-            totalRoomsByHotel.put(hotel.getName(), hotel.getTotalRooms());
+            totalRoomsByHotel.put(hotel.getName(), hotel.getRooms().size());
         }
 
         return totalRoomsByHotel;

@@ -2,6 +2,9 @@ package com.example.hotel.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "hotel")
 public class Hotel {
@@ -16,8 +19,8 @@ public class Hotel {
     @Column
     private String address;
 
-    @Column
-    private int totalRooms;
+    @OneToMany(mappedBy = "hotel")
+    private List<Room> rooms = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -43,11 +46,11 @@ public class Hotel {
         this.address = address;
     }
 
-    public int getTotalRooms() {
-        return totalRooms;
+    public List<Room> getRooms() {
+        return rooms;
     }
 
-    public void setTotalRooms(int totalRooms) {
-        this.totalRooms = totalRooms;
+    public void setRooms(List<Room> rooms) {
+        this.rooms = rooms;
     }
 }
