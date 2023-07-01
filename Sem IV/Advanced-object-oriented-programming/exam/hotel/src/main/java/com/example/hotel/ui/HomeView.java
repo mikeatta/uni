@@ -1,9 +1,11 @@
 package com.example.hotel.ui;
 
 import com.example.hotel.service.HotelServiceImpl;
+import com.example.hotel.service.RoomServiceImpl;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
@@ -17,10 +19,15 @@ public class HomeView extends VerticalLayout {
     @Autowired
     private HotelServiceImpl hotelService;
 
+    @Autowired
+    private RoomServiceImpl roomService;
+
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
         Map<String, Integer> totalRoomsByHotel = hotelService.getTotalRoomsByHotel();
+        Map<String, Integer> availableRoomsByHotel = roomService.getAvailableRoomsByHotel();
+        VerticalLayout verticalLayout = new VerticalLayout();
 
         if (totalRoomsByHotel.isEmpty()) {
             VerticalLayout errorContainer = new VerticalLayout();
@@ -30,13 +37,17 @@ public class HomeView extends VerticalLayout {
             add(errorContainer);
         } else {
             for (Map.Entry<String, Integer> hotel : totalRoomsByHotel.entrySet()) {
-                String locationName = hotel.getKey();
+                String hotelId = hotel.getKey();
                 Integer totalRooms = hotel.getValue();
-                TextField textField = new TextField("Hotel name: " + locationName);
-                textField.setValue("Total rooms: " + totalRooms);
+                Integer availableRooms = availableRoomsByHotel.getOrDefault(hotelId, 0);
+
+                TextField textField = new TextField("Location name: " + hotelId);
+                textField.setValue("Available rooms: " + availableRooms + "/" + totalRooms);
                 textField.setReadOnly(true);
-                add(textField);
+                verticalLayout.add(textField);
             }
+
+            add(verticalLayout);
         }
     }
 
