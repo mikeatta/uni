@@ -4,14 +4,15 @@ import com.example.hotel.service.HotelServiceImpl;
 import com.example.hotel.service.RoomServiceImpl;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Map;
+import java.util.*;
 
 @Route("")
 public class HomeView extends VerticalLayout {
@@ -22,12 +23,13 @@ public class HomeView extends VerticalLayout {
     @Autowired
     private RoomServiceImpl roomService;
 
+    private final VerticalLayout verticalLayout = new VerticalLayout();
+
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
         Map<String, Integer> totalRoomsByHotel = hotelService.getTotalRoomsByHotel();
         Map<String, Integer> availableRoomsByHotel = roomService.getAvailableRoomsByHotel();
-        VerticalLayout verticalLayout = new VerticalLayout();
 
         if (totalRoomsByHotel.isEmpty()) {
             VerticalLayout errorContainer = new VerticalLayout();
@@ -36,7 +38,11 @@ public class HomeView extends VerticalLayout {
             errorContainer.add(noHotelsFoundHeader, noHotelsFoundMessage);
             add(errorContainer);
         } else {
-            for (Map.Entry<String, Integer> hotel : totalRoomsByHotel.entrySet()) {
+            List<Map.Entry<String, Integer>> sortedHotels = new ArrayList<>(totalRoomsByHotel.entrySet());
+
+            sortedHotels.sort(Map.Entry.comparingByKey(Collections.reverseOrder()));
+
+            for (Map.Entry<String, Integer> hotel : sortedHotels) {
                 String hotelId = hotel.getKey();
                 Integer totalRooms = hotel.getValue();
                 Integer availableRooms = availableRoomsByHotel.getOrDefault(hotelId, 0);
@@ -44,14 +50,17 @@ public class HomeView extends VerticalLayout {
                 TextField textField = new TextField("Location name: " + hotelId);
                 textField.setValue("Available rooms: " + availableRooms + "/" + totalRooms);
                 textField.setReadOnly(true);
-                verticalLayout.add(textField);
+                verticalLayout.addComponentAtIndex(0, textField);
             }
-
-            add(verticalLayout);
         }
     }
 
     public HomeView() {
+        Button reservationButton = new Button("Make reservation");
+        reservationButton.addClickListener(e -> UI.getCurrent().navigate(ReservationView.class));
+        verticalLayout.add(reservationButton);
+
+        add(verticalLayout);
     }
 
 }
