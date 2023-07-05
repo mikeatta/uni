@@ -9,11 +9,13 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
+@PageTitle("Hotel Website")
 @Route("")
 public class HomeView extends VerticalLayout {
 
@@ -56,7 +58,7 @@ public class HomeView extends VerticalLayout {
     }
 
     public HomeView() {
-        Button reservationButton = new Button("Make reservation");
+        Button reservationButton = new Button("Make a reservation");
         reservationButton.addClickListener(e -> UI.getCurrent().navigate(ReservationView.class));
         verticalLayout.add(reservationButton);
 
