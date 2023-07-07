@@ -8,4 +8,6 @@ public interface ReservationService {
 
     List<Reservation> findAllReservations();
 
+    void saveReservation(Reservation reservation);
+
 }

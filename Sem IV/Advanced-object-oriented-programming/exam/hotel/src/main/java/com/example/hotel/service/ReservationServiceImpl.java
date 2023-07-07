@@ -20,4 +20,9 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationRepo.findAll();
     }
 
+    @Override
+    public void saveReservation(Reservation reservation) {
+        reservationRepo.save(reservation);
+    }
+
 }

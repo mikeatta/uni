@@ -3,6 +3,7 @@ package com.example.hotel.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.sql.Date;
 
@@ -28,16 +29,16 @@ public class Reservation {
     private String email;
 
     @Column
-    @NotEmpty
+    @NotNull
     private Date checkInDate;
 
     @Column
-    @NotEmpty
+    @NotNull
     private Date checkOutDate;
 
     @Column
-    @NotEmpty
-    private int people;
+    @NotNull
+    private Integer people;
 
     public Long getId() {
         return id;
@@ -87,11 +88,11 @@ public class Reservation {
         this.checkOutDate = checkOutDate;
     }
 
-    public int getPeople() {
+    public Integer getPeople() {
         return people;
     }
 
-    public void setPeople(int people) {
+    public void setPeople(Integer people) {
         this.people = people;
     }
 }

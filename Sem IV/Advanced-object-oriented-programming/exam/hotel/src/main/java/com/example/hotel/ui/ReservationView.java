@@ -13,12 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route("/reserve")
 public class ReservationView extends VerticalLayout {
 
-    private ReservationForm reservationForm;
+    private final ReservationServiceImpl reservationService;
 
     @Autowired
-    private ReservationServiceImpl reservationService;
-
-    public ReservationView() {
+    public ReservationView(ReservationServiceImpl reservationService) {
+        this.reservationService = reservationService;
         configureHeader();
         configureForm();
 
@@ -38,7 +37,7 @@ public class ReservationView extends VerticalLayout {
     }
 
     private Component configureForm() {
-        reservationForm = new ReservationForm();
+        ReservationForm reservationForm = new ReservationForm(reservationService);
         reservationForm.setWidth("25em");
 
         return reservationForm;
