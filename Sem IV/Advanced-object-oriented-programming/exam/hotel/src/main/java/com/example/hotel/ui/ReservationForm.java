@@ -39,15 +39,6 @@ public class ReservationForm  extends FormLayout {
         this.reservationService = reservationService;
         addClassName("reservation-form");
 
-        binder.forField(firstName)
-            .bind(Reservation::getFirstName, Reservation::setFirstName);
-
-        binder.forField(lastName)
-            .bind(Reservation::getLastName, Reservation::setLastName);
-
-        binder.forField(email)
-            .bind(Reservation::getEmail, Reservation::setEmail);
-
         binder.forField(checkInDate)
             .withConverter(new ReservationConverters.LocalDateToDateConverter())
             .bind(Reservation::getCheckInDate, Reservation::setCheckInDate);
@@ -59,6 +50,9 @@ public class ReservationForm  extends FormLayout {
         binder.forField(people)
             .withConverter(new ReservationConverters.IntegerToIntConverter())
             .bind(Reservation::getPeople, Reservation::setPeople);
+
+        // Automatically bind fields with matching names
+        binder.bindInstanceFields(this);
 
         add(
             firstName,
