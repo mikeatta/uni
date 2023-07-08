@@ -7,7 +7,6 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @PageTitle("Make a reservation | Hotel Website")
 @Route("/reserve")
@@ -15,7 +14,6 @@ public class ReservationView extends VerticalLayout {
 
     private final ReservationServiceImpl reservationService;
 
-    @Autowired
     public ReservationView(ReservationServiceImpl reservationService) {
         this.reservationService = reservationService;
         configureHeader();
