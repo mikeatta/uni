@@ -67,12 +67,23 @@ public class ReservationForm  extends FormLayout {
 
     private Component configurePeopleDropdown() {
         // Populate the ComboBox
-        people.setItems(IntStream.rangeClosed(1, 10).boxed().toList());
+        people.setItems(IntStream.rangeClosed(1, 9).boxed().toList());
 
         // Allow entering value from keyboard
         people.setAllowCustomValue(true);
 
-        // TODO: Validate keyboard input
+        // Custom input validation
+        people.setInvalid(false);
+        people.setErrorMessage(null);
+        people.addCustomValueSetListener(e -> {
+            String input = String.valueOf(e.getDetail());
+            boolean isValid = input.matches("\\d+")
+                && Integer.parseInt(input) >= 1
+                && Integer.parseInt(input) <= 9;
+            people.setInvalid(!isValid);
+            if (!isValid)
+                people.setErrorMessage("Please enter a number between 1 and 9.");
+        });
 
         return people;
     }
@@ -99,4 +110,5 @@ public class ReservationForm  extends FormLayout {
             UI.getCurrent().navigate(HomeView.class);
         }
     }
+
 }
