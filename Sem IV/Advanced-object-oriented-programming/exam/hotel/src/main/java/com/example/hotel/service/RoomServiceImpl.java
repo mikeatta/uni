@@ -1,5 +1,6 @@
 package com.example.hotel.service;
 
+import com.example.hotel.model.Room;
 import com.example.hotel.repo.RoomRepo;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +18,18 @@ public class RoomServiceImpl implements RoomService{
     }
 
     @Override
+    public List<Room> getAvailableRooms() {
+        return roomRepo.findAvailableHotelRooms();
+    }
+
+    @Override
     public Map<String, Integer> getAvailableRoomsByHotel() {
-        List<Object[]> rooms = roomRepo.findAvailableHotelRooms();
+        List<Room> rooms = roomRepo.findAvailableHotelRooms();
         Map<String, Integer> availableRoomsByHotel = new LinkedHashMap<>();
 
-        for (Object[] room : rooms) {
-            String locationName = (String) room[0];
-            Integer availableRooms = ((Number) room[1]).intValue();
+        for (Room room : rooms) {
+            String locationName = room.getHotel().getName();
+            Integer availableRooms = room.getCapacity();
             availableRoomsByHotel.put(locationName, availableRooms);
         }
 
