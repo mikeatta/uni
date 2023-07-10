@@ -1,6 +1,6 @@
 package com.example.hotel.ui;
 
-import com.example.hotel.service.ReservationServiceImpl;
+import com.example.hotel.service.BookingService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.html.H3;
@@ -12,10 +12,10 @@ import com.vaadin.flow.router.Route;
 @Route("/reserve")
 public class ReservationView extends VerticalLayout {
 
-    private final ReservationServiceImpl reservationService;
+    private final BookingService bookingService;
 
-    public ReservationView(ReservationServiceImpl reservationService) {
-        this.reservationService = reservationService;
+    public ReservationView(BookingService bookingService) {
+        this.bookingService = bookingService;
         configureHeader();
         configureForm();
 
@@ -35,7 +35,7 @@ public class ReservationView extends VerticalLayout {
     }
 
     private Component configureForm() {
-        ReservationForm reservationForm = new ReservationForm(reservationService);
+        ReservationForm reservationForm = new ReservationForm(bookingService);
         reservationForm.setWidth("25em");
 
         return reservationForm;

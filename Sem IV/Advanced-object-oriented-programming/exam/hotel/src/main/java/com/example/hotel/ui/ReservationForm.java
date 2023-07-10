@@ -2,7 +2,7 @@ package com.example.hotel.ui;
 
 import com.example.hotel.converter.ReservationConverters;
 import com.example.hotel.model.Reservation;
-import com.example.hotel.service.ReservationServiceImpl;
+import com.example.hotel.service.BookingService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
@@ -33,10 +33,10 @@ public class ReservationForm  extends FormLayout {
     Button clear = new Button("Clear");
     Button cancel = new Button("Cancel");
 
-    private final ReservationServiceImpl reservationService;
+    private final BookingService bookingService;
 
-    public ReservationForm(ReservationServiceImpl reservationService) {
-        this.reservationService = reservationService;
+    public ReservationForm(BookingService bookingService) {
+        this.bookingService = bookingService;
         addClassName("reservation-form");
 
         binder.forField(checkInDate)
@@ -106,7 +106,7 @@ public class ReservationForm  extends FormLayout {
         if (binder.isValid()) {
             Reservation reservation = new Reservation();
             binder.writeBeanIfValid(reservation);
-            reservationService.saveReservation(reservation);
+            bookingService.bookReservation(reservation);
             UI.getCurrent().navigate(HomeView.class);
         }
     }
