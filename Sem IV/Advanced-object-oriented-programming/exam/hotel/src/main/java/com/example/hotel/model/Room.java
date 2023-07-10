@@ -17,7 +17,7 @@ public class Room {
     private Boolean available;
 
     @Column
-    private int capacity;
+    private Integer capacity;
 
     @ManyToOne
     @JoinColumn(name = "hotel_id")
@@ -47,11 +47,11 @@ public class Room {
         this.available = available;
     }
 
-    public int getCapacity() {
+    public Integer getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(int capacity) {
+    public void setCapacity(Integer capacity) {
         this.capacity = capacity;
     }
 

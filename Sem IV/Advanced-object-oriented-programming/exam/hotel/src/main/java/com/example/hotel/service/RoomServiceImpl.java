@@ -24,12 +24,12 @@ public class RoomServiceImpl implements RoomService{
 
     @Override
     public Map<String, Integer> getAvailableRoomsByHotel() {
-        List<Room> rooms = roomRepo.findAvailableHotelRooms();
+        List<Object[]> rooms = roomRepo.findAvailableRoomsByHotel();
         Map<String, Integer> availableRoomsByHotel = new LinkedHashMap<>();
 
-        for (Room room : rooms) {
-            String locationName = room.getHotel().getName();
-            Integer availableRooms = room.getCapacity();
+        for (Object[] info : rooms) {
+            String locationName = (String) info[0];
+            Integer availableRooms = ((Number) info[1]).intValue();
             availableRoomsByHotel.put(locationName, availableRooms);
         }
 

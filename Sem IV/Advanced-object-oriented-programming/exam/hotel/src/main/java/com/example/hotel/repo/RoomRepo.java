@@ -8,7 +8,10 @@ import java.util.List;
 
 public interface RoomRepo extends JpaRepository<Room, Long> {
 
-    @Query("SELECT r.hotel.name, COUNT(r.id) AS available_rooms FROM Room r WHERE r.available = true GROUP BY r.hotel.id")
+    @Query("SELECT r FROM Room r WHERE r.available = true")
     List<Room> findAvailableHotelRooms();
+
+    @Query("SELECT r.hotel.name, COUNT(r.id) AS available_rooms FROM Room r WHERE r.available = true GROUP BY r.hotel.id")
+    List<Object[]> findAvailableRoomsByHotel();
 
 }
