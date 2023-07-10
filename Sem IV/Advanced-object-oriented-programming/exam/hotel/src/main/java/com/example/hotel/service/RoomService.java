@@ -11,4 +11,6 @@ public interface RoomService {
 
     Map<String, Integer> getAvailableRoomsByHotel();
 
+    void markRoomAsBooked(Long roomId);
+
 }

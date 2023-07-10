@@ -36,4 +36,9 @@ public class RoomServiceImpl implements RoomService{
         return availableRoomsByHotel;
     }
 
+    @Override
+    public void markRoomAsBooked(Long roomId) {
+        roomRepo.markRoomAsBooked(roomId);
+    }
+
 }
