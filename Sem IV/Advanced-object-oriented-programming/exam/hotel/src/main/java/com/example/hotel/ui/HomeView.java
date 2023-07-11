@@ -6,7 +6,9 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
@@ -57,12 +59,35 @@ public class HomeView extends VerticalLayout {
         }
     }
 
-    public HomeView() {
+    public HomeView(RoomServiceImpl roomService) {
+        this.roomService = roomService;
         Button reservationButton = new Button("Make a reservation");
-        reservationButton.addClickListener(e -> UI.getCurrent().navigate(ReservationView.class));
+
+        // Check for available rooms to book
+        if (!checkForAvailableRooms()) {
+            reservationButton.addClickListener(e -> displayErrorMessage(reservationButton));
+        } else {
+            reservationButton.addClickListener(e -> UI.getCurrent().navigate(ReservationView.class));
+        }
+
         verticalLayout.add(reservationButton);
 
         add(verticalLayout);
+    }
+
+    private void displayErrorMessage(Button button) {
+        button.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        Notification.show(
+                "No hotel rooms available.",
+                3000,
+                Notification.Position.TOP_CENTER
+        );
+
+        // TODO: Remove error styling after timeout
+    }
+
+    private boolean checkForAvailableRooms() {
+        return !roomService.getAvailableRooms().isEmpty();
     }
 
 }

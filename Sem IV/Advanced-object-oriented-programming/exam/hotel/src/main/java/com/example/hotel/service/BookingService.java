@@ -45,6 +45,10 @@ public class BookingService {
             if (bookedSpaces >= numberOfPeople) break;
         }
 
+        if (bookedSpaces < numberOfPeople) {
+            throw new IndexOutOfBoundsException("Not enough rooms to accommodate " + numberOfPeople + " people.");
+        }
+
         return bookedRooms;
     }
 }
