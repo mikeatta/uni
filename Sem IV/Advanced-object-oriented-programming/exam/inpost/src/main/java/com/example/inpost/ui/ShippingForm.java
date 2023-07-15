@@ -32,7 +32,7 @@ public class ShippingForm extends VerticalLayout {
         this.packageService = packageService;
 
         // Bind fields by name
-//        binder.bindInstanceFields(this);
+        binder.bindInstanceFields(this);
 
         add(
             configureSize(),
@@ -77,12 +77,6 @@ public class ShippingForm extends VerticalLayout {
     }
 
     private void submitFormInfo() {
-        if (binder.isValid()) {
-            Package parcel = new Package();
-            binder.writeBeanIfValid(parcel);
-
-            packageService.sendPackage(parcel);
-        }
     }
 
 }
