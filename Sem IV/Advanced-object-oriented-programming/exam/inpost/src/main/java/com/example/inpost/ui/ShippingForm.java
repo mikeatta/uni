@@ -77,6 +77,11 @@ public class ShippingForm extends VerticalLayout {
     }
 
     private void submitFormInfo() {
+        if (binder.isValid()) {
+            Package parcel = new Package();
+            binder.writeBeanIfValid(parcel);
+            packageService.sendPackage(parcel);
+        }
     }
 
 }

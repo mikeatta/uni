@@ -1,6 +1,7 @@
 package com.example.inpost.ui;
 
 import com.example.inpost.model.Inbox;
+import com.example.inpost.service.InboxService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -19,7 +20,11 @@ public class CollectionForm extends VerticalLayout {
     Button submitButton = new Button("Submit");
     Button backButton = new Button("Back");
 
-    public CollectionForm() {
+    private final InboxService inboxService;
+
+    public CollectionForm(InboxService inboxService) {
+        this.inboxService = inboxService;
+        binder.bindInstanceFields(this);
 
         add(
             pin,
@@ -31,16 +36,24 @@ public class CollectionForm extends VerticalLayout {
         submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         backButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
-        submitButton.addClickListener(event -> submitPin());
+        submitButton.addClickListener(event -> collectPackage());
         backButton.addClickListener(event -> navigateToShipping());
 
         return new HorizontalLayout(submitButton, backButton);
+    }
+
+    private void collectPackage() {
+        if (checkPin()) {
+            inboxService.releasePackage();
+        }
+    }
+
+    private Boolean checkPin() {
+        return inboxService.checkInboxPin(pin.getValue().longValue());
     }
 
     private void navigateToShipping() {
         UI.getCurrent().navigate(ShippingView.class);
     }
 
-    private void submitPin() {
-    }
 }
