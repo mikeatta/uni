@@ -20,8 +20,7 @@ public class Inbox {
     @NotNull
     private Boolean available;
 
-    @OneToOne
-    @JoinColumn(name = "parcel_id")
+    @OneToOne(mappedBy = "inbox")
     private Package parcel;
 
     @Column
