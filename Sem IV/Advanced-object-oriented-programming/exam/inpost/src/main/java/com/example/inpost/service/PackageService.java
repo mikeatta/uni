@@ -1,5 +1,6 @@
 package com.example.inpost.service;
 
+import com.example.inpost.model.Inbox;
 import com.example.inpost.model.Package;
 import com.example.inpost.repo.PackageRepo;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,11 @@ import java.util.Calendar;
 public class PackageService {
 
     private final PackageRepo packageRepo;
+    private final InboxService inboxService;
 
-    public PackageService(PackageRepo packageRepo) {
+    public PackageService(PackageRepo packageRepo, InboxService inboxService) {
         this.packageRepo = packageRepo;
+        this.inboxService = inboxService;
     }
 
     public void sendPackage(Package parcel) {
@@ -32,6 +35,9 @@ public class PackageService {
 
         collectionDate = new Date(today.getTime().getTime());
         parcel.setCollectionDeadline(collectionDate);
+
+//        Inbox smallestInbox = inboxService.getSmallestInbox(parcelType);
+//        parcel.setInbox(smallestInbox);
         packageRepo.save(parcel);
     }
 }

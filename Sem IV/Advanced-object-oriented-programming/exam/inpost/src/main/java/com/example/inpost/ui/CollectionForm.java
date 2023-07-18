@@ -15,7 +15,7 @@ public class CollectionForm extends VerticalLayout {
 
     Binder<Inbox> binder = new Binder<>(Inbox.class);
 
-    NumberField pin = new NumberField("Enter collection pin:");
+    private final NumberField pin = new NumberField("Enter collection pin:");
 
     Button submitButton = new Button("Submit");
     Button backButton = new Button("Back");
@@ -36,21 +36,21 @@ public class CollectionForm extends VerticalLayout {
         submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         backButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
-        submitButton.addClickListener(event -> collectPackage());
+//        submitButton.addClickListener(event -> collectPackage());
         backButton.addClickListener(event -> navigateToShipping());
 
         return new HorizontalLayout(submitButton, backButton);
     }
 
-    private void collectPackage() {
-        if (checkPin()) {
-            inboxService.releasePackage();
-        }
-    }
-
-    private Boolean checkPin() {
-        return inboxService.checkInboxPin(pin.getValue().longValue());
-    }
+//    private void collectPackage() {
+//        if (checkPin()) {
+//            inboxService.releasePackage();
+//        }
+//    }
+//
+//    private Boolean checkPin() {
+//        return inboxService.checkInboxPin();
+//    }
 
     private void navigateToShipping() {
         UI.getCurrent().navigate(ShippingView.class);
