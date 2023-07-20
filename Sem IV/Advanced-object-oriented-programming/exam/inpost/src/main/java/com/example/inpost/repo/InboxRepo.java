@@ -13,6 +13,6 @@ public interface InboxRepo extends JpaRepository<Inbox, Long> {
     List<Inbox> getAvailableInboxes();
 
     @Query("SELECT i.pin FROM Inbox i WHERE i.pin = :packagePin")
-    Integer getPackagePin(@Param("packagePin") Long packagePin);
+    Long getPackagePin(@Param("packagePin") Long packagePin);
 
 }

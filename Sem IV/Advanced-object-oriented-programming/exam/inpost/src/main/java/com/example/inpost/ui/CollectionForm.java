@@ -1,5 +1,6 @@
 package com.example.inpost.ui;
 
+import com.example.inpost.converters.LongToDoubleConverter;
 import com.example.inpost.model.Inbox;
 import com.example.inpost.service.InboxService;
 import com.vaadin.flow.component.Component;
@@ -24,7 +25,9 @@ public class CollectionForm extends VerticalLayout {
 
     public CollectionForm(InboxService inboxService) {
         this.inboxService = inboxService;
-        binder.bindInstanceFields(this);
+        binder.forField(pin)
+            .withConverter(new LongToDoubleConverter())
+            .bind(Inbox::getPin, Inbox::setPin);
 
         add(
             pin,
@@ -36,21 +39,22 @@ public class CollectionForm extends VerticalLayout {
         submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         backButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
-//        submitButton.addClickListener(event -> collectPackage());
+        submitButton.addClickListener(event -> collectPackage());
         backButton.addClickListener(event -> navigateToShipping());
 
         return new HorizontalLayout(submitButton, backButton);
     }
 
-//    private void collectPackage() {
-//        if (checkPin()) {
-//            inboxService.releasePackage();
-//        }
-//    }
-//
-//    private Boolean checkPin() {
-//        return inboxService.checkInboxPin();
-//    }
+    private void collectPackage() {
+        if (checkPin()) {
+            inboxService.releasePackage();
+        }
+    }
+
+    private Boolean checkPin() {
+        Long userPin = pin.getValue().longValue();
+        return inboxService.checkInboxPin(userPin);
+    }
 
     private void navigateToShipping() {
         UI.getCurrent().navigate(ShippingView.class);

@@ -4,7 +4,6 @@ import com.example.inpost.model.Inbox;
 import com.example.inpost.repo.InboxRepo;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -21,7 +20,7 @@ public class InboxService {
     }
 
     public Boolean checkInboxPin(Long userPin) {
-        Long packagePin = Long.valueOf(inboxRepo.getPackagePin(userPin));
+        Long packagePin = inboxRepo.getPackagePin(userPin);
         if (packagePin == null) {
             return false;
         }
@@ -33,10 +32,7 @@ public class InboxService {
     }
 
     public Inbox getSmallestInbox(String parcelType) {
-        return (Inbox) inboxRepo.getAvailableInboxes().stream()
-                .sorted(Comparator.comparing(Inbox::getSize))
-                .sorted(Comparator.comparing(inbox -> parcelType))
-                .toList();
+        return null;
     }
 
 }
