@@ -1,8 +1,7 @@
 package com.example.inpost.service;
 
-import com.example.inpost.model.Inbox;
-import com.example.inpost.model.Package;
-import com.example.inpost.repo.PackageRepo;
+import com.example.inpost.models.Package;
+import com.example.inpost.repos.PackageRepo;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -19,6 +18,7 @@ public class PackageService {
         this.inboxService = inboxService;
     }
 
+    // TODO: Set collection date to 5 min and an hour from the creation date
     public void sendPackage(Package parcel) {
         String parcelType = parcel.getType();
         Calendar today = Calendar.getInstance();

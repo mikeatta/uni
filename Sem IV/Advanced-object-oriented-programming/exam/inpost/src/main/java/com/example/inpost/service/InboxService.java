@@ -1,7 +1,7 @@
 package com.example.inpost.service;
 
-import com.example.inpost.model.Inbox;
-import com.example.inpost.repo.InboxRepo;
+import com.example.inpost.models.Inbox;
+import com.example.inpost.repos.InboxRepo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class InboxService {
     }
 
     public void releasePackage() {
-        // Update repo: set availability to true
+        // Update repos: set availability to true
     }
 
     public Inbox getSmallestInbox(String parcelType) {

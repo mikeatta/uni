@@ -1,6 +1,6 @@
-package com.example.inpost.repo;
+package com.example.inpost.repos;
 
-import com.example.inpost.model.Inbox;
+import com.example.inpost.models.Inbox;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

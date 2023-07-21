@@ -1,6 +1,6 @@
 package com.example.inpost.controllers;
 
-import com.example.inpost.model.Inbox;
+import com.example.inpost.models.Inbox;
 import com.example.inpost.service.InboxService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

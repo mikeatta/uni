@@ -1,6 +1,6 @@
-package com.example.inpost.repo;
+package com.example.inpost.repos;
 
-import com.example.inpost.model.Package;
+import com.example.inpost.models.Package;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PackageRepo extends JpaRepository<Package, Long> {

@@ -1,7 +1,7 @@
 package com.example.inpost.ui;
 
 import com.example.inpost.converters.LongToDoubleConverter;
-import com.example.inpost.model.Inbox;
+import com.example.inpost.models.Inbox;
 import com.example.inpost.service.InboxService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;

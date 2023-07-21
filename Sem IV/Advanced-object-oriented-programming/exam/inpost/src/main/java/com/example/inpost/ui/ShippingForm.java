@@ -1,6 +1,6 @@
 package com.example.inpost.ui;
 
-import com.example.inpost.model.Package;
+import com.example.inpost.models.Package;
 import com.example.inpost.service.PackageService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
