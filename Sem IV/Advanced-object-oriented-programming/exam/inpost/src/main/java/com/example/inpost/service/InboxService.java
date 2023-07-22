@@ -39,8 +39,10 @@ public class InboxService {
     public Inbox getSmallestInbox(String parcelSize) {
         List<Inbox> availableInboxes = inboxRepo.getSmallestInboxAvailable(parcelSize);
         if (!availableInboxes.isEmpty()) {
-            // TODO: Set the parcel availability to false
-            return availableInboxes.get(0);
+            Inbox inbox = availableInboxes.get(0);
+            inbox.setAvailable(false);
+            inboxRepo.save(inbox);
+            return inbox;
         }
         return null;
     }
