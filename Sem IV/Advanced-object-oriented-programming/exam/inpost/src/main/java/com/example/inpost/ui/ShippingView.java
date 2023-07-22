@@ -1,6 +1,5 @@
 package com.example.inpost.ui;
 
-import com.example.inpost.service.InboxService;
 import com.example.inpost.service.PackageService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
@@ -17,6 +16,7 @@ public class ShippingView extends VerticalLayout {
 
     public ShippingView(PackageService packageService) {
         this.packageService = packageService;
+
         setSizeFull();
         configureHeader();
         configureForm();

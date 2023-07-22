@@ -1,5 +1,6 @@
 package com.example.inpost.service;
 
+import com.example.inpost.models.Inbox;
 import com.example.inpost.models.Package;
 import com.example.inpost.repos.PackageRepo;
 import org.springframework.stereotype.Service;
@@ -36,8 +37,16 @@ public class PackageService {
         collectionDate = new Date(today.getTime().getTime());
         parcel.setCollectionDeadline(collectionDate);
 
-//        Inbox smallestInbox = inboxService.getSmallestInbox(parcelType);
-//        parcel.setInbox(smallestInbox);
+        // Get the smallest inbox available
+        String parcelSize = parcel.getSize().toLowerCase();
+        Inbox smallestInboxAvailable = inboxService.getSmallestInbox(parcelSize);
+        parcel.setInbox(smallestInboxAvailable);
+
         packageRepo.save(parcel);
     }
+
+    public void removePackage(Package parcel) {
+        packageRepo.delete(parcel);
+    }
+
 }
