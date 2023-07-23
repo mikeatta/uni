@@ -1,8 +1,10 @@
 package com.example.inpost.ui;
 
-import com.example.inpost.converters.LongToDoubleConverter;
+import com.example.inpost.converters.StringToDoubleConverter;
 import com.example.inpost.models.Inbox;
+import com.example.inpost.models.Package;
 import com.example.inpost.service.InboxService;
+import com.example.inpost.service.PackageService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -22,11 +24,14 @@ public class CollectionForm extends VerticalLayout {
     Button backButton = new Button("Back");
 
     private final InboxService inboxService;
+    private final PackageService packageService;
 
-    public CollectionForm(InboxService inboxService) {
+    public CollectionForm(InboxService inboxService, PackageService packageService) {
         this.inboxService = inboxService;
+        this.packageService = packageService;
+
         binder.forField(pin)
-            .withConverter(new LongToDoubleConverter())
+            .withConverter(new StringToDoubleConverter())
             .bind(Inbox::getPin, Inbox::setPin);
 
         add(
@@ -46,14 +51,19 @@ public class CollectionForm extends VerticalLayout {
     }
 
     private void collectPackage() {
-        if (checkPin()) {
-            inboxService.releasePackage();
+        Long userEnteredPin = pin.getValue().longValue();
+
+        if (checkPin(userEnteredPin)) {
+            Inbox releasedInbox = inboxService.releasePackage(userEnteredPin);
+            if (releasedInbox != null) {
+                Package releasedPackage = releasedInbox.getParcel();
+                packageService.removePackage(releasedPackage);
+            }
         }
     }
 
-    private Boolean checkPin() {
-        Long userPin = pin.getValue().longValue();
-        return inboxService.checkInboxPin(userPin);
+    private Boolean checkPin(Long pin) {
+        return inboxService.checkInboxPin(pin);
     }
 
     private void navigateToShipping() {

@@ -24,7 +24,7 @@ public class Inbox {
     private Package parcel;
 
     @Column
-    private Long pin;
+    private String pin;
 
     public Long getId() {
         return id;
@@ -58,11 +58,11 @@ public class Inbox {
         this.parcel = parcel;
     }
 
-    public Long getPin() {
+    public String getPin() {
         return pin;
     }
 
-    public void setPin(Long pin) {
+    public void setPin(String pin) {
         this.pin = pin;
     }
 }
