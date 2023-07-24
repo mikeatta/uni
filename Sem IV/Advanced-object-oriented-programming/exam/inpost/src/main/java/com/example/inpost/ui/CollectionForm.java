@@ -1,6 +1,5 @@
 package com.example.inpost.ui;
 
-import com.example.inpost.converters.StringToDoubleConverter;
 import com.example.inpost.models.Inbox;
 import com.example.inpost.models.Package;
 import com.example.inpost.service.InboxService;
@@ -11,14 +10,14 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 
 public class CollectionForm extends VerticalLayout {
 
     Binder<Inbox> binder = new Binder<>(Inbox.class);
 
-    private final NumberField pin = new NumberField("Enter collection pin:");
+    private final TextField pin = new TextField("Enter collection pin:");
 
     Button submitButton = new Button("Submit");
     Button backButton = new Button("Back");
@@ -30,9 +29,7 @@ public class CollectionForm extends VerticalLayout {
         this.inboxService = inboxService;
         this.packageService = packageService;
 
-        binder.forField(pin)
-            .withConverter(new StringToDoubleConverter())
-            .bind(Inbox::getPin, Inbox::setPin);
+        binder.bindInstanceFields(this);
 
         add(
             pin,
@@ -51,8 +48,7 @@ public class CollectionForm extends VerticalLayout {
     }
 
     private void collectPackage() {
-        Long userEnteredPin = pin.getValue().longValue();
-
+        String userEnteredPin = pin.getValue();
         if (checkPin(userEnteredPin)) {
             Inbox releasedInbox = inboxService.releasePackage(userEnteredPin);
             if (releasedInbox != null) {
@@ -62,7 +58,7 @@ public class CollectionForm extends VerticalLayout {
         }
     }
 
-    private Boolean checkPin(Long pin) {
+    private Boolean checkPin(String pin) {
         return inboxService.checkInboxPin(pin);
     }
 

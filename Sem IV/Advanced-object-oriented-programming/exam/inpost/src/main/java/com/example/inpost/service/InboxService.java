@@ -19,15 +19,13 @@ public class InboxService {
         return inboxRepo.findAll();
     }
 
-    public Boolean checkInboxPin(Long inboxPin) {
-        Long pin = inboxRepo.getInboxPin(inboxPin);
-        if (pin == null) {
-            return false;
-        }
-        return pin.equals(inboxPin);
+    public Boolean checkInboxPin(String userEnteredPin) {
+        // TODO: Handle null values (throws NullPointerException)
+        String inboxPin = inboxRepo.getInboxPin(userEnteredPin);
+        return inboxPin.equals(userEnteredPin);
     }
 
-    public Inbox releasePackage(Long inboxPin) {
+    public Inbox releasePackage(String inboxPin) {
         Inbox inbox = inboxRepo.getInboxByPin(inboxPin);
         if (inbox != null && !inbox.getAvailable()) {
             inboxRepo.markInboxAsAvailable(inboxPin);

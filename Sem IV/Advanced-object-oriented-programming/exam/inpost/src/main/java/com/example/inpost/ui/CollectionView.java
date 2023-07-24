@@ -1,6 +1,7 @@
 package com.example.inpost.ui;
 
 import com.example.inpost.service.InboxService;
+import com.example.inpost.service.PackageService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.html.H3;
@@ -13,9 +14,12 @@ import com.vaadin.flow.router.Route;
 public class CollectionView extends VerticalLayout {
 
     private final InboxService inboxService;
+    private final PackageService packageService;
 
-    public CollectionView(InboxService inboxService) {
+    public CollectionView(InboxService inboxService, PackageService packageService) {
         this.inboxService = inboxService;
+        this.packageService = packageService;
+
         setSizeFull();
         configureHeader();
         configureForm();
@@ -27,7 +31,7 @@ public class CollectionView extends VerticalLayout {
     }
 
     private Component configureForm() {
-        CollectionForm form = new CollectionForm(inboxService);
+        CollectionForm form = new CollectionForm(inboxService, packageService);
         form.setWidth("25em");
         return form;
     }
