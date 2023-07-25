@@ -20,8 +20,10 @@ public class InboxService {
     }
 
     public Boolean checkInboxPin(String userEnteredPin) {
-        // TODO: Handle null values (throws NullPointerException)
         String inboxPin = inboxRepo.getInboxPin(userEnteredPin);
+        if (inboxPin == null) {
+            inboxPin = "";
+        }
         return inboxPin.equals(userEnteredPin);
     }
 

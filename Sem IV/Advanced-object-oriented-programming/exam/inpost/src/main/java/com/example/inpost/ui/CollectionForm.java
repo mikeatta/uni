@@ -49,12 +49,14 @@ public class CollectionForm extends VerticalLayout {
 
     private void collectPackage() {
         String userEnteredPin = pin.getValue();
-        if (checkPin(userEnteredPin)) {
-            Inbox releasedInbox = inboxService.releasePackage(userEnteredPin);
-            if (releasedInbox != null) {
-                Package releasedPackage = releasedInbox.getParcel();
-                packageService.removePackage(releasedPackage);
-            }
+        if (!checkPin(userEnteredPin)) {
+            pin.setInvalid(true);
+            pin.setLabel("Incorrect pin entered!");
+        }
+        Inbox releasedInbox = inboxService.releasePackage(userEnteredPin);
+        if (releasedInbox != null) {
+            Package releasedPackage = releasedInbox.getParcel();
+            packageService.removePackage(releasedPackage);
         }
     }
 
