@@ -12,6 +12,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.validator.RegexpValidator;
 
 public class CollectionForm extends VerticalLayout {
 
@@ -29,12 +31,21 @@ public class CollectionForm extends VerticalLayout {
         this.inboxService = inboxService;
         this.packageService = packageService;
 
-        binder.bindInstanceFields(this);
+        binder.forField(pin)
+            .withValidator(new RegexpValidator("Please enter a valid 4-digit pin.", "[0-9]{4}"))
+            .bind(Inbox::getPin, Inbox::setPin);
 
         add(
-            pin,
+            configurePin(),
             configureButtons()
         );
+    }
+
+    private Component configurePin() {
+        pin.setAllowedCharPattern("[0-9]");
+        pin.setMaxLength(4);
+
+        return pin;
     }
 
     private Component configureButtons() {
@@ -48,15 +59,23 @@ public class CollectionForm extends VerticalLayout {
     }
 
     private void collectPackage() {
-        String userEnteredPin = pin.getValue();
-        if (!checkPin(userEnteredPin)) {
+        BinderValidationStatus<Inbox> status = binder.validate();
+        if (status.hasErrors()) {
+            String regexError = status.getValidationErrors().iterator().next().getErrorMessage();
             pin.setInvalid(true);
-            pin.setLabel("Incorrect pin entered!");
-        }
-        Inbox releasedInbox = inboxService.releasePackage(userEnteredPin);
-        if (releasedInbox != null) {
-            Package releasedPackage = releasedInbox.getParcel();
-            packageService.removePackage(releasedPackage);
+            pin.setErrorMessage(regexError);
+        } else {
+            String userEnteredPin = pin.getValue();
+            if (!checkPin(userEnteredPin)) {
+                pin.setInvalid(true);
+                pin.setErrorMessage("Invalid pin code!");
+            } else {
+                Inbox releasedInbox = inboxService.releasePackage(userEnteredPin);
+                if (releasedInbox != null) {
+                    Package releasedPackage = releasedInbox.getParcel();
+                    packageService.removePackage(releasedPackage);
+                }
+            }
         }
     }
 
