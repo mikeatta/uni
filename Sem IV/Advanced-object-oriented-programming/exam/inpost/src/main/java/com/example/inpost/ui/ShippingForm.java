@@ -31,7 +31,6 @@ public class ShippingForm extends VerticalLayout {
     public ShippingForm(PackageService packageService) {
         this.packageService = packageService;
 
-        // Bind fields by name
         binder.bindInstanceFields(this);
 
         add(
@@ -53,7 +52,6 @@ public class ShippingForm extends VerticalLayout {
     }
 
     private Component configureType() {
-        // Populate the ComboBox
         List<String> packageTypes = new ArrayList<>();
         packageTypes.add("Short-term");
         packageTypes.add("Long-term");
