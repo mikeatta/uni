@@ -27,7 +27,7 @@ public class InboxService {
         return inboxPin.equals(userEnteredPin);
     }
 
-    public Inbox releasePackage(String inboxPin) {
+    public Inbox releaseInbox(String inboxPin) {
         Inbox inbox = inboxRepo.getInboxByPin(inboxPin);
         if (inbox != null && !inbox.getAvailable()) {
             inboxRepo.markInboxAsAvailable(inboxPin);

@@ -59,27 +59,41 @@ public class CollectionForm extends VerticalLayout {
     }
 
     private void collectPackage() {
+        if (validateForm()) {
+            String userEnteredPin = pin.getValue();
+            if (checkUserPin(userEnteredPin)) {
+                openInbox(userEnteredPin);
+            } else {
+                handleInvalidPin();
+            }
+        }
+    }
+
+    private void handleInvalidPin() {
+        pin.setInvalid(true);
+        pin.setErrorMessage("Invalid pin code!");
+    }
+
+    private void openInbox(String pin) {
+        Inbox releasedInbox = inboxService.releaseInbox(pin);
+        if (releasedInbox != null) {
+            Package releasedPackage = releasedInbox.getParcel();
+            packageService.removePackage(releasedPackage);
+        }
+    }
+
+    private boolean validateForm() {
         BinderValidationStatus<Inbox> status = binder.validate();
         if (status.hasErrors()) {
             String regexError = status.getValidationErrors().iterator().next().getErrorMessage();
             pin.setInvalid(true);
             pin.setErrorMessage(regexError);
-        } else {
-            String userEnteredPin = pin.getValue();
-            if (!checkPin(userEnteredPin)) {
-                pin.setInvalid(true);
-                pin.setErrorMessage("Invalid pin code!");
-            } else {
-                Inbox releasedInbox = inboxService.releasePackage(userEnteredPin);
-                if (releasedInbox != null) {
-                    Package releasedPackage = releasedInbox.getParcel();
-                    packageService.removePackage(releasedPackage);
-                }
-            }
+            return false;
         }
+        return true;
     }
 
-    private Boolean checkPin(String pin) {
+    private Boolean checkUserPin(String pin) {
         return inboxService.checkInboxPin(pin);
     }
 
