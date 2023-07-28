@@ -1,5 +1,6 @@
 package com.example.inpost.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -32,6 +33,7 @@ public class Package {
     private Date collectionDeadline;
 
     @OneToOne
+    @JsonManagedReference
     private Inbox inbox;
 
     public Long getId() {

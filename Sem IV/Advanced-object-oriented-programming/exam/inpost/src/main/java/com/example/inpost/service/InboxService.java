@@ -19,6 +19,10 @@ public class InboxService {
         return inboxRepo.findAll();
     }
 
+    public List<Inbox> getAvailableInboxes() {
+        return inboxRepo.getAvailableInboxes();
+    }
+
     public Boolean checkInboxPin(String userEnteredPin) {
         String inboxPin = inboxRepo.getInboxPin(userEnteredPin);
         if (inboxPin == null) {

@@ -23,4 +23,13 @@ public class InboxController {
         return inboxService.getAllInboxes();
     }
 
+    @GetMapping("/available")
+    public List<Inbox> getAvailableInboxes() {
+        return inboxService.getAvailableInboxes();
+    }
+
+    /* TODO: Add API endpoints
+        - Generate inboxes
+     */
+
 }

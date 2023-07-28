@@ -1,5 +1,6 @@
 package com.example.inpost.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -21,6 +22,7 @@ public class Inbox {
     private Boolean available;
 
     @OneToOne(mappedBy = "inbox")
+    @JsonBackReference
     private Package parcel;
 
     @Column

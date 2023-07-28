@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.Calendar;
+import java.util.List;
 
 @Service
 public class PackageService {
@@ -17,6 +18,10 @@ public class PackageService {
     public PackageService(PackageRepo packageRepo, InboxService inboxService) {
         this.packageRepo = packageRepo;
         this.inboxService = inboxService;
+    }
+
+    public List<Package> getAllPackages() {
+        return packageRepo.findAll();
     }
 
     // TODO: Set collection date to 5 min and an hour from the creation date
