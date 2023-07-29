@@ -2,9 +2,7 @@ package com.example.inpost.controllers;
 
 import com.example.inpost.models.Inbox;
 import com.example.inpost.service.InboxService;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,8 +26,9 @@ public class InboxController {
         return inboxService.getAvailableInboxes();
     }
 
-    /* TODO: Add API endpoints
-        - Generate inboxes
-     */
+    @PostMapping("/generate/{amount}")
+    public void generateInboxes(@PathVariable("amount") Integer amount) {
+        inboxService.generateInboxes(amount);
+    }
 
 }
