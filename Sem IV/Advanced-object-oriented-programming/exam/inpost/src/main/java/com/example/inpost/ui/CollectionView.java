@@ -3,8 +3,11 @@ package com.example.inpost.ui;
 import com.example.inpost.models.Inbox;
 import com.example.inpost.service.InboxService;
 import com.example.inpost.service.PackageService;
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -20,6 +23,8 @@ public class CollectionView extends VerticalLayout {
     private final InboxService inboxService;
     private final PackageService packageService;
 
+    Button toggleGridButton = new Button("Show grid", this::toggleGrid);
+
     public CollectionView(InboxService inboxService, PackageService packageService) {
         this.inboxService = inboxService;
         this.packageService = packageService;
@@ -27,20 +32,33 @@ public class CollectionView extends VerticalLayout {
         setSizeFull();
         configureHeader();
         configureForm();
+        configureButton();
         configureGrid();
 
         add(
             configureHeader(),
             configureForm(),
+            configureButton(),
             configureGrid()
         );
+    }
+
+    private Component configureButton() {
+        toggleGridButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        return new VerticalLayout(toggleGridButton);
+    }
+
+    private void toggleGrid(ClickEvent<Button> event) {
+        boolean gridVisible = grid.isVisible();
+        toggleGridButton.setText(gridVisible ? "Show grid" : "Hide grid");
+        grid.setVisible(!gridVisible);
     }
 
     private Component configureGrid() {
         grid.setSizeFull();
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
         grid.setItems(inboxService.getAllInboxes());
-
+        grid.setVisible(false);
         return grid;
     }
 
