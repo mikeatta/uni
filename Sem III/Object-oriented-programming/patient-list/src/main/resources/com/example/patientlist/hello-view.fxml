@@ -35,7 +35,7 @@
         <TextField fx:id="patientAge" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
       <Button onAction="#onHelloButtonClick" text="Add to list" GridPane.columnIndex="1" GridPane.rowIndex="3" />
      <Button onAction="#onHelloButtonClick" text="Print info" GridPane.rowIndex="5" />
-      <ComboBox prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+      <ComboBox fx:id="sortTypeCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
       <Label text="Order by:" GridPane.columnIndex="1" GridPane.rowIndex="4" />
     </GridPane>
 </VBox>
