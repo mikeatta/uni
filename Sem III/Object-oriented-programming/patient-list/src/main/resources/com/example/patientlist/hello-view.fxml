@@ -33,7 +33,7 @@
         <TextField fx:id="patientSurname" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
         <Label text="Age:" GridPane.hgrow="NEVER" GridPane.rowIndex="2" />
         <TextField fx:id="patientAge" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
-      <Button text="Add to list" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+      <Button onAction="#addPatientToList" text="Add to list" GridPane.columnIndex="1" GridPane.rowIndex="3" />
      <Button onAction="#displayPatientInfo" text="Print info" GridPane.rowIndex="5" />
       <ComboBox fx:id="sortTypeCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
       <Label text="Order by:" GridPane.columnIndex="1" GridPane.rowIndex="4" />

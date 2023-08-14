@@ -20,7 +20,7 @@ public class HelloController {
     @FXML
     private ComboBox<String> sortTypeCombo;
 
-    private List<Patient> patients = new LinkedList<>();
+    private final List<Patient> patients = new LinkedList<>();
 
     @FXML
     private void initialize() {
@@ -34,6 +34,40 @@ public class HelloController {
         sortTypes.add("Age");
         sortTypes.add("Date added");
         sortTypeCombo.getItems().addAll(sortTypes);
+    }
+
+    @FXML
+    private void addPatientToList() {
+        Patient patient = getPatientInfo();
+        if (patient != null) {
+            patients.add(patient);
+        } else {
+            System.err.println("Error adding patient to list");
+        }
+    }
+
+    private Patient getPatientInfo() {
+        String name = patientName.getText();
+        String surname = patientSurname.getText();
+        String ageText = patientAge.getText();
+
+        if (name.isEmpty() || surname.isEmpty() || ageText.isEmpty()) {
+            return null;
+        }
+
+        int age;
+        try {
+            age = Integer.parseInt(ageText);
+            if (age < 0) {
+                throw new NumberFormatException("Error: Invalid input");
+            }
+        } catch (NumberFormatException e) {
+            System.err.println(e.getMessage());
+            e.printStackTrace(System.err);
+            return null;
+        }
+
+        return new Patient(name, surname, age);
     }
 
     private String getComboBoxValue() {
