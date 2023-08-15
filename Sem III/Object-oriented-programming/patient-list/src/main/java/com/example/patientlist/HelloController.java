@@ -6,8 +6,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.json.simple.JSONArray;
 
 public class HelloController {
 
@@ -74,16 +77,41 @@ public class HelloController {
         return String.valueOf(sortTypeCombo.getValue());
     }
 
-    @FXML
-    private void displayPatientInfo() {
-        String comboValue = getComboBoxValue();
-        switch (comboValue) {
+    private List<Patient> orderPatientList(String orderType) {
+        List<Patient> orderedPatients = new LinkedList<>();
+        switch (orderType) {
             case "Name" -> System.out.println("Selected 'Name'");
             case "Surname" -> System.out.println("Selected 'Surname'");
             case "Age" -> System.out.println("Selected 'Age'");
             case "Date added" -> System.out.println("Selected 'Date added'");
             default -> System.err.println("Please select order type!");
         }
+        return orderedPatients;
+    }
+
+    private String parseListToJSON(List<Patient> patientList) {
+        JSONArray patientJsonArray = new JSONArray();
+
+        patientList.forEach(patient -> {
+            HashMap<String, Object> patientMap = new HashMap<>();
+            patientMap.put("Name", patient.getName());
+            patientMap.put("Surname", patient.getSurname());
+            patientMap.put("Age", patient.getAge());
+            patientJsonArray.add(patientMap);
+        });
+
+        String jsonPatientList = patientJsonArray.toJSONString();
+        jsonPatientList = jsonPatientList.substring(1, jsonPatientList.length() - 1);
+
+        return jsonPatientList;
+    }
+
+    @FXML
+    private void displayPatientInfo() {
+//        String comboValue = getComboBoxValue();
+//        orderPatientList(comboValue);
+        String jsonPatientList = parseListToJSON(patients);
+        System.out.print(jsonPatientList);
     }
 
 }
