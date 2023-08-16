@@ -1,16 +1,14 @@
 package com.example.patientlist;
 
 import com.example.patientlist.model.Patient;
+import com.google.gson.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.json.simple.JSONArray;
 
 public class HelloController {
 
@@ -90,20 +88,18 @@ public class HelloController {
     }
 
     private String parseListToJSON(List<Patient> patientList) {
-        JSONArray patientJsonArray = new JSONArray();
+        JsonArray patientJsonArray = new JsonArray();
 
         patientList.forEach(patient -> {
-            HashMap<String, Object> patientMap = new HashMap<>();
-            patientMap.put("Name", patient.getName());
-            patientMap.put("Surname", patient.getSurname());
-            patientMap.put("Age", patient.getAge());
-            patientJsonArray.add(patientMap);
+            JsonObject patientObject = new JsonObject();
+            patientObject.add("Name", new JsonPrimitive(patient.getName()));
+            patientObject.add("Surname", new JsonPrimitive(patient.getSurname()));
+            patientObject.add("Age", new JsonPrimitive(patient.getAge()));
+            patientJsonArray.add(patientObject);
         });
 
-        String jsonPatientList = patientJsonArray.toJSONString();
-        jsonPatientList = jsonPatientList.substring(1, jsonPatientList.length() - 1);
-
-        return jsonPatientList;
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(patientJsonArray);
     }
 
     @FXML

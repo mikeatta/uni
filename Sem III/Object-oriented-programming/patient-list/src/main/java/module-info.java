@@ -1,7 +1,7 @@
 module com.example.patientlist {
     requires javafx.controls;
     requires javafx.fxml;
-    requires json.simple;
+    requires com.google.gson;
 
 
     opens com.example.patientlist to javafx.fxml;
