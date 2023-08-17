@@ -6,9 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class HelloController {
 
@@ -76,12 +74,23 @@ public class HelloController {
     }
 
     private List<Patient> orderPatientList(String orderType) {
-        List<Patient> orderedPatients = new LinkedList<>();
+        List<Patient> orderedPatients = new LinkedList<>(patients);
         switch (orderType) {
-            case "Name" -> System.out.println("Selected 'Name'");
-            case "Surname" -> System.out.println("Selected 'Surname'");
-            case "Age" -> System.out.println("Selected 'Age'");
-            case "Date added" -> System.out.println("Selected 'Date added'");
+            case "Name" -> {
+                Comparator<Patient> compareByName = Comparator.comparing(Patient::getName);
+                orderedPatients.sort(compareByName);
+            }
+            case "Surname" -> {
+                Comparator<Patient> compareBySurname = Comparator.comparing(Patient::getSurname);
+                orderedPatients.sort(compareBySurname);
+            }
+            case "Age" -> {
+                Comparator<Patient> compareByAge = Comparator.comparing(Patient::getAge);
+                orderedPatients.sort(compareByAge);
+            }
+            case "Date added" -> {
+                return orderedPatients;
+            }
             default -> System.err.println("Please select order type!");
         }
         return orderedPatients;
@@ -104,10 +113,10 @@ public class HelloController {
 
     @FXML
     private void displayPatientInfo() {
-//        String comboValue = getComboBoxValue();
-//        orderPatientList(comboValue);
-        String jsonPatientList = parseListToJSON(patients);
-        System.out.print(jsonPatientList);
+        String comboValue = getComboBoxValue();
+        List<Patient> orderedPatients = orderPatientList(comboValue);
+        String jsonPatientList = parseListToJSON(orderedPatients);
+        System.out.print("Ordered patient list:\n" + jsonPatientList + "\n\n");
     }
 
 }
