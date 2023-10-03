@@ -10,10 +10,12 @@
 
 #include <stdint.h>
 
-extern uint8_t rx_empty;
-extern uint8_t rx_busy;
-extern uint8_t tx_empty;
-extern uint8_t tx_busy;
+extern volatile uint8_t rx_buffer[];
+extern volatile uint8_t tx_buffer[];
+extern volatile uint8_t rx_empty;
+extern volatile uint8_t rx_busy;
+extern volatile uint8_t tx_empty;
+extern volatile uint8_t tx_busy;
 
 void increase_rx_empty();
 void increase_rx_busy();

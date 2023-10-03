@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "stm32f7xx_hal.h"
+#include "buffer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,7 +35,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+//#define BUFFER_LENGTH 100
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -45,7 +46,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t tx_buffer[] = "Hello world!\r\n";
+uint8_t welcome_message[] = "Hello from STM!\n";
+uint8_t key_pressed;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -89,18 +91,17 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_UART_Receive_IT(&huart3, &key_pressed, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  HAL_UART_Transmit_IT(&huart3, welcome_message, sizeof(welcome_message));
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_UART_Transmit_IT(&huart3, tx_buffer, sizeof(tx_buffer));
-	  HAL_Delay(5000);
   }
   /* USER CODE END 3 */
 }
@@ -147,7 +148,20 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart->Instance == USART3)
+  {
+	  HAL_UART_Transmit_IT(huart, &key_pressed, 1);
 
+	  /* Add entered character to the rx array */
+	  rx_buffer[rx_empty] = key_pressed;
+	  increase_rx_empty();
+
+	  /* Continue listening for input */
+	  HAL_UART_Receive_IT(huart, &key_pressed, 1);
+  }
+}
 /* USER CODE END 4 */
 
 /**
