@@ -38,10 +38,10 @@ uint8_t rx_has_data()
 {
 	if (rx_empty == rx_busy)
 	{
-		return 1;
+		return 0;
 	}
 
-	return 0;
+	return 1;
 }
 
 void increase_tx_empty()
@@ -66,8 +66,8 @@ uint8_t tx_has_data()
 {
 	if (tx_empty == tx_busy)
 	{
-		return 1;
+		return 0;
 	}
 
-	return 0;
+	return 1;
 }
