@@ -35,7 +35,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-//#define BUFFER_LENGTH 100
+#define BUFFER_LENGTH 100
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -46,7 +46,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t welcome_message[] = "Hello from STM!\n";
+uint8_t sent_message[BUFFER_LENGTH];
+volatile uint16_t message_length;
 uint8_t key_pressed;
 /* USER CODE END PV */
 
@@ -58,7 +59,71 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint8_t char_is_endmessage(char c)
+{
+	if (c == '\r' || c == '\n')
+	{
+		return 1;
+	}
 
+	return 0;
+}
+
+uint8_t get_char()
+{
+	uint8_t temp_char;
+
+	temp_char = rx_buffer[rx_busy];
+	increase_rx_busy();
+	return temp_char;
+}
+
+uint16_t pull_message_from_buffer(uint8_t *array)
+{
+	static uint8_t temp_array[BUFFER_LENGTH];
+	static uint16_t idx = 0;
+	volatile uint16_t message_length = 0;
+
+	while (rx_has_data() == 1)
+	{
+		temp_array[idx] = get_char();
+
+		if (char_is_endmessage(temp_array[idx]))
+		{
+			temp_array[idx] = '\0';
+
+			for (int i = 0; i < idx; i++)
+			{
+				array[i] = temp_array[i];
+			}
+
+			message_length = idx;
+			idx = 0;
+			return message_length;
+		}
+
+		idx++;
+		if (idx > BUFFER_LENGTH)
+		{
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
+/* FRAME CHECK FUNCTIONS */
+
+uint8_t fr_check_length(uint16_t length)
+{
+	/* Correct frame length between 14 - 526 chars */
+	if (length < 14 || length > 526)
+	{
+		return 0;
+	}
+
+	return 1;
+}
 /* USER CODE END 0 */
 
 /**
@@ -96,12 +161,43 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  HAL_UART_Transmit_IT(&huart3, welcome_message, sizeof(welcome_message));
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  /* Get message when ENTER is pressed and rx_buffer has any data */
+	  if (rx_has_data() == 1 && char_is_endmessage(key_pressed))
+	  {
+		  message_length = pull_message_from_buffer(sent_message);
+	  }
+
+	  /* Check frame if the length is correct */
+	  if (fr_check_length(message_length))
+	  {
+		  uint16_t idx = rx_busy - (message_length + 1); /* +1 because of '\r' removal in sent_message */
+
+		  /* Handle buffer wrap-araund */
+		  if (idx >= BUFFER_LENGTH)
+		  {
+			  idx += BUFFER_LENGTH;
+		  }
+
+		  /* Transfer message to tx_buffer */
+		  while (idx != rx_busy)
+		  {
+			  tx_buffer[tx_empty] = rx_buffer[idx];
+			  increase_tx_empty();
+			  idx = (idx + 1) % BUFFER_LENGTH;
+		  }
+
+		  /*
+		   * Reset message length back to 0 to prevent the code
+		   * from re-entering length check indefinitely
+		   */
+
+		  message_length = 0;
+	  }
   }
   /* USER CODE END 3 */
 }
@@ -161,6 +257,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	  /* Continue listening for input */
 	  HAL_UART_Receive_IT(huart, &key_pressed, 1);
   }
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if (huart->Instance == USART3) {}
 }
 /* USER CODE END 4 */
 
