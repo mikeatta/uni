@@ -37,8 +37,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define USART_TX_BUF_LEN 100
-#define USART_RX_BUF_LEN 100
+#define USART_TX_BUF_LEN 2048
+#define USART_RX_BUF_LEN 1578
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -47,6 +47,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+
 /* USER CODE BEGIN PV */
 uint8_t USART_TxBuf[USART_TX_BUF_LEN];
 uint8_t USART_RxBuf[USART_RX_BUF_LEN];
@@ -62,6 +63,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
+
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint8_t USART_kbhit()
@@ -98,7 +100,7 @@ int16_t USART_getchar()
 
 uint8_t USART_getline(char *buf)
 {
-	static uint8_t bf[128];
+	static uint8_t bf[1578];
 	static uint8_t idx = 0;
 
 	int i;
@@ -123,7 +125,7 @@ uint8_t USART_getline(char *buf)
 		else
 		{
 			idx++;
-			if (idx >= 128)
+			if (idx >= 1578)
 			{
 				idx = 0;
 			}
@@ -134,7 +136,7 @@ uint8_t USART_getline(char *buf)
 
 void USART_fsend(char* format, ...)
 {
-	char tmp_rs[128];
+	char tmp_rs[1578];
 	int i;
 	__IO int idx;
 
@@ -205,10 +207,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart3, &USART_RxBuf[0], 1);
 
-  USART_fsend("Hello world!\r\n");
-
   int len = 0;
-  char bx[200];
+  static char bx[1578];
   uint32_t cntr = 0;
   /* USER CODE END 2 */
 
@@ -227,20 +227,20 @@ int main(void)
 		  {
 		  	  case 'l':
 		  	  case 'L':
-		  		  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
+		  		  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 		  		  USART_fsend("LED STATE CHANGE\r\n");
 		  		  break;
 		  	  case 's':
 		  	  case 'S':
-		  		  USART_fsend("LED PIN STATE %d\r\n", HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14));
+		  		  USART_fsend("LED PIN STATE %d\r\n", HAL_GPIO_ReadPin(LED_GPIO_Port, LED_Pin));
 		  		  break;
 		  	  case '?':
 		  		  USART_fsend("LOOP CNT %ld\r\n", cntr);
 		  		  break;
 		  }
 	  }
-	/* USER CODE END 3 */
   }
+  /* USER CODE END 3 */
 }
 
 /**
@@ -297,7 +297,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 			{
 				USART_Tx_Busy = 0;
 			}
-			HAL_UART_Transmit_IT(huart, &tmp, 1);
+			HAL_UART_Transmit_IT(&huart3, &tmp, 1);
 		}
 	}
 }
@@ -309,9 +309,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		USART_Rx_Empty++;
 		if (USART_Rx_Empty >= USART_RX_BUF_LEN)
 		{
-			USART_Tx_Empty = 0;
+			USART_Rx_Empty = 0;
 		}
-		HAL_UART_Receive_IT(huart, &USART_RxBuf[USART_Rx_Empty], 1);
+		HAL_UART_Receive_IT(&huart3, &USART_RxBuf[USART_Rx_Empty], 1);
 	}
 }
 /* USER CODE END 4 */
