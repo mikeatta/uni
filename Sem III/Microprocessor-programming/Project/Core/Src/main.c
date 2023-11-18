@@ -24,6 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stm32f7xx_hal.h"
+#include "string.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -37,8 +38,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define USART_TX_BUF_LEN 2048
-#define USART_RX_BUF_LEN 1578
+#define USART_TXBUF_LEN 2048
+#define USART_RXBUF_LEN 1578
+#define MAX_FRAME_LEN 526
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -49,8 +51,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t USART_TxBuf[USART_TX_BUF_LEN];
-uint8_t USART_RxBuf[USART_RX_BUF_LEN];
+uint8_t sender_address[4] = "PC1";
+uint8_t device_address[4] = "STM";
+
+uint8_t USART_TxBuf[USART_TXBUF_LEN];
+uint8_t USART_RxBuf[USART_RXBUF_LEN];
 
 __IO int USART_Tx_Empty = 0;
 __IO int USART_Tx_Busy  = 0;
@@ -86,7 +91,7 @@ int16_t USART_getchar()
 		tmp = USART_RxBuf[USART_Rx_Busy];
 		USART_Rx_Busy++;
 
-		if (USART_Rx_Busy >= USART_RX_BUF_LEN)
+		if (USART_Rx_Busy >= USART_RXBUF_LEN)
 		{
 			USART_Rx_Busy = 0;
 		}
@@ -150,7 +155,7 @@ void USART_fsend(char* format, ...)
 	{
 		USART_TxBuf[idx] = tmp_rs[i];
 		idx++;
-		if (idx >= USART_TX_BUF_LEN)
+		if (idx >= USART_TXBUF_LEN)
 		{
 			idx = 0;
 		}
@@ -161,7 +166,7 @@ void USART_fsend(char* format, ...)
 		USART_Tx_Empty = idx;
 		uint8_t tmp = USART_TxBuf[USART_Tx_Busy];
 		USART_Tx_Busy++;
-		if (USART_Tx_Busy >= USART_TX_BUF_LEN)
+		if (USART_Tx_Busy >= USART_TXBUF_LEN)
 		{
 			USART_Tx_Busy = 0;
 		}
@@ -172,6 +177,211 @@ void USART_fsend(char* format, ...)
 		USART_Tx_Empty = idx;
 	}
 	__enable_irq();
+}
+
+void frame_send(uint8_t address[], uint8_t command[])
+{
+	uint8_t tmp[526];
+	uint16_t index = 0;
+
+	/* Fill device address */
+	tmp[index++] = device_address[0];
+	tmp[index++] = device_address[1];
+	tmp[index++] = device_address[2];
+
+	/* Fill original sender address */
+	tmp[index++] = address[0];
+	tmp[index++] = address[1];
+	tmp[index++] = address[2];
+
+	uint8_t index_cmd = 0;
+	while (command[index_cmd])
+	{
+		tmp[index++] = command[index_cmd++];
+	}
+
+	/* Calculating checksum */
+	uint32_t crc = 0;
+	for (uint16_t i = 0; i < index; i++)
+	{
+		crc += tmp[i];
+	}
+	crc %= 1000;
+
+	/* Placing the checksum within the frame */
+	tmp[index++] = crc / 100 + '0'; crc %= 100;
+	tmp[index++] = crc / 10 + '0'; crc %= 10;
+	tmp[index++] = crc + '0';
+
+	uint8_t result[526];
+	uint16_t length = 0;
+	result[length++] = '#';
+	for (uint16_t i = 0; i < index; i++)
+	{
+		switch(tmp[i])
+		{
+		case '\\':
+			result[length++] = '\\';
+			result[length++] = '\\';
+			break;
+		case '#':
+			result[length++] = '\\';
+			result[length++] = '@';
+			break;
+		case ';':
+			result[length++] = '\\';
+			result[length++] = ':';
+			break;
+		default:
+			result[length++] = tmp[i];
+		}
+	}
+	result[length++] = ';';
+	result[length++] = '\r';
+	result[length++] = '\n';
+
+	__IO uint16_t idx = USART_Tx_Empty;
+	for (uint16_t i = 0; i < length; i++)
+	{
+		USART_TxBuf[idx] = result[i];
+		if (++idx == USART_TXBUF_LEN)
+		{
+			idx = 0;
+		}
+	}
+	__disable_irq();
+	if (USART_Tx_Empty == USART_Tx_Busy && __HAL_UART_GET_FLAG(&huart3, UART_FLAG_TXE == SET))
+	{
+		USART_Tx_Empty = idx;
+		uint8_t tmp = USART_TxBuf[USART_Tx_Busy];
+		if (++USART_Tx_Busy >= USART_TXBUF_LEN)
+		{
+			USART_Tx_Busy = 0;
+		}
+		HAL_UART_Transmit_IT(&huart3, &tmp, 1);
+	}
+	else
+	{
+		USART_Tx_Empty = idx;
+	}
+	__enable_irq();
+}
+
+uint8_t frame_get(uint8_t address[], uint8_t command[])
+{
+	static uint8_t tmp[526];
+	static uint16_t index = 0;
+	static uint8_t escape = 0;
+
+	while (USART_Rx_Busy != USART_Rx_Empty)
+	{
+		tmp[index] = USART_RxBuf[USART_Rx_Busy];
+		if (++USART_Rx_Busy >= USART_RXBUF_LEN)
+		{
+			USART_Rx_Busy = 0;
+		}
+
+		/* Check for a frame start char */
+		if (tmp[index] == '#')
+		{
+			tmp[0] = '#';
+			index = 1;
+			escape = 0;
+			continue;
+		}
+
+		/* If received char was not a frame start char */
+		if (!index)
+		{
+			continue;
+		}
+
+		if (escape)
+		{
+			if (tmp[index] == '\\')
+			{
+				tmp[index++] = '\\';
+			}
+			else if (tmp[index] == '$')
+			{
+				tmp[index++] = '#';
+			}
+			else if (tmp[index++] == ':')
+			{
+				tmp[index++] = ';';
+			}
+			else
+			{
+				index = 0;
+			}
+			escape = 0;
+		}
+		else if (tmp[index] == '\\')
+		{
+			/* Enable escape character sequence */
+			escape = 1;
+		}
+		else if (tmp[index] == ';')
+		{
+			/* Store current message length */
+			uint16_t length = index + 1;
+			index = 0;
+
+			/* If frame length is shorted than minimum length */
+			if (length < 14)
+			{
+				continue;
+			}
+
+			/* If device address does not match */
+			if (tmp[4] != device_address[0] || tmp[5] != device_address[1] || tmp[6] != device_address[2])
+			{
+				continue;
+			}
+
+			if (tmp[length - 4] < '0' || tmp[length - 4] > '9' || tmp[length - 3] < '0' || tmp[length - 3] > '9' || tmp[length - 2] < '0' || tmp[length - 2] > '9')
+			{
+				continue;
+			}
+
+			/* Read command length */
+			uint16_t command_length = 0;
+			for (uint16_t i = 10; i < length - 4; i++)
+			{
+				command[command_length++] = tmp[i];
+			}
+
+			command[command_length] = 0;
+
+			/* Calculate command checksum */
+			uint32_t crc = 0;
+			for (uint16_t i = 0; i < command_length; i++)
+			{
+				crc += command[i];
+			}
+			crc %= 1000;
+
+			uint16_t fcrc = ((tmp[length - 4] - '0') * 100) + ((tmp[length - 3] - '0') * 10) + (tmp[length - 2] - '0');
+
+			/* If checksums do not match */
+			if (crc != fcrc)
+			{
+				continue;
+			}
+
+			/* Fill in sender address */
+			address[0] = tmp[1];
+			address[1] = tmp[2];
+			address[2] = tmp[3];
+
+			return 1;
+		}
+		else if (++index >= 526)
+		{
+			index = 0;
+		}
+	}
+	return 0;
 }
 /* USER CODE END 0 */
 
@@ -205,39 +415,22 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Receive_IT(&huart3, &USART_RxBuf[0], 1);
+  HAL_UART_Receive_IT(&huart3, &USART_RxBuf[USART_Rx_Empty], 1);
 
-  int len = 0;
-  static char bx[1578];
-  uint32_t cntr = 0;
+  uint8_t address[4] = "PC1";
+  uint8_t command[512], tmp[512];
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  cntr++;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  if ((len = USART_getline(bx)) > 0)
+	  if (frame_get(address, command))
 	  {
-		  USART_fsend("REC[%d]> %s\r\n", len, bx);
-		  switch(bx[0])
-		  {
-		  	  case 'l':
-		  	  case 'L':
-		  		  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-		  		  USART_fsend("LED STATE CHANGE\r\n");
-		  		  break;
-		  	  case 's':
-		  	  case 'S':
-		  		  USART_fsend("LED PIN STATE %d\r\n", HAL_GPIO_ReadPin(LED_GPIO_Port, LED_Pin));
-		  		  break;
-		  	  case '?':
-		  		  USART_fsend("LOOP CNT %ld\r\n", cntr);
-		  		  break;
-		  }
+		  frame_send(address, command);
 	  }
   }
   /* USER CODE END 3 */
@@ -293,7 +486,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 		{
 			uint8_t tmp = USART_TxBuf[USART_Tx_Busy];
 			USART_Tx_Busy++;
-			if (USART_Tx_Busy >= USART_TX_BUF_LEN)
+			if (USART_Tx_Busy >= USART_TXBUF_LEN)
 			{
 				USART_Tx_Busy = 0;
 			}
@@ -307,7 +500,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	if (huart == &huart3)
 	{
 		USART_Rx_Empty++;
-		if (USART_Rx_Empty >= USART_RX_BUF_LEN)
+		if (USART_Rx_Empty >= USART_RXBUF_LEN)
 		{
 			USART_Rx_Empty = 0;
 		}
