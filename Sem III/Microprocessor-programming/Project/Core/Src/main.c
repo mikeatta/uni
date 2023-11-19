@@ -273,6 +273,7 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 	static uint16_t index = 0;
 	static uint8_t escape = 0;
 
+	/* While there's data in the RX buffer */
 	while (USART_Rx_Busy != USART_Rx_Empty)
 	{
 		tmp[index] = USART_RxBuf[USART_Rx_Busy];
@@ -327,7 +328,7 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 			uint16_t length = index + 1;
 			index = 0;
 
-			/* If frame length is shorted than minimum length */
+			/* If frame length is shorted than minimum allowed length */
 			if (length < 14)
 			{
 				continue;
@@ -345,6 +346,9 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 			}
 
 			/* Read command length */
+			uint16_t param_command_length = (tmp[7] - '0') + (tmp[8] - '0') + (tmp[9] - '0');
+
+			/* Read command and validate length */
 			uint16_t command_length = 0;
 			for (uint16_t i = 10; i < length - 4; i++)
 			{
@@ -352,6 +356,12 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 			}
 
 			command[command_length] = 0;
+
+			/* Compare declared command length against actual command length */
+			if (command_length != param_command_length)
+			{
+				continue;
+			}
 
 			/* Calculate command checksum */
 			uint32_t crc = 0;
