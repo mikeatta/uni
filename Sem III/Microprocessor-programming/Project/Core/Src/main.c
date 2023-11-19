@@ -51,7 +51,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t sender_address[4] = "PC1";
 uint8_t device_address[4] = "STM";
 
 uint8_t USART_TxBuf[USART_TXBUF_LEN];
@@ -340,6 +339,13 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 				continue;
 			}
 
+			/* Check if command length contains invalid characters */
+			if (tmp[7] < '0' || tmp[7] > '9' || tmp[8] < '0' || tmp[8] > '9' || tmp[9] < '0' || tmp[9] > '9')
+			{
+				continue;
+			}
+
+			/* Check if checksum contains invalid characters */
 			if (tmp[length - 4] < '0' || tmp[length - 4] > '9' || tmp[length - 3] < '0' || tmp[length - 3] > '9' || tmp[length - 2] < '0' || tmp[length - 2] > '9')
 			{
 				continue;
@@ -427,7 +433,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart3, &USART_RxBuf[USART_Rx_Empty], 1);
 
-  uint8_t address[4] = "PC1";
+  uint8_t address[4] = "";
   uint8_t command[512], tmp[512];
   /* USER CODE END 2 */
 
