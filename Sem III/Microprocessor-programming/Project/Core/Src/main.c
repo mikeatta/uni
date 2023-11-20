@@ -296,6 +296,7 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 			continue;
 		}
 
+		/* Check for escape characters */
 		if (escape)
 		{
 			if (tmp[index] == '\\')
@@ -314,6 +315,7 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 			{
 				index = 0;
 			}
+			/* Disable escape character sequence */
 			escape = 0;
 		}
 		else if (tmp[index] == '\\')
@@ -327,7 +329,7 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 			uint16_t length = index + 1;
 			index = 0;
 
-			/* If frame length is shorted than minimum allowed length */
+			/* If frame length is shorter than minimum allowed length */
 			if (length < 14)
 			{
 				continue;
@@ -340,7 +342,7 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 			}
 
 			/* Check if command length contains invalid characters */
-			if (tmp[7] < '0' || tmp[7] > '9' || tmp[8] < '0' || tmp[8] > '9' || tmp[9] < '0' || tmp[9] > '9')
+			if (tmp[length - 12] < '0' || tmp[length - 12] > '9' || tmp[length - 11] < '0' || tmp[length - 11] > '9' || tmp[length - 10] < '0' || tmp[length - 10] > '9')
 			{
 				continue;
 			}
@@ -352,7 +354,7 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 			}
 
 			/* Read command length */
-			uint16_t param_command_length = (tmp[7] - '0') + (tmp[8] - '0') + (tmp[9] - '0');
+			uint16_t param_command_length = ((tmp[7] - '0') * 100) + ((tmp[8] - '0') * 10) + (tmp[9] - '0');
 
 			/* Read command and validate length */
 			uint16_t command_length = 0;
