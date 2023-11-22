@@ -342,7 +342,7 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 			}
 
 			/* Check if command length contains invalid characters */
-			if (tmp[length - 12] < '0' || tmp[length - 12] > '9' || tmp[length - 11] < '0' || tmp[length - 11] > '9' || tmp[length - 10] < '0' || tmp[length - 10] > '9')
+			if (tmp[7] < '0' || tmp[7] > '9' || tmp[8] < '0' || tmp[8] > '9' || tmp[9] < '0' || tmp[9] > '9')
 			{
 				continue;
 			}
