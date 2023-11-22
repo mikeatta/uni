@@ -243,7 +243,7 @@ void frame_send(uint8_t address[], uint8_t command[])
 	for (uint16_t i = 0; i < length; i++)
 	{
 		USART_TxBuf[idx] = result[i];
-		if (++idx == USART_TXBUF_LEN)
+		if (++idx >= USART_TXBUF_LEN)
 		{
 			idx = 0;
 		}
@@ -435,7 +435,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart3, &USART_RxBuf[USART_Rx_Empty], 1);
 
-  uint8_t address[4] = "";
+  uint8_t sender_address[4] = "";
   uint8_t command[512], tmp[512];
   /* USER CODE END 2 */
 
@@ -446,9 +446,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  if (frame_get(address, command))
+	  if (frame_get(sender_address, command))
 	  {
-		  frame_send(address, command);
+		  frame_send(sender_address, command);
 	  }
   }
   /* USER CODE END 3 */
