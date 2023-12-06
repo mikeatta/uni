@@ -193,17 +193,24 @@ void frame_send(uint8_t address[], uint8_t command[])
 	tmp[index++] = address[1];
 	tmp[index++] = address[2];
 
-	uint8_t index_cmd = 0;
+	/* Fill command length */
+	uint16_t cmd_len = sizeof(command) + 1;
+	tmp[index++] = cmd_len / 100 + '0'; cmd_len %= 100;
+	tmp[index++] = cmd_len / 10 + '0'; cmd_len %= 10;
+	tmp[index++] = cmd_len + '0';
+
+	/* Copy command to tmp array */
+	uint16_t index_cmd = 0;
 	while (command[index_cmd])
 	{
 		tmp[index++] = command[index_cmd++];
 	}
 
 	/* Calculating checksum */
-	uint32_t crc = 0;
-	for (uint16_t i = 0; i < index; i++)
+	uint16_t crc = 0;
+	for (uint16_t i = 0; i < cmd_len; i++)
 	{
-		crc += tmp[i];
+		crc += command[i];
 	}
 	crc %= 1000;
 
@@ -303,7 +310,7 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 			{
 				tmp[index++] = '\\';
 			}
-			else if (tmp[index] == '$')
+			else if (tmp[index] == '@')
 			{
 				tmp[index++] = '#';
 			}
