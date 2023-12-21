@@ -1,5 +1,6 @@
 package com.example.stockmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @JsonProperty("id")
     private UUID id;
 
     @Column
