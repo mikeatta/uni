@@ -6,7 +6,11 @@ import process from 'process';
 import { authenticate } from '@google-cloud/local-auth';
 import { google } from 'googleapis';
 
-const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
+// If modifying the scopes, delete token.json
+const SCOPES = [
+  'https://www.googleapis.com/auth/calendar.readonly',
+  'https://www.googleapis.com/auth/tasks.readonly',
+];
 // The token.js file stores user's tokens and is automatically created when
 // the user logs in for the first time and completes the authorization process
 const TOKEN_PATH = path.join(process.cwd(), 'token.json');
@@ -50,21 +54,22 @@ async function authorize() {
   return client;
 }
 
-async function createCalendar(auth) {
+async function getAPIClient(auth) {
   try {
     const calendar = google.calendar({ version: 'v3', auth });
-    return calendar;
+    const tasks = google.tasks({ version: 'v1', auth });
+    return [calendar, tasks];
   } catch (err) {
     return null;
   }
 }
 
-async function authenticateAndGetCalendar() {
+async function authenticateAndGetClient() {
   let credentials = await loadSavedCredentialsIfExist();
   if (!credentials) {
     credentials = await authorize();
   }
-  return await createCalendar(credentials);
+  return await getAPIClient(credentials);
 }
 
-export { authenticateAndGetCalendar };
+export { authenticateAndGetClient };

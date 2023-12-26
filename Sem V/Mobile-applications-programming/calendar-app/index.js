@@ -1,6 +1,6 @@
 'use strict';
 
-import { authenticateAndGetCalendar } from './auth.js';
+import { authenticateAndGetClient } from './auth.js';
 
 async function listEvents(calendar) {
   const res = await calendar.events.list({
@@ -22,10 +22,26 @@ async function listEvents(calendar) {
   });
 }
 
+async function listTasklists(tasks) {
+  const res = await tasks.tasklists.list({
+    maxResults: 10,
+  });
+  const taskEntries = res.data.items;
+  if (!taskEntries || taskEntries.length === 0) {
+    console.log('No tasks found.');
+    return;
+  }
+  console.log('Available tasklists:');
+  taskEntries.map((task, i) => {
+    console.log(task);
+  });
+}
+
 async function main() {
   try {
-    const calendar = await authenticateAndGetCalendar();
+    const [calendar, tasks] = await authenticateAndGetClient();
     await listEvents(calendar);
+    await listTasklists(tasks);
   } catch (err) {
     console.error('Error getting events:', err);
   }
