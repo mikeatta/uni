@@ -57,8 +57,8 @@ async function authorize() {
 async function getAPIClient(auth) {
   try {
     const calendar = google.calendar({ version: 'v3', auth });
-    const tasks = google.tasks({ version: 'v1', auth });
-    return [calendar, tasks];
+    const service = google.tasks({ version: 'v1', auth });
+    return [calendar, service];
   } catch (err) {
     return null;
   }

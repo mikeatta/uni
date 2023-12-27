@@ -22,26 +22,26 @@ async function listEvents(calendar) {
   });
 }
 
-async function listTasklists(tasks) {
-  const res = await tasks.tasklists.list({
+async function listTasklists(service) {
+  const res = await service.tasklists.list({
     maxResults: 10,
   });
-  const taskEntries = res.data.items;
-  if (!taskEntries || taskEntries.length === 0) {
+  const tasklists = res.data.items;
+  if (!tasklists || tasklists.length === 0) {
     console.log('No tasks found.');
     return;
   }
   console.log('Available tasklists:');
-  taskEntries.map((task, i) => {
-    console.log(task);
+  tasklists.map((tasklist, i) => {
+    console.log(tasklist);
   });
 }
 
 async function main() {
   try {
-    const [calendar, tasks] = await authenticateAndGetClient();
+    const [calendar, service] = await authenticateAndGetClient();
     await listEvents(calendar);
-    await listTasklists(tasks);
+    await listTasklists(service);
   } catch (err) {
     console.error('Error getting events:', err);
   }
