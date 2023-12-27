@@ -37,11 +37,32 @@ async function listTasklists(service) {
   });
 }
 
+async function listTasks(service) {
+  const res = await service.tasks.list({
+    tasklist: 'MTI4NTk2NzEwNjY0MzQ5NjAzNzg6MDow',
+  });
+  const tasks = res.data.items;
+  if (!tasks || tasks.length === 0) {
+    console.log('No tasks found.');
+    return;
+  }
+  console.log('Found tasks:');
+  tasks.map((task, i) => {
+    // Extract just the due date from the string
+    const due = new Date(task.due).toISOString().split('T')[0];
+    const title = task.title;
+    const notes = task.notes !== undefined ? task.notes : '';
+    // Print notes if available, else print just the date and title
+    console.log(notes ? `${due} - ${title}: ${notes}` : `${due} - ${title}`);
+  });
+}
+
 async function main() {
   try {
     const [calendar, service] = await authenticateAndGetClient();
     await listEvents(calendar);
     await listTasklists(service);
+    await listTasks(service);
   } catch (err) {
     console.error('Error getting events:', err);
   }
