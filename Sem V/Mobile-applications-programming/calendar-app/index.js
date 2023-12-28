@@ -32,9 +32,16 @@ async function listTasklists(service) {
     return;
   }
   console.log('Available tasklists:');
-  tasklists.map((tasklist, i) => {
-    console.log(tasklist);
+  const tasklistObjects = tasklists.map((tasklist, i) => {
+    const title = tasklist.title;
+    const id = tasklist.id;
+    console.log(`${i + 1}. ${title} - ID: ${id}`);
+    return {
+      id: id,
+      title: title,
+    };
   });
+  return tasklistObjects;
 }
 
 async function listTasks(service) {
@@ -61,7 +68,7 @@ async function main() {
   try {
     const [calendar, service] = await authenticateAndGetClient();
     await listEvents(calendar);
-    await listTasklists(service);
+    const tasklists = await listTasklists(service);
     await listTasks(service);
   } catch (err) {
     console.error('Error getting events:', err);
