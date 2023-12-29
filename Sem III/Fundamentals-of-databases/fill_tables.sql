@@ -17,25 +17,6 @@ INSERT ALL
     INTO Producent(ProducentID, Nazwa, Kraj) VALUES (15, 'Mitsuoka', 'Japonia')
 SELECT * FROM dual;
 
--- Insert 15 entries into Options
-INSERT ALL
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (1, 'Nawigacja', 3000)
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (2, 'Podgrzewane siedzenia', 2800)
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (3, 'Podgrzewana kierownica', 1700)
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (4, 'Ładowarka bezprzewodowa', 1200)
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (5, 'Asystent parkowania', 8800)
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (6, 'Kamera cofania', 3600)
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (7, 'Panoramiczny dach', 13300)
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (8, 'System monitorowania toru jazdy', 10500)
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'System bezkluczykowy', 2600)
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (10, 'Czujniki cofania', 2200)
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (11, 'System monitorowania ślepego punktu', 6600)
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (12, 'Opony zimowe', 7400)
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (13, 'Bagażnik na dach', 3300)
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (14, 'Uchwyt na rowery', 1600)
-    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (15, 'Nagłośnienie premium', 10200)
-SELECT * FROM dual;
-
 -- Insert 15 entries into Car
 INSERT ALL
     INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena, Wykonczenie) VALUES (1, 1, 'Honda', 'Accord', 2022, 'ABC123', 96000, 2)
@@ -55,23 +36,127 @@ INSERT ALL
     INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena, Wykonczenie) VALUES (15, 15, 'Mitsuoka', 'Orochi', 2013, 'MIT013', 560000, 3)
 SELECT * FROM dual;
 
--- Insert 15 entries into CarOptions
+-- Insert 15 entries into Options
 INSERT ALL
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (1, 1)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (2, 1)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (3, 9)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (4, 5)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (5, 10)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (6, 11)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (7, 1)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (8, 12)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (9, 2)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (10, 3)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (11, 2)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (12, 3)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (13, 1)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (14, 1)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (15, 5)
+    -- Insert options for Car with SamochodID = 1
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (1, 'Nawigacja', 3000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (1, 'Ładowarka bezprzewodowa', 1500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (1, 'Kamera cofania', 1500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (1, 'Czujniki cofania', 1000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (1, 'System bezkluczykowy', 2000)
+
+    -- Insert options for Car with SamochodID = 2
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (2, 'Nawigacja', 3000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (2, 'Kamera cofania', 1500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (2, 'Czujniki cofania', 1000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (2, 'System bezkluczykowy', 2000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (2, 'System monitorowania ślepego punktu', 2000)
+
+    -- Insert options for Car with SamochodID = 3
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (3, 'Nawigacja', 3000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (3, 'Kamera cofania', 1500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (3, 'Czujniki cofania', 1000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (3, 'System bezkluczykowy', 2000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (3, 'System monitorowania ślepego punktu', 6600)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (3, 'Asystent parkowania', 8800)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (3, 'Opony zimowe', 12400)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (3, 'Panoramiczny dach', 22600)
+
+    -- Insert options for Car with SamochodID = 4
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (4, 'Nawigacja', 3000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (4, 'Kamera cofania', 1500)
+
+    -- Insert options for Car with SamochodID = 5
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (5, 'Nawigacja', 3000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (5, 'Kamera cofania', 1500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (5, 'Opony zimowe', 12400)
+
+    -- Insert options for Car with SamochodID = 6
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (6, 'Nawigacja', 3000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (6, 'Kamera cofania', 1500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (6, 'Czujniki cofania', 1000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (6, 'System monitorowania ślepego punktu', 6600)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (6, 'Asystent parkowania', 8800)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (6, 'Opony zimowe', 12400)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (6, 'Bagażnik na dach', 3300)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (6, 'Uchwyt na rowery', 1600)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (6, 'System monitorowania toru jazdy', 10500)
+
+    -- Insert options for Car with SamochodID = 7
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (7, 'Nawigacja', 3000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (7, 'Kamera cofania', 1500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (7, 'Czujniki cofania', 1000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (7, 'System bezkluczykowy', 2000)
+
+    -- Insert options for Car with SamochodID = 8
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (8, 'Nawigacja', 3000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (8, 'Kamera cofania', 1500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (8, 'Czujniki cofania', 1000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (8, 'System monitorowania ślepego punktu', 6600)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (8, 'Asystent parkowania', 8800)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (8, 'Opony zimowe', 12400)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (8, 'System monitorowania toru jazdy', 10500)
+
+    -- Insert options for Car with SamochodID = 9
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'Nawigacja', 3000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'Kamera cofania', 1500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'Czujniki cofania', 1000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'Ładowarka bezprzewodowa', 1200)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'System monitorowania ślepego punktu', 6600)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'System bezkluczykowy', 2600)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'Podgrzewane siedzenia', 7200)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'Podgrzewana kierownica', 3700)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'Asystent parkowania', 8800)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'Opony zimowe', 12400)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'Bagażnik na dach', 3300)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'Uchwyt na rowery', 1600)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'System monitorowania toru jazdy', 10500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (9, 'Nagłośnienie premium', 10500)
+
+    -- Insert options for Car with SamochodID = 10
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (10, 'Nawigacja', 3000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (10, 'Kamera cofania', 1500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (10, 'Czujniki cofania', 1000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (10, 'Podgrzewane siedzenia', 7200)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (10, 'Asystent parkowania', 8800)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (10, 'Opony zimowe', 12400)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (10, 'Bagażnik na dach', 3300)
+
+    -- Insert options for Car with SamochodID = 11
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (11, 'Opony zimowe', 12400)
+
+    -- Insert options for Car with SamochodID = 12
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (12, 'Nawigacja', 3000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (12, 'Kamera cofania', 1500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (12, 'Czujniki cofania', 1000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (12, 'Ładowarka bezprzewodowa', 1200)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (12, 'System bezkluczykowy', 2600)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (12, 'odgrzewane siedzenia', 7200)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (12, 'Podgrzewana kierownica', 3700)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (12, 'Asystent parkowania', 8800)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (12, 'Opony zimowe', 12400)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (12, 'Nagłośnienie premium', 10500)
+
+    -- Insert options for Car with SamochodID = 14
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (14, 'Nawigacja', 3000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (14, 'Kamera cofania', 1500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (14, 'Czujniki cofania', 1000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (14, 'Ładowarka bezprzewodowa', 1200)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (14, 'System monitorowania ślepego punktu', 6600)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (14, 'System bezkluczykowy', 2600)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (14, 'Podgrzewane siedzenia', 7200)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (14, 'Podgrzewana kierownica', 3700)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (14, 'Asystent parkowania', 8800)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (14, 'Opony zimowe', 12400)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (14, 'System monitorowania toru jazdy', 10500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (14, 'Nagłośnienie premium', 10500)
+
+ -- Insert options for Car with SamochodID = 15
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (15, 'Nawigacja', 3000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (15, 'Kamera cofania', 1500)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (15, 'Czujniki cofania', 1000)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (15, 'Podgrzewane siedzenia', 7200)
+    INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (15, 'Nagłośnienie premium', 10500)
 SELECT * FROM dual;
 
 -- Insert 15 entries into ServiceRequest

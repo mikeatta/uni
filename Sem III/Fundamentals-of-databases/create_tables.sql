@@ -5,13 +5,6 @@ CREATE TABLE Producent (
     Kraj VARCHAR2(50)
 );
 
--- Create Options Table
-CREATE TABLE Opcje (
-    OpcjaID NUMBER PRIMARY KEY,
-    Nazwa VARCHAR2(255) NOT NULL,
-    Cena NUMBER NOT NULL
-);
-
 -- Create Car Table
 CREATE TABLE Samochod (
     SamochodID NUMBER PRIMARY KEY,
@@ -24,11 +17,12 @@ CREATE TABLE Samochod (
     Wykonczenie NUMBER NOT NULL
 );
 
--- Create CarOptions Table
-CREATE TABLE SamochodOpcje (
-    SamochodID NUMBER REFERENCES Samochod(SamochodID),
-    OpcjaID NUMBER REFERENCES Opcje(OpcjaID),
-    PRIMARY KEY (SamochodID, OpcjaID)
+-- Create Options Table
+CREATE TABLE Opcje (
+    OpcjaID NUMBER PRIMARY KEY,
+    SamochodID NUMBER REFERENCES SamochodID(SamochodID),
+    Nazwa VARCHAR2(255) UNIQUE NOT NULL,
+    Cena NUMBER
 );
 
 -- Create ServiceRequest Table
