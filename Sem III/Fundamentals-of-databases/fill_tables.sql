@@ -13,7 +13,7 @@ INSERT ALL
     INTO Producent(ProducentID, Nazwa, Kraj) VALUES (11, 'Jeep', 'USA')
     INTO Producent(ProducentID, Nazwa, Kraj) VALUES (12, 'Volvo', 'Szwecja')
     INTO Producent(ProducentID, Nazwa, Kraj) VALUES (13, 'Subaru', 'Japonia')
-    INTO Producent(ProducentID, Nazwa, Kraj) VALUES (14, 'Chrystler', 'USA')
+    INTO Producent(ProducentID, Nazwa, Kraj) VALUES (14, 'Chrysler', 'USA')
     INTO Producent(ProducentID, Nazwa, Kraj) VALUES (15, 'Mitsuoka', 'Japonia')
 SELECT * FROM dual;
 
@@ -31,7 +31,7 @@ INSERT ALL
     INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena, Wykonczenie) VALUES (10, 12, 'VOlvo', 'V90', 2013, 'VLVV90', 70000, 2)
     INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena, Wykonczenie) VALUES (11, 13, 'Subaru', 'Impreza', 2007, 'SBRU07', 63000, 2)
     INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena, Wykonczenie) VALUES (12, 8, 'Kia', 'Stinger', 2018, 'STGR18', 133000, 2)
-    INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena, Wykonczenie) VALUES (13, 14, 'Chrystler', 'PT-Cruiser', 2006, 'PTCR06', 17000, 1)
+    INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena, Wykonczenie) VALUES (13, 14, 'Chrysler', 'PT-Cruiser', 2006, 'PTCR06', 17000, 1)
     INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena, Wykonczenie) VALUES (14, 5, 'Mercedes-Benz', 'G', 2023, 'GKLS63', 1340000, 3)
     INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena, Wykonczenie) VALUES (15, 15, 'Mitsuoka', 'Orochi', 2013, 'MIT013', 560000, 3)
 SELECT * FROM dual;
