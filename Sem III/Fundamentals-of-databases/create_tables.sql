@@ -19,10 +19,12 @@ CREATE TABLE Samochod (
 
 -- Create Options Table
 CREATE TABLE Opcje (
-    OpcjaID NUMBER PRIMARY KEY,
-    SamochodID NUMBER REFERENCES SamochodID(SamochodID),
-    Nazwa VARCHAR2(255) UNIQUE NOT NULL,
-    Cena NUMBER
+    OpcjaID NUMBER,
+    SamochodID NUMBER,
+    Nazwa VARCHAR2(255) NOT NULL,
+    Cena NUMBER,
+    PRIMARY KEY (OpcjaID, SamochodID),
+    FOREIGN KEY (SamochodID) REFERENCES Samochod(SamochodID)
 );
 
 -- Create ServiceRequest Table
