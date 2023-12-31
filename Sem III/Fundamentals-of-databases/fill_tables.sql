@@ -296,14 +296,14 @@ INSERT ALL
     INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (15, 15, 15, 15, date'2023-03-15')
 SELECT * FROM dual;
 
--- Insert 15 entries into Discount
+-- Insert 6 entries into Discount
 INSERT ALL
-    INTO Rabat (KlientID, TransakcjaID, Ilosc, Procent) VALUES (1, 4, 5000, 0)
-    INTO Rabat (KlientID, TransakcjaID, Ilosc, Procent) VALUES (3, 5, 0, 10)
-    INTO Rabat (KlientID, TransakcjaID, Ilosc, Procent) VALUES (6, 6, 0, 15)
-    INTO Rabat (KlientID, TransakcjaID, Ilosc, Procent) VALUES (9, 7, 0, 20)
-    INTO Rabat (KlientID, TransakcjaID, Ilosc, Procent) VALUES (12, 8, 2500, 0)
-    INTO Rabat (KlientID, TransakcjaID, Ilosc, Procent) VALUES (15, 9, 12500, 0)
+    INTO Rabat (TransakcjaID, KlientID, Kwota, Procent, Rodzaj) VALUES (5, 12, NULL, 5, 'Procent')
+    INTO Rabat (TransakcjaID, KlientID, Kwota, Procent, Rodzaj) VALUES (6, 10, 125, NULL, 'Kwota')
+    INTO Rabat (TransakcjaID, KlientID, Kwota, Procent, Rodzaj) VALUES (7, 5, 300, NULL, 'Kwota')
+    INTO Rabat (TransakcjaID, KlientID, Kwota, Procent, Rodzaj) VALUES (10, 6, 150, NULL, 'Kwota')
+    INTO Rabat (TransakcjaID, KlientID, Kwota, Procent, Rodzaj) VALUES (13, 3, NULL, 100, 'Procent')
+    INTO Rabat (TransakcjaID, KlientID, Kwota, Procent, Rodzaj) VALUES (14, 15, NULL, 20, 'Procent')
 SELECT * FROM dual;
 
 -- Insert 15 entries into Payment

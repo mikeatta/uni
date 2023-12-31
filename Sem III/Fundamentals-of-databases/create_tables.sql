@@ -91,11 +91,12 @@ CREATE TABLE Transakcja (
 
 -- Create Discount Table
 CREATE TABLE Rabat (
-    KlientID NUMBER REFERENCES Klient(KlientID),
     TransakcjaID NUMBER REFERENCES Transakcja(TransakcjaID),
-    Ilosc NUMBER,
+    KlientID NUMBER REFERENCES Klient(KlientID),
+    Kwota NUMBER,
     Procent NUMBER,
-    PRIMARY KEY (KlientID, TransakcjaID)
+    Rodzaj VARCHAR2(10),
+    PRIMARY KEY (TransakcjaID, KlientID)
 );
 
 -- Create Payment Table
