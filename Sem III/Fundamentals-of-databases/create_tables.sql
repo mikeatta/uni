@@ -67,7 +67,7 @@ CREATE TABLE Serwisant (
 CREATE TABLE Zadania (
     ZadanieID NUMBER PRIMARY KEY,
     PracownikID NUMBER REFERENCES Pracownik(PracownikID),
-    Nazwa VARCHAR2(255)
+    Opis VARCHAR2(255)
 );
 
 -- Create Customer Table
