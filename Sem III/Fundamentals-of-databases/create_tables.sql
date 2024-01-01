@@ -45,7 +45,7 @@ CREATE TABLE Pracownik (
     PracownikID NUMBER PRIMARY KEY,
     Imie VARCHAR2(50) NOT NULL,
     Nazwisko VARCHAR2(50) NOT NULL,
-    Zadania VARCHAR2(500)
+    Stanowisko VARCHAR2(50)
 );
 
 -- Create Service Table
@@ -65,7 +65,7 @@ CREATE TABLE Sprzedawca (
 -- Create Mechanic Table
 CREATE TABLE Serwisant (
     PracownikID NUMBER PRIMARY KEY REFERENCES Pracownik(PracownikID),
-    Specjalizacje VARCHAR2(500)
+    Specjalizacje VARCHAR2(50)
 );
 
 -- Create Tasks Table
