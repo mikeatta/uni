@@ -13,18 +13,23 @@ CREATE TABLE Samochod (
     Model VARCHAR2(255) NOT NULL,
     Rocznik NUMBER NOT NULL,
     VIN VARCHAR2(50) UNIQUE NOT NULL,
-    Cena NUMBER NOT NULL,
-    Wykonczenie NUMBER NOT NULL
+    Cena NUMBER(10,2) NOT NULL
 );
 
 -- Create Options Table
 CREATE TABLE Opcje (
-    OpcjaID NUMBER,
-    SamochodID NUMBER,
+    OpcjaID NUMBER PRIMARY KEY,
     Nazwa VARCHAR2(255) NOT NULL,
-    Cena NUMBER,
-    PRIMARY KEY (OpcjaID, SamochodID),
-    FOREIGN KEY (SamochodID) REFERENCES Samochod(SamochodID)
+    Cena NUMBER(7,2)
+);
+
+-- Create CarOptions Table
+CREATE TABLE SamochodOpcje (
+    SamochodID NUMBER,
+    OpcjaID NUMBER,
+    PRIMARY KEY (SamochodID, OpcjaID),
+    FOREIGN KEY (SamochodID) REFERENCES Samochod(SamochodID),
+    FOREIGN KEY (OpcjaID) REFERENCES Opcje(OpcjaID)
 );
 
 -- Create ServiceRequest Table
