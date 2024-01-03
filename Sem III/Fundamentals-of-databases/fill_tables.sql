@@ -55,7 +55,7 @@ INSERT ALL
     INTO Opcje (OpcjaID, Nazwa, Cena) VALUES (15, 'Uchwyt na rowery', 1600)
 SELECT * FROM dual;
 
--- Insert entries into CarOptions
+-- Insert 91 entries into CarOptions
 INSERT ALL
     -- Insert options for Car with SamochodID = 1
     INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (1, 1)
@@ -291,7 +291,7 @@ SELECT * FROM dual;
 INSERT ALL
     INTO Zadania (ZadanieID, PracownikID, Opis) VALUES (1, 1, 'Oddzwonienie do klienta')
     INTO Zadania (ZadanieID, PracownikID, Opis) VALUES (2, 2, 'Finalizacja zamówienia')
-    INTO Zadania (ZadanieID, PracownikID, Opis) VALUES (3, 3, 'Wymiana płynu hamulcowego')
+    INTO Zadania (ZadanieID, PracownikID, Opis) VALUES (3, 3, 'Wymiana hamulców w pojeździe klienta')
     INTO Zadania (ZadanieID, PracownikID, Opis) VALUES (4, 4, 'Prezentacja samochodu')
     INTO Zadania (ZadanieID, PracownikID, Opis) VALUES (5, 6, 'Założenie opon zimowych')
     INTO Zadania (ZadanieID, PracownikID, Opis) VALUES (6, 17, 'Przedstawienie oferty klientowi')
