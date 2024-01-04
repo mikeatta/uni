@@ -32,7 +32,7 @@ INSERT ALL
     INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena) VALUES (11, 13, 'Subaru', 'Impreza', 2007, 'SBRU07', 63000)
     INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena) VALUES (12, 8, 'Kia', 'Stinger', 2018, 'STGR18', 133000)
     INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena) VALUES (13, 14, 'Chrysler', 'PT-Cruiser', 2006, 'PTCR06', 17000)
-    INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena) VALUES (14, 5, 'Mercedes-Benz', 'G', 2023, 'GKLS63', 1340000)
+    INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena) VALUES (14, 5, 'Mercedes-Benz', 'G Class', 2023, 'GKLS63', 1340000)
     INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena) VALUES (15, 15, 'Mitsuoka', 'Orochi', 2013, 'MIT013', 560000)
 SELECT * FROM dual;
 
@@ -156,18 +156,18 @@ INSERT ALL
     INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (12, 13)
 
     -- Insert options for Car with SamochodID = 14
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (13, 1)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (13, 2)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (13, 3)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (13, 4)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (13, 5)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (13, 6)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (13, 7)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (13, 8)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (13, 9)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (13, 10)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (13, 11)
-    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (13, 13)
+    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (14, 1)
+    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (14, 2)
+    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (14, 3)
+    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (14, 4)
+    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (14, 5)
+    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (14, 6)
+    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (14, 7)
+    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (14, 8)
+    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (14, 9)
+    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (14, 10)
+    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (14, 11)
+    INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (14, 13)
 
     -- Insert options for Car with SamochodID = 15
     INTO SamochodOpcje (SamochodID, OpcjaID) VALUES (15, 1)
