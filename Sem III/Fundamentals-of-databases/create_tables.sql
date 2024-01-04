@@ -91,6 +91,7 @@ CREATE TABLE Transakcja (
     SamochodID NUMBER REFERENCES Samochod(SamochodID),
     KlientID NUMBER REFERENCES Klient(KlientID),
     PracownikID NUMBER REFERENCES Pracownik(PracownikID),
+    Typ VARCHAR2(10) CHECK (Typ IN ('Zakup', 'Serwis')),
     Data DATE
 );
 

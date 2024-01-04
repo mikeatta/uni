@@ -341,21 +341,21 @@ SELECT * FROM dual;
 
 -- Insert 15 entries into Transaction
 INSERT ALL
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (1, 14, 15, 29, date'2023-04-10')
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (2, 3, 1, 11, date'2023-05-13')
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (3, 15, 3, 8, date'2023-06-15')
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (4, 13, 2, 15, date'2023-07-17')
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (5, 11, 12, 26, date'2023-08-22')
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (6, 7, 10, 5, date'2023-09-28')
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (7, 8, 5, 26, date'2023-10-30')
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (8, 9, 8, 30, date'2023-11-06')
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (9, 4, 11, 16, date'2023-12-11')
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (10, 1, 6, 2, date'2024-01-17')
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (11, 12, 5, 9, date'2024-02-23')
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (12, 5, 14, 3, date'2024-03-27')
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (13, 15, 3, 26, date'2024-04-30')
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (14, 10, 15, 9, date'2024-05-09')
-    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (15, 2, 7, 29, date'2024-06-12')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (1, 14, 15, 29, 'Zakup', date'2023-04-10')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (2, 3, 1, 11, 'Serwis', date'2023-05-13')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (3, 15, 3, 8, 'Zakup', date'2023-06-15')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (4, 13, 2, 15, 'Serwis', date'2023-07-17')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (5, 11, 12, 26, 'Serwis', date'2023-08-22')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (6, 7, 10, 5, 'Serwis', date'2023-09-28')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (7, 8, 5, 26, 'Serwis', date'2023-10-30')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (8, 9, 8, 30, 'Serwis', date'2023-11-06')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (9, 4, 11, 16, 'Serwis', date'2023-12-11')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (10, 1, 6, 2, 'Zakup', date'2024-01-17')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (11, 12, 5, 9, 'Serwis', date'2024-02-23')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (12, 5, 14, 3, 'Serwis', date'2024-03-27')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (13, 15, 3, 26, 'Serwis', date'2024-04-30')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (14, 10, 15, 9, 'Serwis', date'2024-05-09')
+    INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (15, 2, 7, 29, 'Serwis', date'2024-06-12')
 SELECT * FROM dual;
 
 -- Insert 6 entries into Discount

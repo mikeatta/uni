@@ -59,10 +59,10 @@ INSERT INTO Klient (KlientID, Imie, Nazwisko, Email, PESEL, Telefon) VALUES (16,
 INSERT INTO Klient (KlientID, Imie, Nazwisko, Email, PESEL, Telefon) VALUES (17, 'Kamil', 'Dąbrowski', 'kamil.dabrowski@email.com', 81012227579, '012-345-678');
 
 -- Insert into Transaction
-INSERT INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (16, 17, 16, 23, date'2024-07-23');
-INSERT INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (17, 19, 17, 27, date'2024-07-28');
-INSERT INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (18, 17, 16, 5, date'2024-07-30');
-INSERT INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Data) VALUES (19, 5, 14, 6, date'2024-08-03');
+INSERT INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (16, 17, 16, 23, 'Zakup', date'2024-07-23');
+INSERT INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (17, 19, 17, 27, 'Zakup', date'2024-07-28');
+INSERT INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (18, 17, 16, 5, 'Serwis', date'2024-07-30');
+INSERT INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Data) VALUES (19, 5, 14, 6, 'Serwis', date'2024-08-03');
 
 -- Insert into Discount
 INSERT INTO Rabat (TransakcjaID, KlientID, Kwota, Procent, Rodzaj) VALUES (18, 16, NULL, 100, 'Procent');
