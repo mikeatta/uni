@@ -205,7 +205,7 @@ INSERT ALL
     INTO Pracownik (PracownikID, Imie, Nazwisko, Stanowisko) VALUES (5, 'Krzysztof', 'Tomaszewski', 'Serwisant')
     INTO Pracownik (PracownikID, Imie, Nazwisko, Stanowisko) VALUES (6, 'Joanna', 'Mazurek', 'Sprzedawca')
     INTO Pracownik (PracownikID, Imie, Nazwisko, Stanowisko) VALUES (7, 'Daniel', 'Wójcik', 'Serwisant')
-    INTO Pracownik (PracownikID, Imie, Nazwisko, Stanowisko) VALUES (8, 'Katarzyna', 'Anilewicz', 'Serwisant')
+    INTO Pracownik (PracownikID, Imie, Nazwisko, Stanowisko) VALUES (8, 'Katarzyna', 'Anilewicz', 'Sprzedawca')
     INTO Pracownik (PracownikID, Imie, Nazwisko, Stanowisko) VALUES (9, 'Mateusz', 'Brązowy', 'Serwisant')
     INTO Pracownik (PracownikID, Imie, Nazwisko, Stanowisko) VALUES (10, 'Olga', 'Hałas', 'Sprzedawca')
     INTO Pracownik (PracownikID, Imie, Nazwisko, Stanowisko) VALUES (11, 'Jakub', 'Tomczak', 'Serwisant')
