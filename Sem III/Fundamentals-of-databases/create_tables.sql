@@ -13,14 +13,14 @@ CREATE TABLE Samochod (
     Model VARCHAR2(255) NOT NULL,
     Rocznik NUMBER NOT NULL,
     VIN VARCHAR2(50) UNIQUE NOT NULL,
-    Cena NUMBER(10,2) NOT NULL
+    Cena NUMBER(10,2) CHECK (Cena >= 0) NOT NULL
 );
 
 -- Create Options Table
 CREATE TABLE Opcje (
     OpcjaID NUMBER PRIMARY KEY,
     Nazwa VARCHAR2(255) NOT NULL,
-    Cena NUMBER(7,2)
+    Cena NUMBER(7,2) CHECK (Cena >= 0) NOT NULL
 );
 
 -- Create CarOptions Table
@@ -59,7 +59,7 @@ CREATE TABLE Serwis (
 -- Create Salesperson Table
 CREATE TABLE Sprzedawca (
     PracownikID NUMBER PRIMARY KEY REFERENCES Pracownik(PracownikID),
-    IloscTransakcji NUMBER
+    IloscTransakcji NUMBER CHECK (IloscTransakcji >= 0)
 );
 
 -- Create Mechanic Table
@@ -99,8 +99,8 @@ CREATE TABLE Transakcja (
 CREATE TABLE Rabat (
     TransakcjaID NUMBER REFERENCES Transakcja(TransakcjaID),
     KlientID NUMBER REFERENCES Klient(KlientID),
-    Kwota NUMBER,
-    Procent NUMBER,
+    Kwota NUMBER(10, 2) CHECK (Kwota >= 0),
+    Procent NUMBER(3) CHECK (Procent >= 0),
     Rodzaj VARCHAR2(10),
     PRIMARY KEY (TransakcjaID, KlientID)
 );
@@ -109,6 +109,6 @@ CREATE TABLE Rabat (
 CREATE TABLE Platnosc (
     PlatnoscID NUMBER PRIMARY KEY,
     TransakcjaID NUMBER REFERENCES Transakcja(TransakcjaID),
-    Wartosc NUMBER,
+    Wartosc NUMBER(11, 2) CHECK (Wartosc >= 0) NOT NULL,
     Data DATE
 );
