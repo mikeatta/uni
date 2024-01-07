@@ -4,10 +4,10 @@ INSERT INTO Producent (ProducentID, Nazwa, Kraj) VALUES (17, 'Chevrolet', 'USA')
 INSERT INTO Producent (ProducentID, Nazwa, Kraj) VALUES (18, 'Volkswagen', 'Niemcy');
 
 -- Insert into Car
-INSERT INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena) VALUES (16, 16, 'Toyota', 'Camry', 2021, 'XYZ789', 75000);
-INSERT INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena) VALUES (17, 16, 'Toyota', 'Prius', 2023, 'PRS383', 114000);
-INSERT INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena) VALUES (18, 17, 'Chevrolet', 'Malibu', 2018, 'LMN456', 68000);
-INSERT INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena) VALUES (19, 18, 'Volkswagen', 'Passat', 2016, 'OPQ123', 72000);
+INSERT INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena) VALUES (16, 16, 'Toyota', 'Camry', 2021, 'XYZ789', 75000.00);
+INSERT INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena) VALUES (17, 16, 'Toyota', 'Prius', 2023, 'PRS383', 114000.00);
+INSERT INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena) VALUES (18, 17, 'Chevrolet', 'Malibu', 2018, 'LMN456', 68000.00);
+INSERT INTO Samochod (SamochodID, ProducentID, Marka, Model, Rocznik, VIN, Cena) VALUES (19, 18, 'Volkswagen', 'Passat', 2016, 'OPQ123', 72000.00);
 
 -- Insert into CarOptions
     -- Insert options for Car with SamochodID = 16
@@ -68,7 +68,7 @@ INSERT INTO Transakcja (TransakcjaID, SamochodID, KlientID, PracownikID, Typ, Da
 INSERT INTO Rabat (TransakcjaID, KlientID, Kwota, Procent, Rodzaj) VALUES (18, 16, NULL, 100, 'Procent');
 
 -- Insert into Payment
-INSERT INTO Platnosc (PlatnoscID, TransakcjaID, Wartosc, Data) VALUES (16, 16, 114000, date'2024-07-23');
-INSERT INTO Platnosc (PlatnoscID, TransakcjaID, Wartosc, Data) VALUES (17, 17, 72000, date'2024-07-28');
-INSERT INTO Platnosc (PlatnoscID, TransakcjaID, Wartosc, Data) VALUES (18, 18, 1000, date'2024-07-30');
-INSERT INTO Platnosc (PlatnoscID, TransakcjaID, Wartosc, Data) VALUES (19, 19, 800, date'2024-08-03');
+INSERT INTO Platnosc (PlatnoscID, TransakcjaID, Wartosc, Data) VALUES (16, 16, 114000.00, date'2024-07-23');
+INSERT INTO Platnosc (PlatnoscID, TransakcjaID, Wartosc, Data) VALUES (17, 17, 72000.00, date'2024-07-28');
+INSERT INTO Platnosc (PlatnoscID, TransakcjaID, Wartosc, Data) VALUES (18, 18, 1000.00, date'2024-07-30');
+INSERT INTO Platnosc (PlatnoscID, TransakcjaID, Wartosc, Data) VALUES (19, 19, 800.00, date'2024-08-03');
