@@ -1,13 +1,13 @@
 -- Create Manufacturer Table
 CREATE TABLE Producent (
-    ProducentID NUMBER PRIMARY KEY,
+    ProducentID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     Nazwa VARCHAR2(255) NOT NULL,
     Kraj VARCHAR2(50)
 );
 
 -- Create Car Table
 CREATE TABLE Samochod (
-    SamochodID NUMBER PRIMARY KEY,
+    SamochodID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     ProducentID NUMBER REFERENCES Producent(ProducentID),
     Marka VARCHAR2(255) NOT NULL,
     Model VARCHAR2(255) NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE Samochod (
 
 -- Create Options Table
 CREATE TABLE Opcje (
-    OpcjaID NUMBER PRIMARY KEY,
+    OpcjaID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     Nazwa VARCHAR2(255) NOT NULL,
     Cena NUMBER(7,2) CHECK (Cena >= 0) NOT NULL
 );
@@ -34,7 +34,7 @@ CREATE TABLE SamochodOpcje (
 
 -- Create ServiceRequest Table
 CREATE TABLE SerwisZgloszenie (
-    ZgloszenieID NUMBER PRIMARY KEY,
+    ZgloszenieID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     SamochodID NUMBER REFERENCES Samochod(SamochodID),
     Opis VARCHAR2(500),
     Status VARCHAR2(50)
@@ -42,7 +42,7 @@ CREATE TABLE SerwisZgloszenie (
 
 -- Create Employee Table
 CREATE TABLE Pracownik (
-    PracownikID NUMBER PRIMARY KEY,
+    PracownikID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     Imie VARCHAR2(50) NOT NULL,
     Nazwisko VARCHAR2(50) NOT NULL,
     Stanowisko VARCHAR2(50)
@@ -50,7 +50,7 @@ CREATE TABLE Pracownik (
 
 -- Create Service Table
 CREATE TABLE Serwis (
-    SerwisID NUMBER PRIMARY KEY,
+    SerwisID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     ZgloszenieID NUMBER REFERENCES SerwisZgloszenie(ZgloszenieID),
     PracownikID NUMBER REFERENCES Pracownik(PracownikID),
     Data DATE
@@ -70,14 +70,14 @@ CREATE TABLE Serwisant (
 
 -- Create Tasks Table
 CREATE TABLE Zadania (
-    ZadanieID NUMBER PRIMARY KEY,
+    ZadanieID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     PracownikID NUMBER REFERENCES Pracownik(PracownikID),
     Opis VARCHAR2(255)
 );
 
 -- Create Customer Table
 CREATE TABLE Klient (
-    KlientID NUMBER PRIMARY KEY,
+    KlientID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     Imie VARCHAR2(50) NOT NULL,
     Nazwisko VARCHAR2(50) NOT NULL,
     Email VARCHAR2(255) NOT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE Klient (
 
 -- Create Transaction Table
 CREATE TABLE Transakcja (
-    TransakcjaID NUMBER PRIMARY KEY,
+    TransakcjaID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     SamochodID NUMBER REFERENCES Samochod(SamochodID),
     KlientID NUMBER REFERENCES Klient(KlientID),
     PracownikID NUMBER REFERENCES Pracownik(PracownikID),
@@ -107,7 +107,7 @@ CREATE TABLE Rabat (
 
 -- Create Payment Table
 CREATE TABLE Platnosc (
-    PlatnoscID NUMBER PRIMARY KEY,
+    PlatnoscID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     TransakcjaID NUMBER REFERENCES Transakcja(TransakcjaID),
     Wartosc NUMBER(11, 2) CHECK (Wartosc >= 0) NOT NULL,
     Data DATE
