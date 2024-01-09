@@ -163,7 +163,7 @@ HAVING COUNT(SO.OpcjaID) > ANY (
 )
 ORDER BY IloscOpcji ASC;
 
--- List all the cars with a production year greater than 2015 (ALL)
+-- List all the cars with a price lower than the Mazda CX-5 (ALL)
 SELECT SamochodID, Marka, Model, Cena
 FROM Samochod
 WHERE Cena < ALL (
