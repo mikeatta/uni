@@ -93,9 +93,43 @@ async function deleteProduct() {
   }
 }
 
+async function modifyProduct() {
+  for (const selectedItem of selectedItems.value) {
+    try {
+      const modifyResponse = await fetch(`/api/v1/products/${selectedItem.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newProduct.value)
+      });
+
+      if (modifyResponse.ok) {
+        // Attempt to parse the JSON response
+        try {
+          // Set new values to selected items
+          const updatedProduct = await modifyResponse.json();
+          const index = products.value.findIndex(product => product.id === updatedProduct.id);
+          if (index !== -1) {
+            products.value.splice(index, 1, updatedProduct);
+          }
+        } catch (jsonError) {
+          console.log('Error parsing JSON response:', jsonError);
+        }
+      } else {
+        console.log(`Error modifying item with ID ${selectedItem.id}`);
+      }
+    } catch (error) {
+      console.log('Error modifying items:', error);
+    }
+  }
+}
+
 async function performOperation() {
   if (selectedOperation.value === 'delete') {
     await deleteProduct();
+  } else if (selectedOperation.value === 'modify') {
+    await modifyProduct();
   }
 
   // Reset operation selection
@@ -108,8 +142,9 @@ async function performOperation() {
     <h1>List of products:</h1>
 
     <!-- Dropdown menu for selecting operations -->
-    <select v-model="selectedOperation">
-      <option value="delete">Delete</option>
+    <select v-model='selectedOperation'>
+      <option value='delete'>Delete</option>
+      <option value='modify'>Modify</option>
     </select>
 
     <!-- Button to trigger the selected operation -->
