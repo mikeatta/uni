@@ -76,7 +76,6 @@ async function addProduct() {
 async function deleteProduct() {
   for (const selectedItem of selectedItems.value) {
     try {
-      // const deleteURL = `/api/v1/products/${selectedItem.id}`;
       const deleteResponse = await fetch(`/api/v1/products/${selectedItem.id}`, {
         method: 'DELETE'
       });
@@ -148,15 +147,15 @@ async function performOperation() {
     </select>
 
     <!-- Button to trigger the selected operation -->
-    <button @click="performOperation">Submit</button>
+    <button @click='performOperation'>Submit</button>
 
     <!-- Form for adding new products -->
     <form @submit.prevent='addProduct'>
-      <label>Name: <input v-model='newProduct.name' required /></label><br>
-      <label>Size: <input v-model='newProduct.size' required /></label><br>
-      <label>SKU: <input v-model='newProduct.sku' required /></label><br>
-      <label>Purchase price: <input v-model.number='newProduct.purchasePrice' required /></label><br>
-      <label>Market price: <input v-model.number='newProduct.marketPrice' required /></label><br>
+      <label>Name: <input v-model='newProduct.name' required/></label><br>
+      <label>Size: <input v-model='newProduct.size' required/></label><br>
+      <label>SKU: <input v-model='newProduct.sku' required/></label><br>
+      <label>Purchase price: <input v-model.number='newProduct.purchasePrice' required/></label><br>
+      <label>Market price: <input v-model.number='newProduct.marketPrice' required/></label><br>
       <button type='submit'>Add Product</button>
     </form>
 
@@ -166,7 +165,7 @@ async function performOperation() {
         <th>
           <!-- Checkbox for selecting individual items -->
           <label>
-            <input type="checkbox" v-model="selectAll" @change="toggleSelectAll">
+            <input type='checkbox' v-model='selectAll' @change='toggleSelectAll'>
             Select all
           </label>
         </th>
@@ -181,7 +180,7 @@ async function performOperation() {
       <tr v-for='product in products' :key='product.id'>
         <td>
           <!-- Checkbox for each item -->
-          <input type="checkbox" v-model="selectedItems" :value="product" />
+          <input type='checkbox' v-model='selectedItems' :value='product'/>
         </td>
         <td>{{ product.name }}</td>
         <td>{{ product.size }}</td>
