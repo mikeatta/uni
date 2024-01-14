@@ -54,8 +54,7 @@ async function addProduct() {
 
     if (addResponse.ok) {
       // Update the product list
-      const addedProduct = await addResponse.json();
-      products.value = [...products.value, addedProduct];
+      products.value = [...products.value, newProduct.value];
 
       // Clear the form
       newProduct.value = {
@@ -104,16 +103,10 @@ async function modifyProduct() {
       });
 
       if (modifyResponse.ok) {
-        // Attempt to parse the JSON response
-        try {
-          // Set new values to selected items
-          const updatedProduct = await modifyResponse.json();
-          const index = products.value.findIndex(product => product.id === updatedProduct.id);
-          if (index !== -1) {
-            products.value.splice(index, 1, updatedProduct);
-          }
-        } catch (jsonError) {
-          console.log('Error parsing JSON response:', jsonError);
+        // Set new values to selected items
+        const index = products.value.findIndex(product => product.id === selectedItem.id);
+        if (index !== -1) {
+          products.value[index] = newProduct.value;
         }
       } else {
         console.log(`Error modifying item with ID ${selectedItem.id}`);
