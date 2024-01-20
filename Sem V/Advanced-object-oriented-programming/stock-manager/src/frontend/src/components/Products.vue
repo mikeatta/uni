@@ -139,64 +139,102 @@ async function modifyProduct() {
 </script>
 
 <template>
-  <div>
-    <h1>List of products:</h1>
+  <section class='productsView'>
+    <div class='productList'>
+      <h1>List of products:</h1>
+      <div class='optionsMenu' v-if='showOperationsMenu'>
+        <!-- Dropdown menu for selecting operations -->
+        <select v-model='selectedOperation'>
+          <option value='delete'>Delete</option>
+          <option value='modify'>Modify</option>
+        </select>
 
-    <!-- Form for adding new products -->
-    <form @submit.prevent='addProduct'>
-      <label>Name: <input v-model='newProduct.name' required/></label><br>
-      <label>Size: <input v-model='newProduct.size' required/></label><br>
-      <label>SKU: <input v-model='newProduct.sku' required/></label><br>
-      <label>Purchase price: <input v-model.number='newProduct.purchasePrice' required/></label><br>
-      <label>Market price: <input v-model.number='newProduct.marketPrice' required/></label><br>
-      <button type='submit'>Add Product</button>
-    </form>
+        <!-- Button to trigger the selected operation -->
+        <button @click='performOperation'>Submit</button>
+      </div>
 
-    <div class='optionsMenu' v-if='showOperationsMenu'>
-      <!-- Dropdown menu for selecting operations -->
-      <select v-model='selectedOperation'>
-        <option value='delete'>Delete</option>
-        <option value='modify'>Modify</option>
-      </select>
-
-      <!-- Button to trigger the selected operation -->
-      <button @click='performOperation'>Submit</button>
+      <table>
+        <thead>
+        <tr>
+          <th>
+            <label>
+              <!-- Checkbox for selecting the whole item list -->
+              <input type='checkbox' v-model='selectAll' @change='toggleSelectAll'>
+              Select all
+            </label>
+          </th>
+          <th>Name</th>
+          <th>Size</th>
+          <th>SKU</th>
+          <th>Purchase price</th>
+          <th>Market price</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for='product in products' :key='product.id'>
+          <td>
+            <!-- Checkbox for each item -->
+            <input type='checkbox' v-model='selectedItems' :value='product'/>
+          </td>
+          <td>{{ product.name }}</td>
+          <td>{{ product.size }}</td>
+          <td>{{ product.sku }}</td>
+          <td>{{ product.purchasePrice.toFixed(2) }}</td>
+          <td>{{ product.marketPrice.toFixed(2) }}</td>
+        </tr>
+        </tbody>
+      </table>
     </div>
 
-    <table>
-      <thead>
-      <tr>
-        <th>
-          <label>
-            <!-- Checkbox for selecting the whole item list -->
-            <input type='checkbox' v-model='selectAll' @change='toggleSelectAll'>
-            Select all
-          </label>
-        </th>
-        <th>Name</th>
-        <th>Size</th>
-        <th>SKU</th>
-        <th>Purchase price</th>
-        <th>Market price</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr v-for='product in products' :key='product.id'>
-        <td>
-          <!-- Checkbox for each item -->
-          <input type='checkbox' v-model='selectedItems' :value='product'/>
-        </td>
-        <td>{{ product.name }}</td>
-        <td>{{ product.size }}</td>
-        <td>{{ product.sku }}</td>
-        <td>{{ product.purchasePrice.toFixed(2) }}</td>
-        <td>{{ product.marketPrice.toFixed(2) }}</td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
+    <div class='controls'>
+      <div class='controlButtons'>
+        <button id='add-item-btn'>Add</button>
+        <button id='update-item-btn'>Update</button>
+        <button id='delete-item-btn'>Remove</button>
+      </div>
+
+      <div class='controlForm'>
+        <!-- Form for adding new products and editing existing entries -->
+        <form @submit.prevent='addProduct'>
+          <label>Name: <input v-model='newProduct.name' required/></label><br>
+          <label>Size: <input v-model='newProduct.size' required/></label><br>
+          <label>SKU: <input v-model='newProduct.sku' required/></label><br>
+          <label>Purchase price: <input v-model.number='newProduct.purchasePrice' required/></label><br>
+          <label>Market price: <input v-model.number='newProduct.marketPrice' required/></label><br>
+          <button id='ctrl-form-btn' type='submit'>Submit</button>
+        </form>
+      </div>
+    </div>
+  </section>
 </template>
 
 <style scoped>
+.productsView {
+  display: flex;
+  flex-direction: row;
+  gap: 5vw;
+}
 
+.productList {
+  flex: 3;
+}
+
+.controls {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.controlButtons {
+  justify-content: space-between;
+}
+
+.controlForm input {
+  width: 100%;
+}
+.controlButtons,
+.controlForm {
+  display: flex;
+  flex: 1;
+}
 </style>
