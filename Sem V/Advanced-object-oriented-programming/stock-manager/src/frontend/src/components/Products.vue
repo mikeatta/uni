@@ -1,10 +1,11 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watchEffect } from 'vue';
 
 const products = ref([]);
 const selectedItems = ref([]);
 const selectAll = ref(false);
 const selectedOperation = ref('');
+let showOperationsMenu = ref(false);
 const newProduct = ref({
   name: '',
   size: '',
@@ -30,6 +31,11 @@ onMounted(async () => {
   }
 });
 
+watchEffect(() => {
+  showOperationsMenu.value = selectedItems.value.length > 0;
+  selectAll.value = selectedItems.value.length === products.value.length;
+});
+
 function toggleSelectAll() {
   if (selectAll.value) {
     selectedItems.value = [...products.value];
@@ -40,6 +46,17 @@ function toggleSelectAll() {
 
 function resetDropdownSelection() {
   selectedItems.value = [];
+}
+
+async function performOperation() {
+  if (selectedOperation.value === 'delete') {
+    await deleteProduct();
+  } else if (selectedOperation.value === 'modify') {
+    await modifyProduct();
+  }
+
+  // Reset operation selection
+  resetDropdownSelection();
 }
 
 async function addProduct() {
@@ -116,31 +133,11 @@ async function modifyProduct() {
     }
   }
 }
-
-async function performOperation() {
-  if (selectedOperation.value === 'delete') {
-    await deleteProduct();
-  } else if (selectedOperation.value === 'modify') {
-    await modifyProduct();
-  }
-
-  // Reset operation selection
-  resetDropdownSelection();
-}
 </script>
 
 <template>
   <div>
     <h1>List of products:</h1>
-
-    <!-- Dropdown menu for selecting operations -->
-    <select v-model='selectedOperation'>
-      <option value='delete'>Delete</option>
-      <option value='modify'>Modify</option>
-    </select>
-
-    <!-- Button to trigger the selected operation -->
-    <button @click='performOperation'>Submit</button>
 
     <!-- Form for adding new products -->
     <form @submit.prevent='addProduct'>
@@ -152,12 +149,23 @@ async function performOperation() {
       <button type='submit'>Add Product</button>
     </form>
 
+    <div class='optionsMenu' v-if='showOperationsMenu'>
+      <!-- Dropdown menu for selecting operations -->
+      <select v-model='selectedOperation'>
+        <option value='delete'>Delete</option>
+        <option value='modify'>Modify</option>
+      </select>
+
+      <!-- Button to trigger the selected operation -->
+      <button @click='performOperation'>Submit</button>
+    </div>
+
     <table>
       <thead>
       <tr>
         <th>
-          <!-- Checkbox for selecting individual items -->
           <label>
+            <!-- Checkbox for selecting individual items -->
             <input type='checkbox' v-model='selectAll' @change='toggleSelectAll'>
             Select all
           </label>
