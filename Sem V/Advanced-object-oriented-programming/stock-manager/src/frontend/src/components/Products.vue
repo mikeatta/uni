@@ -48,6 +48,16 @@ function resetDropdownSelection() {
   selectedItems.value = [];
 }
 
+function clearProductForm() {
+  newProduct.value = {
+    name: '',
+    size: '',
+    sku: '',
+    purchasePrice: 0.00,
+    marketPrice: 0.00,
+  };
+}
+
 async function performOperation() {
   if (selectedOperation.value === 'delete') {
     await deleteProduct();
@@ -72,15 +82,7 @@ async function addProduct() {
     if (addResponse.ok) {
       // Update the product list
       products.value = [...products.value, newProduct.value];
-
-      // Clear the form
-      newProduct.value = {
-        name: '',
-        size: '',
-        sku: '',
-        purchasePrice: 0.00,
-        marketPrice: 0.00,
-      };
+      clearProductForm();
     } else {
       console.error('Error adding product:', addResponse.status, addResponse.statusText);
     }
@@ -132,6 +134,7 @@ async function modifyProduct() {
       console.log('Error modifying items:', error);
     }
   }
+  clearProductForm();
 }
 </script>
 
