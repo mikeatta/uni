@@ -168,7 +168,7 @@ async function modifyProduct() {
       <tr>
         <th>
           <label>
-            <!-- Checkbox for selecting individual items -->
+            <!-- Checkbox for selecting the whole item list -->
             <input type='checkbox' v-model='selectAll' @change='toggleSelectAll'>
             Select all
           </label>
