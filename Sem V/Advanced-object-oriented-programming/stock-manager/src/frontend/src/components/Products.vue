@@ -5,7 +5,8 @@ const products = ref([]);
 const selectedItems = ref([]);
 const selectAll = ref(false);
 const selectedOperation = ref('');
-let showOperationsMenu = ref(false);
+let showControlForm = ref(false);
+let showConfirmationDialog = ref(false);
 const newProduct = ref({
   name: '',
   size: '',
@@ -32,9 +33,36 @@ onMounted(async () => {
 });
 
 watchEffect(() => {
-  showOperationsMenu.value = selectedItems.value.length > 0;
   selectAll.value = selectedItems.value.length === products.value.length;
 });
+
+function toggleControlMenu(operation) {
+  // Set the selected operation
+  selectedOperation.value = operation;
+
+  // Display delete pop-up warning
+  if (operation === 'delete') {
+    showConfirmationDialog.value = true;
+  } else {
+    showControlForm.value = !showControlForm.value;
+  }
+}
+
+function cancelDeleteOperation() {
+  showConfirmationDialog.value = false;
+  resetOperationHideMenu();
+}
+
+function getButtonText() {
+  switch (selectedOperation.value) {
+    case 'add':
+      return 'Add item';
+    case 'update':
+      return 'Modify item(s)';
+    default:
+      return 'Submit';
+  }
+}
 
 function toggleSelectAll() {
   if (selectAll.value) {
@@ -44,8 +72,13 @@ function toggleSelectAll() {
   }
 }
 
-function resetDropdownSelection() {
-  selectedItems.value = [];
+function resetOperationHideMenu() {
+  if (selectedOperation.value === 'delete') {
+    showConfirmationDialog.value = false;
+  } else {
+    showControlForm.value = false;
+  }
+  selectedOperation.value = '';
 }
 
 function clearProductForm() {
@@ -59,14 +92,18 @@ function clearProductForm() {
 }
 
 async function performOperation() {
-  if (selectedOperation.value === 'delete') {
-    await deleteProduct();
-  } else if (selectedOperation.value === 'modify') {
-    await modifyProduct();
+  switch (selectedOperation.value) {
+    case 'add':
+      await addProduct();
+      break;
+    case 'update':
+      await modifyProduct();
+      break;
+    case 'delete':
+      await deleteProduct();
+      break;
   }
-
-  // Reset operation selection
-  resetDropdownSelection();
+  resetOperationHideMenu();
 }
 
 async function addProduct() {
@@ -142,17 +179,6 @@ async function modifyProduct() {
   <section class='productsView'>
     <div class='productList'>
       <h1>List of products:</h1>
-      <div class='optionsMenu' v-if='showOperationsMenu'>
-        <!-- Dropdown menu for selecting operations -->
-        <select v-model='selectedOperation'>
-          <option value='delete'>Delete</option>
-          <option value='modify'>Modify</option>
-        </select>
-
-        <!-- Button to trigger the selected operation -->
-        <button @click='performOperation'>Submit</button>
-      </div>
-
       <table>
         <thead>
         <tr>
@@ -188,21 +214,26 @@ async function modifyProduct() {
 
     <div class='controls'>
       <div class='controlButtons'>
-        <button id='add-item-btn'>Add</button>
-        <button id='update-item-btn'>Update</button>
-        <button id='delete-item-btn'>Remove</button>
+        <button id='add-item-btn' @click="() => toggleControlMenu('add')">Add</button>
+        <button id='update-item-btn' @click="() => toggleControlMenu('update')">Update</button>
+        <button id='delete-item-btn' @click="() => toggleControlMenu('delete')">Delete</button>
       </div>
 
-      <div class='controlForm'>
+      <div class='controlForm' v-if='showControlForm'>
         <!-- Form for adding new products and editing existing entries -->
-        <form @submit.prevent='addProduct'>
+        <form @submit.prevent='performOperation'>
           <label>Name: <input v-model='newProduct.name' required/></label><br>
           <label>Size: <input v-model='newProduct.size' required/></label><br>
           <label>SKU: <input v-model='newProduct.sku' required/></label><br>
           <label>Purchase price: <input v-model.number='newProduct.purchasePrice' required/></label><br>
           <label>Market price: <input v-model.number='newProduct.marketPrice' required/></label><br>
-          <button id='ctrl-form-btn' type='submit'>Submit</button>
+          <button id='ctrl-form-btn' type='submit'>{{ getButtonText() }}</button>
         </form>
+      </div>
+      <div class='confirmationDialog' v-if='showConfirmationDialog'>
+        <p>Are you sure you want to delete {{ selectedItems.length }} items?</p>
+        <button @click='performOperation'>Confirm</button>
+        <button @click='cancelDeleteOperation'>Cancel</button>
       </div>
     </div>
   </section>
@@ -226,15 +257,17 @@ async function modifyProduct() {
 }
 
 .controlButtons {
+  display: flex;
+  flex: 0;
   justify-content: space-between;
+}
+
+.controlForm {
+  display: flex;
+  flex: 1;
 }
 
 .controlForm input {
   width: 100%;
-}
-.controlButtons,
-.controlForm {
-  display: flex;
-  flex: 1;
 }
 </style>
