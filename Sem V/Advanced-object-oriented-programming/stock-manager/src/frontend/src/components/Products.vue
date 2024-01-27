@@ -243,7 +243,7 @@ async function modifyProduct() {
 .productsView {
   display: flex;
   flex-direction: row;
-  gap: 5vw;
+  gap: 5%;
 }
 
 .productList {
