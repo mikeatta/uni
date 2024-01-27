@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watchEffect } from 'vue';
+import { ref, onMounted, watchEffect, computed } from 'vue';
 
 const products = ref([]);
 const selectedItems = ref([]);
@@ -14,6 +14,9 @@ const newProduct = ref({
   purchasePrice: 0.00,
   marketPrice: 0.00,
 });
+
+const searchQuery = ref('');
+const debounceDelay = 300;
 
 onMounted(async () => {
   try {
@@ -35,6 +38,26 @@ onMounted(async () => {
 watchEffect(() => {
   selectAll.value = selectedItems.value.length === products.value.length;
 });
+
+const debounce = (func, delay) => {
+  let timeoutId;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+};
+
+const delayedSearchUpdateQuery = debounce((value) => {
+  searchQuery.value = value;
+}, debounceDelay);
+
+const filteredProducts = computed(() => {
+  return products.value.filter(product =>
+      product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+})
 
 function toggleControlMenu(operation) {
   // Set the selected operation
@@ -179,6 +202,14 @@ async function modifyProduct() {
   <section class='productsView'>
     <div class='productList'>
       <h1>List of products:</h1>
+
+      <!-- Product search box -->
+      <div class='searchBox'>
+        <label for='search'>Search:</label>
+        <input type='text' id='search' v-model='searchQuery'
+               @input='($event) => delayedSearchUpdateQuery($event.target.value)' />
+      </div>
+
       <table>
         <thead>
         <tr>
@@ -197,7 +228,7 @@ async function modifyProduct() {
         </tr>
         </thead>
         <tbody>
-        <tr v-for='product in products' :key='product.id'>
+        <tr v-for='product in filteredProducts' :key='product.id'>
           <td>
             <!-- Checkbox for each item -->
             <input type='checkbox' v-model='selectedItems' :value='product'/>
