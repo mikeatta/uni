@@ -17,6 +17,7 @@ const newProduct = ref({
 
 const searchQuery = ref('');
 const debounceDelay = 300;
+const sortDirection = ref('off');
 
 onMounted(async () => {
   try {
@@ -58,6 +59,30 @@ const filteredProducts = computed(() => {
       product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 })
+
+const toggleSortDirection = () => {
+  const sortStates = ['off', 'asc', 'desc'];
+  const currentState = sortStates.indexOf(sortDirection.value);
+  const nextState = (currentState + 1) % sortStates.length;
+  sortDirection.value = sortStates[nextState];
+}
+
+const sortedProducts = computed(() => {
+  let sortedProducts = [...filteredProducts.value];
+
+  if (sortDirection.value !== 'off') {
+    sortedProducts = sortedProducts.sort((a, b) => {
+      const fa = a.name.toLowerCase();
+      const fb = b.name.toLowerCase();
+
+      return sortDirection.value === 'asc' ? fa.localeCompare(fb) : fb.localeCompare(fa);
+    });
+  } else {
+    sortedProducts = [...filteredProducts.value];
+  }
+
+  return sortedProducts;
+});
 
 function toggleControlMenu(operation) {
   // Set the selected operation
@@ -207,7 +232,7 @@ async function modifyProduct() {
       <div class='searchBox'>
         <label for='search'>Search:</label>
         <input type='text' id='search' v-model='searchQuery'
-               @input='($event) => delayedSearchUpdateQuery($event.target.value)' />
+               @input='($event) => delayedSearchUpdateQuery($event.target.value)'/>
       </div>
 
       <table>
@@ -220,7 +245,11 @@ async function modifyProduct() {
               Select all
             </label>
           </th>
-          <th>Name</th>
+          <th>
+            <span @click='toggleSortDirection'>Name</span>
+            <span v-if='sortDirection.value === "asc"'>▲</span>
+            <span v-else-if='sortDirection.value === "desc"'>▼</span>
+          </th>
           <th>Size</th>
           <th>SKU</th>
           <th>Purchase price</th>
@@ -228,7 +257,7 @@ async function modifyProduct() {
         </tr>
         </thead>
         <tbody>
-        <tr v-for='product in filteredProducts' :key='product.id'>
+        <tr v-for='product in sortedProducts' :key='product.id'>
           <td>
             <!-- Checkbox for each item -->
             <input type='checkbox' v-model='selectedItems' :value='product'/>
