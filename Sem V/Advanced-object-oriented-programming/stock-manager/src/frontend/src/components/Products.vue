@@ -247,8 +247,8 @@ async function modifyProduct() {
           </th>
           <th>
             <span @click='toggleSortDirection'>Name</span>
-            <span v-if='sortDirection.value === "asc"'>▲</span>
-            <span v-else-if='sortDirection.value === "desc"'>▼</span>
+            <span v-if='sortDirection.valueOf() === "asc"'> ▲</span>
+            <span v-else-if='sortDirection.valueOf() === "desc"'> ▼</span>
           </th>
           <th>Size</th>
           <th>SKU</th>
