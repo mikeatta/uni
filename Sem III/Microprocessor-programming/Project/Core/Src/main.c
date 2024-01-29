@@ -38,9 +38,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define USART_TXBUF_LEN 2048
-#define USART_RXBUF_LEN 1578
-#define MAX_FRAME_LEN 526
+#define USART_TXBUF_LEN 16704
+#define USART_RXBUF_LEN 4176
+#define MAX_FRAME_LEN 1044 // 1 + 6 + 6 + 3 + 1024 + 3 + 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -70,77 +70,9 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t USART_kbhit()
-{
-	if (USART_Rx_Empty == USART_Rx_Busy)
-	{
-		return 0;
-	}
-	else
-	{
-		return 1;
-	}
-}
-
-int16_t USART_getchar()
-{
-	int16_t tmp;
-	if (USART_Rx_Empty != USART_Rx_Busy)
-	{
-		tmp = USART_RxBuf[USART_Rx_Busy];
-		USART_Rx_Busy++;
-
-		if (USART_Rx_Busy >= USART_RXBUF_LEN)
-		{
-			USART_Rx_Busy = 0;
-		}
-		return tmp;
-	}
-	else
-	{
-		return -1;
-	}
-}
-
-uint8_t USART_getline(char *buf)
-{
-	static uint8_t bf[1578];
-	static uint8_t idx = 0;
-
-	int i;
-	uint8_t ret;
-
-	while (USART_kbhit())
-	{
-		bf[idx] = USART_getchar();
-		/* Checking for newline characters */
-		if(((bf[idx] == 10) || (bf[idx] ==13)))
-		{
-			bf[idx] = 0;
-			for (i = 0; i <= idx; i++)
-			{
-				/* Copy chars to buffer */
-				buf[i] = bf[i];
-			}
-			ret = idx;
-			idx = 0;
-			return ret;
-		}
-		else
-		{
-			idx++;
-			if (idx >= 1578)
-			{
-				idx = 0;
-			}
-		}
-	}
-	return 0;
-}
-
 void USART_fsend(char* format, ...)
 {
-	char tmp_rs[1578];
+	char tmp_rs[MAX_FRAME_LEN];
 	int i;
 	__IO int idx;
 
@@ -194,17 +126,10 @@ void frame_send(uint8_t address[], uint8_t command[])
 	tmp[index++] = address[2];
 
 	/* Fill command length */
-	uint16_t cmd_len = sizeof(command) + 1;
+	uint16_t cmd_len = strlen(command) + 1;
 	tmp[index++] = cmd_len / 100 + '0'; cmd_len %= 100;
 	tmp[index++] = cmd_len / 10 + '0'; cmd_len %= 10;
 	tmp[index++] = cmd_len + '0';
-
-	/* Copy command to tmp array */
-	uint16_t index_cmd = 0;
-	while (command[index_cmd])
-	{
-		tmp[index++] = command[index_cmd++];
-	}
 
 	/* Calculating checksum */
 	uint16_t crc = 0;
@@ -219,7 +144,7 @@ void frame_send(uint8_t address[], uint8_t command[])
 	tmp[index++] = crc / 10 + '0'; crc %= 10;
 	tmp[index++] = crc + '0';
 
-	uint8_t result[526];
+	uint8_t result[MAX_FRAME_LEN + 3];
 	uint16_t length = 0;
 	result[length++] = '#';
 	for (uint16_t i = 0; i < index; i++)
@@ -275,7 +200,7 @@ void frame_send(uint8_t address[], uint8_t command[])
 
 uint8_t frame_get(uint8_t address[], uint8_t command[])
 {
-	static uint8_t tmp[526];
+	static uint8_t tmp[MAX_FRAME_LEN];
 	static uint16_t index = 0;
 	static uint8_t escape = 0;
 
@@ -306,20 +231,21 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 		/* Check for escape characters */
 		if (escape)
 		{
-			if (tmp[index] == '\\')
+			if (tmp[index] == '\\' && index <= MAX_FRAME_LEN)
 			{
 				tmp[index++] = '\\';
 			}
-			else if (tmp[index] == '@')
+			else if (tmp[index] == '@' && index <= MAX_FRAME_LEN)
 			{
 				tmp[index++] = '#';
 			}
-			else if (tmp[index++] == ':')
+			else if (tmp[index++] == ':' && index <= MAX_FRAME_LEN)
 			{
 				tmp[index++] = ';';
 			}
 			else
 			{
+				// Reset index in case of an incorrect character
 				index = 0;
 			}
 			/* Disable escape character sequence */
@@ -336,7 +262,7 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 			uint16_t length = index + 1;
 			index = 0;
 
-			/* If frame length is shorter than minimum allowed length */
+			/* If frame length is shorter than the minimum allowed length */
 			if (length < 14)
 			{
 				continue;
@@ -360,7 +286,7 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 				continue;
 			}
 
-			/* Read command length */
+			/* Read user-defined command length */
 			uint16_t param_command_length = ((tmp[7] - '0') * 100) + ((tmp[8] - '0') * 10) + (tmp[9] - '0');
 
 			/* Read command and validate length */
@@ -401,7 +327,7 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 
 			return 1;
 		}
-		else if (++index >= 526)
+		else if (++index >= MAX_FRAME_LEN)
 		{
 			index = 0;
 		}
@@ -443,7 +369,7 @@ int main(void)
   HAL_UART_Receive_IT(&huart3, &USART_RxBuf[USART_Rx_Empty], 1);
 
   uint8_t sender_address[4] = "";
-  uint8_t command[512], tmp[512];
+  uint8_t command[], tmp[];
   /* USER CODE END 2 */
 
   /* Infinite loop */
