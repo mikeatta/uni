@@ -38,9 +38,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define USART_TXBUF_LEN 16704
-#define USART_RXBUF_LEN 4176
-#define MAX_FRAME_LEN 1044 // 1 + 6 + 6 + 3 + 1024 + 3 + 1
+#define USART_TXBUF_LEN 16608
+#define USART_RXBUF_LEN 4152
+#define MAX_FRAME_LEN 1038 // 1 + 3 + 3 + 3 + 1024 + 3 + 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -92,6 +92,7 @@ void USART_fsend(char* format, ...)
 		}
 	}
 	__disable_irq();
+	// TODO: Learn the reason for the if statement check - find out what the statement checks
 	if ((USART_Tx_Empty == USART_Tx_Busy) && (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_TXE) == SET))
 	{
 		USART_Tx_Empty = idx;
@@ -112,7 +113,7 @@ void USART_fsend(char* format, ...)
 
 void frame_send(uint8_t address[], uint8_t command[])
 {
-	uint8_t tmp[526];
+	uint8_t tmp[MAX_FRAME_LEN];
 	uint16_t index = 0;
 
 	/* Fill device address */
@@ -126,7 +127,7 @@ void frame_send(uint8_t address[], uint8_t command[])
 	tmp[index++] = address[2];
 
 	/* Fill command length */
-	uint16_t cmd_len = strlen(command) + 1;
+	uint16_t cmd_len = strlen((const char *)command);
 	tmp[index++] = cmd_len / 100 + '0'; cmd_len %= 100;
 	tmp[index++] = cmd_len / 10 + '0'; cmd_len %= 10;
 	tmp[index++] = cmd_len + '0';
@@ -231,15 +232,15 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 		/* Check for escape characters */
 		if (escape)
 		{
-			if (tmp[index] == '\\' && index <= MAX_FRAME_LEN)
+			if (tmp[index] == '\\' && index < MAX_FRAME_LEN)
 			{
 				tmp[index++] = '\\';
 			}
-			else if (tmp[index] == '@' && index <= MAX_FRAME_LEN)
+			else if (tmp[index] == '@' && index < MAX_FRAME_LEN)
 			{
 				tmp[index++] = '#';
 			}
-			else if (tmp[index++] == ':' && index <= MAX_FRAME_LEN)
+			else if (tmp[index] == ':' && index < MAX_FRAME_LEN)
 			{
 				tmp[index++] = ';';
 			}
@@ -289,19 +290,20 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 			/* Read user-defined command length */
 			uint16_t param_command_length = ((tmp[7] - '0') * 100) + ((tmp[8] - '0') * 10) + (tmp[9] - '0');
 
-			/* Read command and validate length */
-			uint16_t command_length = 0;
-			for (uint16_t i = 10; i < length - 4; i++)
-			{
-				command[command_length++] = tmp[i];
-			}
-
-			command[command_length] = 0;
+			// TODO: Subtract min frame length from (size of) command
+			/* Subtract minimum frame length (14) from the received frame length */
+			uint16_t command_length = length - 14;
 
 			/* Compare declared command length against actual command length */
 			if (command_length != param_command_length)
 			{
 				continue;
+			}
+
+			/* Copy the command from the tmp array */
+			for (uint16_t i = 0; i < command_length; i++)
+			{
+				command[i] = tmp[i + 10];
 			}
 
 			/* Calculate command checksum */
@@ -369,7 +371,7 @@ int main(void)
   HAL_UART_Receive_IT(&huart3, &USART_RxBuf[USART_Rx_Empty], 1);
 
   uint8_t sender_address[4] = "";
-  uint8_t command[], tmp[];
+  uint8_t command[1024];
   /* USER CODE END 2 */
 
   /* Infinite loop */
