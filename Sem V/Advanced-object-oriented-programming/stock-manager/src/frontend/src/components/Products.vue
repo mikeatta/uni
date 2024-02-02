@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, watchEffect, computed } from 'vue';
 
+import Summary from '@/components/Summary.vue';
+
 const products = ref([]);
 const selectedItems = ref([]);
 const selectAll = ref(false);
@@ -224,6 +226,9 @@ async function modifyProduct() {
 </script>
 
 <template>
+  <!-- Product Summary component -->
+  <Summary :products='products' />
+
   <section class='productsView'>
     <div class='productList'>
       <h1>List of products:</h1>
