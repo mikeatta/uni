@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watchEffect, computed } from 'vue';
 
-import Summary from '@/components/Summary.vue';
+const emit = defineEmits(['updateProductList']);
 
 const products = ref([]);
 const selectedItems = ref([]);
@@ -33,10 +33,18 @@ onMounted(async () => {
       purchasePrice: product.purchasePrice || 0.00,
       marketPrice: product.marketPrice || 0.00,
     }));
+
+    updateProductList();
   } catch (error) {
     console.error('Error fetching products:', error);
   }
 });
+
+const updateProductList = () => {
+  if (products.value.length > 0) {
+    emit('updateProductList', products.value);
+  }
+}
 
 watchEffect(() => {
   selectAll.value = selectedItems.value.length === products.value.length;
@@ -153,6 +161,8 @@ async function performOperation() {
       await deleteProduct();
       break;
   }
+
+  updateProductList();
   resetOperationHideMenu();
 }
 
@@ -226,9 +236,6 @@ async function modifyProduct() {
 </script>
 
 <template>
-  <!-- Product Summary component -->
-  <Summary :products='products' />
-
   <section class='productsView'>
     <div class='productList'>
       <h1>List of products:</h1>
