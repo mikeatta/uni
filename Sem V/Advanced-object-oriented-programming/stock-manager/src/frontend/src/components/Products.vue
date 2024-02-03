@@ -46,10 +46,6 @@ const updateProductList = () => {
   }
 }
 
-watchEffect(() => {
-  selectAll.value = selectedItems.value.length === products.value.length;
-});
-
 const debounce = (func, delay) => {
   let timeoutId;
   return (...args) => {
@@ -242,8 +238,15 @@ async function modifyProduct() {
       console.log('Error modifying items:', error);
     }
   }
-  clearProductForm();
 }
+
+watchEffect(() => {
+  if (searchQuery.value) {
+    selectAll.value = selectedItems.value.length === filteredProducts.value.length;
+  } else {
+    selectAll.value = selectedItems.value.length === products.value.length;
+  }
+});
 </script>
 
 <template>
