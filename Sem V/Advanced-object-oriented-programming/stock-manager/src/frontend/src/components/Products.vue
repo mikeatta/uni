@@ -124,8 +124,14 @@ function getButtonText() {
 
 function toggleSelectAll() {
   if (selectAll.value) {
-    selectedItems.value = [...products.value];
+    selectedItems.value = [...filteredProducts.value];
   } else {
+    selectedItems.value = [];
+  }
+}
+
+function resetSelectedProducts() {
+  if (selectedItems.value) {
     selectedItems.value = [];
   }
 }
@@ -162,7 +168,9 @@ async function performOperation() {
       break;
   }
 
+  clearProductForm();
   updateProductList();
+  resetSelectedProducts();
   resetOperationHideMenu();
 }
 
@@ -177,9 +185,10 @@ async function addProduct() {
     });
 
     if (addResponse.ok) {
-      // Update the product list
-      products.value = [...products.value, newProduct.value];
-      clearProductForm();
+      const newProduct = await addResponse.json();
+
+      // Add the new product to the list
+      products.value = [...products.value, newProduct];
     } else {
       console.error('Error adding product:', addResponse.status, addResponse.statusText);
     }
@@ -219,10 +228,12 @@ async function modifyProduct() {
       });
 
       if (modifyResponse.ok) {
+        const newProduct = await modifyResponse.json();
+
         // Set new values to selected items
         const index = products.value.findIndex(product => product.id === selectedItem.id);
         if (index !== -1) {
-          products.value[index] = newProduct.value;
+          products.value[index] = newProduct;
         }
       } else {
         console.log(`Error modifying item with ID ${selectedItem.id}`);

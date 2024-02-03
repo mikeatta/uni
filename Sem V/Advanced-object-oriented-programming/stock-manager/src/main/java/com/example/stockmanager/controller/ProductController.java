@@ -24,12 +24,12 @@ public class ProductController {
     }
 
     @PostMapping
-    public void addProduct(@RequestBody Product product) {
-        productRepo.save(product);
+    public Product addProduct(@RequestBody Product product) {
+        return productRepo.save(product);
     }
 
     @PutMapping(value = "/{id}")
-    public void updateProduct(@PathVariable UUID id, @RequestBody Product product) {
+    public Optional<Product> updateProduct(@PathVariable UUID id, @RequestBody Product product) {
         Optional<Product> productSaved = productRepo.findById(id);
         productSaved.ifPresent(p -> {
             Product updatedProduct = productSaved.get();
@@ -40,6 +40,7 @@ public class ProductController {
             updatedProduct.setMarketPrice(product.getMarketPrice());
             productRepo.save(updatedProduct);
         });
+        return productSaved;
     }
 
     @DeleteMapping(value = "/{id}")
