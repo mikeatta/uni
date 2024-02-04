@@ -4,6 +4,7 @@ import { ref, onMounted, watchEffect, computed } from 'vue';
 const emit = defineEmits(['updateProductList']);
 
 const products = ref([]);
+const filteredProducts = ref([]);
 const selectedItems = ref([]);
 const selectAll = ref(false);
 const selectedOperation = ref('');
@@ -19,7 +20,6 @@ const newProduct = ref({
 });
 
 const searchQuery = ref('');
-const debounceDelay = 300;
 const sortDirection = ref('off');
 
 onMounted(async () => {
@@ -44,29 +44,28 @@ onMounted(async () => {
 
 const updateProductList = () => {
   if (products.value.length > 0) {
+    // Pass the loaded product list outside of Products.vue
     emit('updateProductList', products.value);
+    // Fill out filteredProducts to load the items on a refresh
+    filteredProducts.value = products.value;
   }
 }
 
-const debounce = (func, delay) => {
-  let timeoutId;
+function debounce(callback, delay = 300) {
+  let timeout;
   return (...args) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      func(...args);
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      callback(...args);
     }, delay);
-  };
-};
+  }
+}
 
-const delayedSearchUpdateQuery = debounce((value) => {
-  searchQuery.value = value;
-}, debounceDelay);
-
-const filteredProducts = computed(() => {
-  return products.value.filter(product =>
+const delaySearchQueryUpdate = debounce(() => {
+  filteredProducts.value = products.value.filter(product =>
       product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
-})
+});
 
 const toggleSortDirection = () => {
   const sortStates = ['off', 'asc', 'desc'];
@@ -260,7 +259,7 @@ watchEffect(() => {
       <div class='searchBox'>
         <label for='search'>Search:</label>
         <input type='text' id='search' v-model='searchQuery'
-               @input='($event) => delayedSearchUpdateQuery($event.target.value)'/>
+               @input='delaySearchQueryUpdate'/>
       </div>
 
       <table>
