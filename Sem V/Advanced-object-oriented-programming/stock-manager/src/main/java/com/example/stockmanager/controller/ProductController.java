@@ -25,6 +25,7 @@ public class ProductController {
 
     @PostMapping
     public Product addProduct(@RequestBody Product product) {
+        product.setAmountMade(product.getAmountMade());
         return productRepo.save(product);
     }
 
@@ -38,6 +39,7 @@ public class ProductController {
             updatedProduct.setSku(product.getSku());
             updatedProduct.setPurchasePrice(product.getPurchasePrice());
             updatedProduct.setMarketPrice(product.getMarketPrice());
+            updatedProduct.setAmountMade(product.getAmountMade());
             productRepo.save(updatedProduct);
         });
         return productSaved;

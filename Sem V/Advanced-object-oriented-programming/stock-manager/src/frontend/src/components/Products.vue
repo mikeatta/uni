@@ -15,6 +15,7 @@ const newProduct = ref({
   sku: '',
   purchasePrice: 0.00,
   marketPrice: 0.00,
+  amountMade: 0.00,
 });
 
 const searchQuery = ref('');
@@ -32,6 +33,7 @@ onMounted(async () => {
       sku: product.sku || '',
       purchasePrice: product.purchasePrice || 0.00,
       marketPrice: product.marketPrice || 0.00,
+      amountMade: product.amountMade || 0.00,
     }));
 
     updateProductList();
@@ -280,6 +282,7 @@ watchEffect(() => {
           <th>SKU</th>
           <th>Purchase price</th>
           <th>Market price</th>
+          <th>Amount made</th>
         </tr>
         </thead>
         <tbody>
@@ -293,6 +296,7 @@ watchEffect(() => {
           <td>{{ product.sku }}</td>
           <td>{{ product.purchasePrice.toFixed(2) }}</td>
           <td>{{ product.marketPrice.toFixed(2) }}</td>
+          <td>{{ product.amountMade.toFixed(2) }}</td>
         </tr>
         </tbody>
       </table>

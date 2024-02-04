@@ -29,6 +29,19 @@ public class Product {
     @Column
     private BigDecimal marketPrice;
 
+    @Column
+    private BigDecimal amountMade;
+
+    private BigDecimal calculateAmountMade() {
+        try {
+            return marketPrice.subtract(purchasePrice);
+        } catch (ArithmeticException e) {
+            e.printStackTrace();
+            // Set a fallback 0 value in case of an exception
+            return BigDecimal.ZERO;
+        }
+    }
+
     public String getName() {
         return name;
     }
@@ -67,5 +80,13 @@ public class Product {
 
     public void setMarketPrice(BigDecimal marketPrice) {
         this.marketPrice = marketPrice;
+    }
+
+    public BigDecimal getAmountMade() {
+        return calculateAmountMade();
+    }
+
+    public void setAmountMade(BigDecimal amountMade) {
+        this.amountMade = amountMade;
     }
 }
