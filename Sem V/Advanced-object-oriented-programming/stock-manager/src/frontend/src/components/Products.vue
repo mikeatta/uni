@@ -92,14 +92,33 @@ const sortedProducts = computed(() => {
   return sortedProducts;
 });
 
-function toggleControlMenu(operation) {
-  // Set the selected operation
-  selectedOperation.value = operation;
+function fillOutModifyForm() {
+  if (selectedItems.value.length > 0) {
+    const firstSelectedItem = selectedItems.value[0];
+    newProduct.value = {
+      name: firstSelectedItem.name,
+      size: firstSelectedItem.size,
+      sku: firstSelectedItem.sku,
+      purchasePrice: firstSelectedItem.purchasePrice,
+      marketPrice: firstSelectedItem.marketPrice,
+      // Automatically calculated property amountMade
+      // Assigned to avoid a type warning in the code
+      amountMade: firstSelectedItem.amountMade,
+    }
+  }
+}
 
-  // Display delete pop-up warning
-  if (operation === 'delete') {
+function toggleControlMenu(operation) {
+  const itemIsSelected = selectedItems.value.length > 0;
+
+  if (operation === 'update' && itemIsSelected) {
+    fillOutModifyForm();
+    showControlForm.value = !showControlForm.value;
+  } else if (operation === 'delete') {
+    // Display the delete pop-up warning
     showConfirmationDialog.value = true;
   } else {
+    clearProductForm();
     showControlForm.value = !showControlForm.value;
   }
 }
