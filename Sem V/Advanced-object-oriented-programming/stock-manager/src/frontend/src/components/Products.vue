@@ -165,6 +165,7 @@ function clearProductForm() {
     sku: '',
     purchasePrice: 0.00,
     marketPrice: 0.00,
+    amountMade: 0,
   };
 }
 
