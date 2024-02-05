@@ -7,6 +7,7 @@ const products = ref([]);
 const filteredProducts = ref([]);
 const selectedItems = ref([]);
 const selectAll = ref(false);
+let selectAllDisabled = ref(false);
 const selectedOperation = ref('');
 let showControlForm = ref(false);
 let showConfirmationDialog = ref(false);
@@ -133,6 +134,21 @@ function resetSelectedProducts() {
   }
 }
 
+function updateSelectAllState() {
+  const filteredProductsHasValue = filteredProducts.value.length > 0;
+  const productsHasValue = products.value.length > 0;
+
+  if (filteredProductsHasValue && searchQuery.value) {
+    selectAll.value = selectedItems.value.length === filteredProducts.value.length;
+    selectAllDisabled = false;
+  } else if (productsHasValue && !searchQuery.value) {
+    selectAll.value = selectedItems.value.length === products.value.length;
+    selectAllDisabled = false;
+  } else {
+    selectAllDisabled = true;
+  }
+}
+
 function resetOperationHideMenu() {
   if (selectedOperation.value === 'delete') {
     showConfirmationDialog.value = false;
@@ -242,11 +258,8 @@ async function modifyProduct() {
 }
 
 watchEffect(() => {
-  if (searchQuery.value) {
-    selectAll.value = selectedItems.value.length === filteredProducts.value.length;
-  } else {
-    selectAll.value = selectedItems.value.length === products.value.length;
-  }
+  // Enable / disable the 'Select all' checkbox
+  updateSelectAllState();
 });
 </script>
 
@@ -268,7 +281,8 @@ watchEffect(() => {
           <th>
             <label>
               <!-- Checkbox for selecting the whole item list -->
-              <input type='checkbox' v-model='selectAll' @change='toggleSelectAll'>
+              <input type='checkbox' v-model='selectAll' v-bind:disabled='selectAllDisabled'
+                     @change='toggleSelectAll'>
               Select all
             </label>
           </th>
