@@ -10,6 +10,7 @@ const selectAll = ref(false);
 let selectAllDisabled = ref(false);
 const selectedOperation = ref('');
 let showControlForm = ref(false);
+const disabledControlButtons = ref([]);
 let showConfirmationDialog = ref(false);
 const newProduct = ref({
   name: '',
@@ -92,6 +93,15 @@ const sortedProducts = computed(() => {
   return sortedProducts;
 });
 
+function setControlButtonAccess(operation) {
+  if (disabledControlButtons.value.length === 0) {
+    const buttons = ['add', 'update', 'delete'];
+    disabledControlButtons.value = buttons.filter(button => button !== operation);
+  } else {
+    disabledControlButtons.value = [];
+  }
+}
+
 function fillOutModifyForm() {
   if (selectedItems.value.length > 0) {
     const firstSelectedItem = selectedItems.value[0];
@@ -116,15 +126,19 @@ function toggleControlMenu(operation) {
     showControlForm.value = !showControlForm.value;
   } else if (operation === 'delete') {
     // Display the delete pop-up warning
-    showConfirmationDialog.value = true;
+    showConfirmationDialog.value = !showConfirmationDialog.value;
   } else {
     clearProductForm();
     showControlForm.value = !showControlForm.value;
   }
+
+  setControlButtonAccess(operation);
+  selectedOperation.value = operation;
 }
 
 function cancelDeleteOperation() {
   showConfirmationDialog.value = false;
+  setControlButtonAccess(selectedOperation.value);
   resetOperationHideMenu();
 }
 
@@ -205,6 +219,7 @@ async function performOperation() {
   updateProductList();
   resetSelectedProducts();
   resetOperationHideMenu();
+  setControlButtonAccess(selectedOperation.value);
 }
 
 async function addProduct() {
@@ -337,9 +352,15 @@ watchEffect(() => {
 
     <div class='controls'>
       <div class='controlButtons'>
-        <button id='add-item-btn' @click="() => toggleControlMenu('add')">Add</button>
-        <button id='update-item-btn' @click="() => toggleControlMenu('update')">Update</button>
-        <button id='delete-item-btn' @click="() => toggleControlMenu('delete')">Delete</button>
+        <button id='add-item-btn' v-bind:disabled='disabledControlButtons.includes("add")'
+                @click='() => toggleControlMenu("add")'>Add
+        </button>
+        <button id='update-item-btn' v-bind:disabled='disabledControlButtons.includes("update")'
+                @click='() => toggleControlMenu("update")'>Update
+        </button>
+        <button id='delete-item-btn' v-bind:disabled='disabledControlButtons.includes("delete")'
+                @click='() => toggleControlMenu("delete")'>Delete
+        </button>
       </div>
 
       <div class='controlForm' v-if='showControlForm'>
