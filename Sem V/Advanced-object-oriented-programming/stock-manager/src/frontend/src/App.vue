@@ -6,7 +6,6 @@ import Products from "@/components/Products.vue";
 const products = ref([]);
 
 const updateProducts = (updatedProducts) => {
-  console.log('Updating products with emit() ...');
   products.value = updatedProducts;
 };
 </script>
