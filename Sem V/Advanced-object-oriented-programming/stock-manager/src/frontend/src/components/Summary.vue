@@ -13,6 +13,10 @@ const { products } = defineProps(['products']);
         <h3>Total Value</h3>
         <p>$ {{ products.reduce((sum, product) => sum + product.marketPrice, 0).toFixed(2) }}</p>
       </div>
+      <div id='totalProductValue' class='summaryItem'>
+        <h3>Total profit</h3>
+        <p>$ {{ products.reduce((sum, product) => sum + product.amountMade, 0).toFixed(2) }}</p>
+      </div>
     </div>
   </section>
 </template>
