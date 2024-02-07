@@ -24,6 +24,9 @@ public class Product {
     private String sku;
 
     @Column
+    private String category;
+
+    @Column
     private BigDecimal purchasePrice;
 
     @Column
@@ -64,6 +67,14 @@ public class Product {
 
     public void setSku(String sku) {
         this.sku = sku;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public BigDecimal getPurchasePrice() {

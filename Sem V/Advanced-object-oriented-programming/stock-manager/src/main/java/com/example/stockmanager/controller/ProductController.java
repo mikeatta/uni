@@ -37,6 +37,7 @@ public class ProductController {
             updatedProduct.setName(product.getName());
             updatedProduct.setSize(product.getSize());
             updatedProduct.setSku(product.getSku());
+            updatedProduct.setCategory(product.getCategory());
             updatedProduct.setPurchasePrice(product.getPurchasePrice());
             updatedProduct.setMarketPrice(product.getMarketPrice());
             updatedProduct.setAmountMade(product.getAmountMade());

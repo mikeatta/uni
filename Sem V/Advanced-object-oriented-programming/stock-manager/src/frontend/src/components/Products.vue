@@ -16,6 +16,7 @@ const newProduct = ref({
   name: '',
   size: '',
   sku: '',
+  category: '',
   purchasePrice: 0.00,
   marketPrice: 0.00,
   amountMade: 0.00,
@@ -33,6 +34,7 @@ onMounted(async () => {
       name: product.name || '',
       size: product.size || '',
       sku: product.sku || '',
+      category: product.category || '',
       purchasePrice: product.purchasePrice || 0.00,
       marketPrice: product.marketPrice || 0.00,
       amountMade: product.amountMade || 0.00,
@@ -109,6 +111,7 @@ function fillOutModifyForm() {
       name: firstSelectedItem.name,
       size: firstSelectedItem.size,
       sku: firstSelectedItem.sku,
+      category: firstSelectedItem.category,
       purchasePrice: firstSelectedItem.purchasePrice,
       marketPrice: firstSelectedItem.marketPrice,
       // Automatically calculated property amountMade
@@ -196,6 +199,7 @@ function clearProductForm() {
     name: '',
     size: '',
     sku: '',
+    category: '',
     purchasePrice: 0.00,
     marketPrice: 0.00,
     amountMade: 0,
@@ -328,6 +332,7 @@ watchEffect(() => {
           </th>
           <th>Size</th>
           <th>SKU</th>
+          <th>Category</th>
           <th>Purchase price</th>
           <th>Market price</th>
           <th>Amount made</th>
@@ -342,6 +347,7 @@ watchEffect(() => {
           <td>{{ product.name }}</td>
           <td>{{ product.size }}</td>
           <td>{{ product.sku }}</td>
+          <td>{{ product.category }}</td>
           <td>{{ product.purchasePrice.toFixed(2) }}</td>
           <td>{{ product.marketPrice.toFixed(2) }}</td>
           <td>{{ product.amountMade.toFixed(2) }}</td>
@@ -369,6 +375,7 @@ watchEffect(() => {
           <label>Name: <input v-model='newProduct.name' required/></label><br>
           <label>Size: <input v-model='newProduct.size' required/></label><br>
           <label>SKU: <input v-model='newProduct.sku' required/></label><br>
+          <label>Category: <input v-model='newProduct.category' required/></label><br>
           <label>Purchase price: <input v-model.number='newProduct.purchasePrice' required/></label><br>
           <label>Market price: <input v-model.number='newProduct.marketPrice' required/></label><br>
           <button id='ctrl-form-btn' type='submit'>{{ getButtonText() }}</button>
