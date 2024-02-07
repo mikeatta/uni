@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import Charts from "@/components/Charts.vue";
 import Summary from "@/components/Summary.vue";
 import Products from "@/components/Products.vue";
 
@@ -12,6 +13,7 @@ const updateProducts = (updatedProducts) => {
 
 <template>
   <main>
+    <Charts :products='products' />
     <Summary :products='products' />
     <Products @updateProductList='updateProducts' />
   </main>
