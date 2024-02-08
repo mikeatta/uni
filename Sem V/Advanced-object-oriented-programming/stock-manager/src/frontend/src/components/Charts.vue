@@ -42,8 +42,16 @@ function generateCharts() {
     options: {
       responsive: false,
       plugins: {
+        title: {
+          display: true,
+          align: 'start',
+          text: 'Count by category',
+          padding: 5
+        },
         legend: {
-          display: true
+          display: true,
+          position: 'right',
+          align: 'end'
         }
       }
     }
@@ -64,8 +72,16 @@ function generateCharts() {
     options: {
       responsive: false,
       plugins: {
+        title: {
+          display: true,
+          align: 'start',
+          text: 'Value by category',
+          padding: 5
+        },
         legend: {
-          display: true
+          display: true,
+          position: 'right',
+          align: 'end'
         }
       }
     }
