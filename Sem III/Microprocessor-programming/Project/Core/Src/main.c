@@ -92,7 +92,6 @@ void USART_fsend(char* format, ...)
 		}
 	}
 	__disable_irq();
-	// TODO: Learn the reason for the if statement check - find out what the statement checks
 	if ((USART_Tx_Empty == USART_Tx_Busy) && (__HAL_UART_GET_FLAG(&huart3, UART_FLAG_TXE) == SET))
 	{
 		USART_Tx_Empty = idx;
@@ -127,15 +126,17 @@ void frame_send(uint8_t address[], uint8_t command[])
 	tmp[index++] = address[2];
 
 	/* Fill command length */
-	uint16_t cmd_len = strlen((const char *)command);
-	tmp[index++] = cmd_len / 100 + '0'; cmd_len %= 100;
-	tmp[index++] = cmd_len / 10 + '0'; cmd_len %= 10;
-	tmp[index++] = cmd_len + '0';
+	size_t cmd_len = strlen((char *)command);
+	size_t cmd_len_fill = cmd_len; /* Tmp variable for placing array length in the frame */
+	tmp[index++] = cmd_len_fill / 100 + '0'; cmd_len_fill %= 100;
+	tmp[index++] = cmd_len_fill / 10 + '0'; cmd_len_fill %= 10;
+	tmp[index++] = cmd_len_fill + '0';
 
-	/* Calculating checksum */
+	/* Calculate checksum and copy the command */
 	uint16_t crc = 0;
 	for (uint16_t i = 0; i < cmd_len; i++)
 	{
+		tmp[index++] = command[i];
 		crc += command[i];
 	}
 	crc %= 1000;
@@ -145,7 +146,7 @@ void frame_send(uint8_t address[], uint8_t command[])
 	tmp[index++] = crc / 10 + '0'; crc %= 10;
 	tmp[index++] = crc + '0';
 
-	uint8_t result[MAX_FRAME_LEN + 3];
+	uint8_t result[MAX_FRAME_LEN + 4];
 	uint16_t length = 0;
 	result[length++] = '#';
 	for (uint16_t i = 0; i < index; i++)
@@ -171,6 +172,7 @@ void frame_send(uint8_t address[], uint8_t command[])
 	result[length++] = ';';
 	result[length++] = '\r';
 	result[length++] = '\n';
+	result[length++] = '\0';
 
 	__IO uint16_t idx = USART_Tx_Empty;
 	for (uint16_t i = 0; i < length; i++)
@@ -306,6 +308,9 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 				command[i] = tmp[i + 10];
 			}
 
+			// Terminate the array
+			command[command_length] = '\0';
+
 			/* Calculate command checksum */
 			uint32_t crc = 0;
 			for (uint16_t i = 0; i < command_length; i++)
@@ -371,7 +376,7 @@ int main(void)
   HAL_UART_Receive_IT(&huart3, &USART_RxBuf[USART_Rx_Empty], 1);
 
   uint8_t sender_address[4] = "";
-  uint8_t command[1024];
+  uint8_t command[1025];
   /* USER CODE END 2 */
 
   /* Infinite loop */
