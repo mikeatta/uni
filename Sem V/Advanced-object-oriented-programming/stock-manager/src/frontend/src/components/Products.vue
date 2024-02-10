@@ -401,6 +401,32 @@ watchEffect(() => {
   flex: 3;
 }
 
+.searchBox label {
+  margin-right: 6px;
+}
+
+.searchBox input[type="text"] {
+  appearance: none;
+  -webkit-appearance: none;
+  font-size: 12px;
+  padding: 0.1rem;
+  border: 0.1rem solid white;
+  border-radius: 0.5rem;
+  background-color: rgba(18, 18, 18, 0.33);
+  color: white;
+}
+
+.searchBox input[type="text"]:hover {
+  background-color: #797979;
+  transition-duration: 300ms;
+}
+
+.searchBox input[type="text"]:focus {
+  outline: none;
+  border: 0.15rem solid white;
+  transition-duration: 0ms;
+}
+
 .productTable {
   margin-top: 12px;
   margin-bottom: 12px;
