@@ -318,7 +318,7 @@ watchEffect(() => {
         <thead>
         <tr>
           <th>
-            <label id='selectAllCheckboxLabel'>
+            <label :id='selectAllDisabled ? "selectAllCheckboxLabelDisabled" : "selectAllCheckboxLabel"'>
               <!-- Checkbox for selecting the whole item list -->
               <input type='checkbox' id='selectAllCheckbox' v-model='selectAll' v-bind:disabled='selectAllDisabled'
                      @change='toggleSelectAll'>
@@ -581,10 +581,16 @@ watchEffect(() => {
   display: none;
 }
 
+/* Disable hover effects when the element is disabled */
 #selectAllCheckboxLabel:hover {
   color: #b7b7b7;
   transition-duration: 300ms;
   cursor: pointer;
+}
+
+#selectAllCheckboxLabelDisabled:hover {
+  color: white;
+  cursor: default;
 }
 
 .selectCheckbox input[type="checkbox"] {
