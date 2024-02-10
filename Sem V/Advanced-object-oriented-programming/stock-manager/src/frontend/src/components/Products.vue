@@ -382,9 +382,11 @@ watchEffect(() => {
         </form>
       </div>
       <div class='confirmationDialog' v-if='showConfirmationDialog'>
-        <p>Are you sure you want to delete {{ selectedItems.length }} items?</p>
-        <button @click='performOperation'>Confirm</button>
-        <button @click='cancelDeleteOperation'>Cancel</button>
+        <p>Are you sure you want to delete <span id='removedItemCount'>{{ selectedItems.length }}</span> item(s)?</p>
+        <div class='confirmationDialogButtons'>
+          <button @click='performOperation'>Confirm</button>
+          <button @click='cancelDeleteOperation'>Cancel</button>
+        </div>
       </div>
     </div>
   </section>
@@ -425,6 +427,126 @@ watchEffect(() => {
   outline: none;
   border: 0.15rem solid white;
   transition-duration: 0ms;
+}
+
+.controlButtons {
+  margin-top: 18px;
+  margin-bottom: 18px;
+}
+
+.controlButtons button {
+  appearance: none;
+  -webkit-appearance: none;
+  font-size: 1rem;
+  padding: 0.4rem;
+  border: 0.1rem solid white;
+  border-radius: 0.5rem;
+  background-color: rgba(18, 18, 18, 0.33);
+  color: white;
+}
+
+.controlButtons button:hover {
+  background-color: #797979;
+  transition-duration: 300ms;
+  cursor: pointer;
+}
+
+.controlButtons button:disabled {
+  background-color: #b7b7b7;
+  cursor: default;
+}
+
+.controlForm input {
+  appearance: none;
+  -webkit-appearance: none;
+  font-size: 18px;
+  padding: 0.1rem 0.2rem;
+  border: 0.1rem solid white;
+  border-radius: 0.5rem;
+  background-color: rgba(18, 18, 18, 0.33);
+  color: white;
+}
+
+.controlForm input:hover {
+  background-color: #797979;
+  transition-duration: 300ms;
+}
+
+.controlForm input:focus {
+  outline: none;
+  border: 0.15rem solid white;
+  transition-duration: 0ms;
+}
+
+.controlForm button {
+  appearance: none;
+  -webkit-appearance: none;
+  font-size: 1rem;
+  margin-top: 6px;
+  padding: 0.3rem;
+  border: 0.1rem solid white;
+  border-radius: 0.5rem;
+  background-color: rgba(18, 18, 18, 0.33);
+  color: white;
+}
+
+.controlForm button:hover {
+  background-color: #797979;
+  transition-duration: 300ms;
+  cursor: pointer;
+}
+
+.controlForm button:disabled {
+  background-color: #b7b7b7;
+  cursor: default;
+}
+
+.confirmationDialog {
+  display: flex;
+  flex-direction: column;
+  appearance: none;
+  -webkit-appearance: none;
+  font-size: 1rem;
+  margin-top: 10px;
+  padding: 1rem;
+  border: 0.1rem solid white;
+  border-radius: 0.5rem;
+  background-color: rgba(18, 18, 18, 0.33);
+  color: white;
+}
+
+.confirmationDialog span#removedItemCount {
+  font-weight: bold;
+}
+
+.confirmationDialog p {
+  text-align: center;
+}
+
+.confirmationDialogButtons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  margin-top: 6px;
+}
+
+.confirmationDialogButtons button {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0;
+  font-size: 1rem;
+  margin-top: 6px;
+  padding: 0.3rem;
+  border: 0.1rem solid white;
+  border-radius: 0.5rem;
+  background-color: rgba(18, 18, 18, 0.33);
+  color: white;
+}
+
+.confirmationDialogButtons button:hover {
+  background-color: #797979;
+  transition-duration: 300ms;
+  cursor: pointer;
 }
 
 .productTable {
