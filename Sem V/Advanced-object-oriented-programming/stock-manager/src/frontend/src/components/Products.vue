@@ -314,13 +314,13 @@ watchEffect(() => {
                @input='delaySearchQueryUpdate'/>
       </div>
 
-      <table>
+      <table class='productTable'>
         <thead>
         <tr>
           <th>
-            <label>
+            <label id='selectAllCheckboxLabel'>
               <!-- Checkbox for selecting the whole item list -->
-              <input type='checkbox' v-model='selectAll' v-bind:disabled='selectAllDisabled'
+              <input type='checkbox' id='selectAllCheckbox' v-model='selectAll' v-bind:disabled='selectAllDisabled'
                      @change='toggleSelectAll'>
               Select all
             </label>
@@ -340,7 +340,7 @@ watchEffect(() => {
         </thead>
         <tbody>
         <tr v-for='product in sortedProducts' :key='product.id'>
-          <td>
+          <td class='selectCheckbox'>
             <!-- Checkbox for each item -->
             <input type='checkbox' v-model='selectedItems' :value='product'/>
           </td>
@@ -399,6 +399,76 @@ watchEffect(() => {
 
 .productList {
   flex: 3;
+}
+
+.productTable {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  border-collapse: collapse;
+}
+
+.productTable th {
+  text-align: left;
+  background-color: rgba(18, 18, 18, 0.33);
+  color: white;
+}
+
+.productTable td, .productTable th {
+  padding: 8px;
+}
+
+.productTable tr {
+  color: white;
+}
+
+.productTable tr:nth-child(even) {
+  background-color: rgba(18, 18, 18, 0.33);
+}
+
+.productTable tr:hover {
+  background-color: #797979;
+}
+
+#selectAllCheckbox {
+  display: none;
+}
+
+#selectAllCheckboxLabel:hover {
+  color: #b7b7b7;
+  transition-duration: 300ms;
+  cursor: pointer;
+}
+
+.selectCheckbox input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  font-size: 2rem;
+  padding: 0.1rem;
+  border: 0.1rem solid white;
+  border-radius: 0.5rem;
+}
+
+.selectCheckbox input[type="checkbox"]::before {
+  content: '';
+  width: 0.7rem;
+  height: 0.7rem;
+  clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);
+  transform: scale(0);
+  background-color: white;
+}
+
+.selectCheckbox input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+.selectCheckbox input[type="checkbox"]:hover {
+  background-color: #494848;
+  color: white;
+  transition-duration: 300ms;
+  cursor: pointer;
 }
 
 .controls {
