@@ -125,5 +125,6 @@ watch(() => props.products, (newProducts, oldProducts) => {
 <style scoped>
 .productCharts {
   display: flex;
+  gap: 6%;
 }
 </style>
