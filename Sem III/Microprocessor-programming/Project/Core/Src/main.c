@@ -27,6 +27,7 @@
 #include "string.h"
 
 #include <string.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdarg.h>
 /* USER CODE END Includes */
@@ -125,23 +126,28 @@ void frame_send(uint8_t address[], uint8_t command[])
 	tmp[index++] = address[1];
 	tmp[index++] = address[2];
 
-	/* Fill command length */
-	size_t cmd_len = strlen((char *)command);
-	size_t cmd_len_fill = cmd_len; /* Tmp variable for placing array length in the frame */
-	tmp[index++] = cmd_len_fill / 100 + '0'; cmd_len_fill %= 100;
-	tmp[index++] = cmd_len_fill / 10 + '0'; cmd_len_fill %= 10;
-	tmp[index++] = cmd_len_fill + '0';
+	/* Fill the command and find the command length */
+	uint16_t cmd_len = 0;
+	while(command[cmd_len])
+	{
+		tmp[index++ + 3] = command[cmd_len++];
+	}
 
-	/* Calculate checksum and copy the command */
+	/* Calculate the checksum */
 	uint16_t crc = 0;
 	for (uint16_t i = 0; i < cmd_len; i++)
 	{
-		tmp[index++] = command[i];
 		crc += command[i];
 	}
 	crc %= 1000;
 
-	/* Placing the checksum within the frame */
+	/* Fill the command length */
+	tmp[6] = cmd_len / 100 + '0'; cmd_len %= 100;
+	tmp[7] = cmd_len / 10 + '0'; cmd_len %= 10;
+	tmp[8] = cmd_len + '0';
+	index += 3;
+
+	/* Fill the checksum */
 	tmp[index++] = crc / 100 + '0'; crc %= 100;
 	tmp[index++] = crc / 10 + '0'; crc %= 10;
 	tmp[index++] = crc + '0';
@@ -375,7 +381,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart3, &USART_RxBuf[USART_Rx_Empty], 1);
 
-  uint8_t sender_address[4] = "";
+  uint8_t sender_address[4];
   uint8_t command[1025];
   /* USER CODE END 2 */
 
