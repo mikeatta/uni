@@ -383,6 +383,7 @@ int main(void)
 
   uint8_t sender_address[4];
   uint8_t command[1025];
+  uint8_t tmp[1025];
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -395,7 +396,30 @@ int main(void)
 	  if (frame_get(sender_address, command))
 	  {
 		  frame_send(sender_address, command);
-	  }
+
+		  if (!strcmp((char *)command, "ON"))
+		  {
+			  HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, 1);
+			  sprintf((char *)tmp, "DIODE TURNED ON");
+			  frame_send(sender_address, tmp);
+		  }
+		  else if (!strcmp((char *)command, "OFF"))
+		  {
+			  HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, 0);
+			  sprintf((char *)tmp, "DIODE TURNED OFF");
+			  frame_send(sender_address, tmp);
+		  }
+		  else if (!strcmp((char *)command, "STATE"))
+		  {
+			  sprintf((char *)tmp, "PIN STATE: %d", HAL_GPIO_ReadPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin));
+			  frame_send(sender_address, tmp);
+		  }
+		  else
+		  {
+			  sprintf((char *)tmp, "UNKNOWN COMMAND");
+			  frame_send(sender_address, tmp);
+		  }
+	  } /* End frame if */
   }
   /* USER CODE END 3 */
 }
