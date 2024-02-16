@@ -1,7 +1,5 @@
 'use strict';
 
-import { authenticateAndGetClient } from './auth.js';
-
 async function listEvents(calendar) {
   const res = await calendar.events.list({
     calendarId: 'primary',
@@ -20,6 +18,7 @@ async function listEvents(calendar) {
     const start = event.start.dateTime || event.start.date;
     console.log(`${start} - ${event.summary}`);
   });
+  return events;
 }
 
 async function listTasklists(service) {
@@ -62,17 +61,7 @@ async function listTasks(service) {
     // Print notes if available, else print just the date and title
     console.log(notes ? `${due} - ${title}: ${notes}` : `${due} - ${title}`);
   });
+  return tasks;
 }
 
-async function main() {
-  try {
-    const [calendar, service] = await authenticateAndGetClient();
-    await listEvents(calendar);
-    const tasklists = await listTasklists(service);
-    await listTasks(service);
-  } catch (err) {
-    console.error('Error getting events:', err);
-  }
-}
-
-main();
+export { listEvents, listTasklists, listTasks };
