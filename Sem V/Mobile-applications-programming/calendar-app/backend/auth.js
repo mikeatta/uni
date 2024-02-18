@@ -8,8 +8,8 @@ import { google } from 'googleapis';
 
 // If modifying the scopes, delete token.json
 const SCOPES = [
-  'https://www.googleapis.com/auth/calendar.readonly',
-  'https://www.googleapis.com/auth/tasks.readonly',
+  'https://www.googleapis.com/auth/calendar',
+  'https://www.googleapis.com/auth/tasks',
 ];
 // The token.js file stores user's tokens and is automatically created when
 // the user logs in for the first time and completes the authorization process
