@@ -35,10 +35,17 @@ export default function App() {
       ) : (
         <View>
           {calendarData.events.map((event, index) => {
-            const start = event.start.dateTime || event.start.date;
-            <Text key={index}>
-              {start} - {event.summary}
-            </Text>;
+            const start = () => {
+              return new Date(
+                event.start.dateTime || event.start.date
+              ).toLocaleString();
+            };
+
+            return (
+              <Text key={index}>
+                {start()} - {event.summary}
+              </Text>
+            );
           })}
         </View>
       )}
