@@ -14,7 +14,7 @@ export default function App() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          'http://localhost:3000/api/v1/calendar'
+          'http://localhost:3001/api/v1/calendar'
         );
         setCalendarData(response.data);
       } catch (error) {
