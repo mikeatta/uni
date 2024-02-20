@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Picker,
+} from 'react-native';
+import CustomDatePicker from './components/CustomDatePicker.js';
 import axios from 'axios';
 
 export default function App() {
@@ -10,6 +18,39 @@ export default function App() {
     tasks: [],
   });
 
+  const [newEntry, setNewEntry] = useState({
+    title: '',
+    description: '',
+    dateTime: new Date(),
+    type: 'event', // Type of entry: (default) 'event' or 'task'
+  });
+
+  const handleInputChange = (name, value) => {
+    setNewEntry((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        'http://localhost:3001/api/v1/calendar/new-entry',
+        newEntry
+      );
+      // Reset the form after submission
+      setNewEntry({
+        title: '',
+        description: '',
+        dateTime: new Date(),
+        type: 'event',
+      });
+    } catch (error) {
+      console.error('Error submitting new entry:', error);
+    }
+  };
+
+  // Fetch calendar data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -27,6 +68,40 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      {/* New Entry Form */}
+      <View style={styles.form}>
+        <Text>Create New Entry</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder='Title'
+          value={newEntry.title}
+          onChangeText={(text) => handleInputChange('title', text)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder='Description'
+          value={newEntry.description}
+          onChangeText={(text) => handleInputChange('description', text)}
+        />
+        <CustomDatePicker
+          selected={newEntry.dateTime}
+          onChange={(date) => handleInputChange('dateTime', date)}
+        />
+        <Picker
+          style={styles.input}
+          selectedValue={newEntry.type}
+          onValueChange={(value) => handleInputChange('type', value)}
+        >
+          <Picker.Item label='Event' value='event' />
+          <Picker.Item label='Task' value='task' />
+        </Picker>
+        <Pressable style={styles.button} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Submit</Text>
+        </Pressable>
+      </View>
+
+      {/* Calendar Data Display */}
       <Text>Calendar Data</Text>
 
       <Text>Events:</Text>
@@ -99,5 +174,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  form: {
+    width: '80%',
+    marginBottom: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: 'blue',
+    padding: 10,
+    alignItems: 'center',
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
