@@ -21,6 +21,18 @@ async function listEvents(calendar) {
   return events;
 }
 
+async function addEvent(calendar, event) {
+  try {
+    const res = await calendar.events.insert({
+      calendarId: 'primary',
+      resource: event,
+    });
+    console.log('New event added %s', res.data.htmlLink);
+  } catch (error) {
+    console.error('Error adding event', error);
+  }
+}
+
 async function listTasklists(service) {
   const res = await service.tasklists.list({
     maxResults: 10,
@@ -64,4 +76,17 @@ async function listTasks(service) {
   return tasks;
 }
 
-export { listEvents, listTasklists, listTasks };
+async function addTask(service, task) {
+  try {
+    const res = await service.tasks.insert({
+      tasklist: 'MTI4NTk2NzEwNjY0MzQ5NjAzNzg6MDow',
+      resource: task,
+    });
+    console.log('Task added:', res.data);
+    return res.data;
+  } catch (error) {
+    console.error('Error adding task', error);
+  }
+}
+
+export { listEvents, addEvent, listTasklists, listTasks, addTask };
