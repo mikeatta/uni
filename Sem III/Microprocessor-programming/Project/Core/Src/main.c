@@ -18,13 +18,16 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "i2c.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stm32f7xx_hal.h"
+#include "am2320.h"
 #include "string.h"
+#include "math.h"
 
 #include <string.h>
 #include <stdint.h>
@@ -378,12 +381,17 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART3_UART_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart3, &USART_RxBuf[USART_Rx_Empty], 1);
 
   uint8_t sender_address[4];
   uint8_t command[1025];
   uint8_t tmp[1025];
+
+  Am2320_HandleTypeDef Am2320_;
+  Am2320_ = am2320_Init(&hi2c1, AM2320_ADDRESS);
+  float temperature, humidity;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -412,6 +420,12 @@ int main(void)
 		  else if (!strcmp((char *)command, "STATE"))
 		  {
 			  sprintf((char *)tmp, "PIN STATE: %d", HAL_GPIO_ReadPin(LED_BLUE_GPIO_Port, LED_BLUE_Pin));
+			  frame_send(sender_address, tmp);
+		  }
+		  else if (!strcmp((char *)command, "TEST_DATA_READ"))
+		  {
+			  am2320_GetTemperatureAndHumidity(&Am2320_, &temperature, &humidity);
+			  sprintf((char *)tmp, "[ TEMP: %.1fºC | HMDT: %.1f%% ]", temperature, humidity);
 			  frame_send(sender_address, tmp);
 		  }
 		  else
