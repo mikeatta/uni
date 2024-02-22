@@ -301,8 +301,7 @@ uint8_t frame_get(uint8_t address[], uint8_t command[])
 			/* Read user-defined command length */
 			uint16_t param_command_length = ((tmp[7] - '0') * 100) + ((tmp[8] - '0') * 10) + (tmp[9] - '0');
 
-			// TODO: Subtract min frame length from (size of) command
-			/* Subtract minimum frame length (14) from the received frame length */
+			/* Subtract minimum valid frame length (14) from the received frame length */
 			uint16_t command_length = length - 14;
 
 			/* Compare declared command length against actual command length */
