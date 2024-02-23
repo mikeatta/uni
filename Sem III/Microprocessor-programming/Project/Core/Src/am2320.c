@@ -19,13 +19,15 @@ uint8_t am2320_ReadValue(Am2320_HandleTypeDef *am2320)
 {
 	uint8_t registers[3] = { 0x03, 0x00, 0x04 };
 	HAL_I2C_Master_Transmit_IT(am2320->i2c_handle, am2320->sensor_address, 0x00, 0);
-	HAL_Delay(1);
+	/* Use a blocking delay to ensure the sensor has enough time to wake up */
+	while (HAL_I2C_GetState(am2320->i2c_handle) != HAL_I2C_STATE_READY);
 	if (HAL_I2C_Master_Transmit_IT(am2320->i2c_handle, am2320->sensor_address, registers, 3) != HAL_OK)
 	{
 		/* Error code #1 - Problem with sending read request */
 		return 1;
 	}
-	HAL_Delay(2);
+	/* Use a blocking delay to ensure the sensor has enough time to read the data */
+	while (HAL_I2C_GetState(am2320->i2c_handle) != HAL_I2C_STATE_READY);
 	if (HAL_I2C_Master_Receive_IT(am2320->i2c_handle, am2320->sensor_address, am2320->data, 8) != HAL_OK)
 	{
 		/* Error code #2 - Problem with receiving data */
