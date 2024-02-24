@@ -6,10 +6,12 @@ import { authenticateAndGetClient } from './auth.js';
 import {
   listEvents,
   addEvent,
+  editEvent,
   removeEvent,
   listTasklists,
   listTasks,
   addTask,
+  editTask,
   removeTask,
 } from './taskManager.js';
 
@@ -72,6 +74,45 @@ app.post('/api/v1/calendar/new-entry', async (req, res) => {
     }
 
     res.status(200).json({ message: 'Entry added successfully!' });
+  } catch (err) {
+    console.error('Error', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.patch('/api/v1/calendar/modify-entry', async (req, res) => {
+  try {
+    const { id, title, description, dateTime, type } = req.body;
+    const [calendar, service] = await authenticateAndGetClient();
+
+    if (type === 'event') {
+      const event = {
+        eventId: id,
+        summary: title,
+        description: description,
+        start: {
+          dateTime: dateTime,
+          timeZone: 'CET',
+        },
+        end: {
+          dateTime: dateTime,
+          timeZone: 'CET',
+        },
+      };
+
+      await editEvent(calendar, event);
+    } else {
+      const task = {
+        id: id,
+        title: title,
+        notes: description,
+        due: dateTime,
+      };
+
+      await editTask(service, task);
+    }
+
+    res.status(200).json({ message: 'Entry modified successfully!' });
   } catch (err) {
     console.error('Error', err);
     res.status(500).json({ error: 'Internal server error' });
