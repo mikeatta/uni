@@ -33,6 +33,18 @@ async function addEvent(calendar, event) {
   }
 }
 
+async function removeEvent(calendar, { eventId }) {
+  try {
+    const res = await calendar.events.delete({
+      calendarId: 'primary',
+      eventId: eventId,
+    });
+    console.log('Event removed successfully. Status: ', res.status);
+  } catch (error) {
+    console.error('Error removing event', error);
+  }
+}
+
 async function listTasklists(service) {
   const res = await service.tasklists.list({
     maxResults: 10,
@@ -89,4 +101,24 @@ async function addTask(service, task) {
   }
 }
 
-export { listEvents, addEvent, listTasklists, listTasks, addTask };
+async function removeTask(service, { task }) {
+  try {
+    const res = await service.tasks.delete({
+      tasklist: 'MTI4NTk2NzEwNjY0MzQ5NjAzNzg6MDow',
+      task: task,
+    });
+    console.log('Task removed successfully. Status: ', res.status);
+  } catch (error) {
+    console.error('Error removing task', error);
+  }
+}
+
+export {
+  listEvents,
+  addEvent,
+  removeEvent,
+  listTasklists,
+  listTasks,
+  addTask,
+  removeTask,
+};
