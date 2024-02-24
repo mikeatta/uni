@@ -10,6 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import CustomDatePicker from './components/CustomDatePicker.js';
+import EditEntryWindow from './components/EditEntryWindow.js';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
@@ -26,6 +27,15 @@ export default function App() {
     dateTime: new Date(),
     type: 'event', // Type of entry: (default) 'event' or 'task'
   });
+
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState(null);
+
+  const handleEdit = (entry, type) => {
+    const editedEntry = { ...entry, type };
+    setSelectedEntry(editedEntry);
+    setEditModalVisible(true);
+  };
 
   const handleInputChange = (name, value) => {
     setNewEntry((prevState) => ({
@@ -51,6 +61,19 @@ export default function App() {
       fetchData();
     } catch (error) {
       console.error('Error submitting new entry:', error);
+    }
+  };
+
+  const handleEditSubmit = async (editedData) => {
+    try {
+      const response = await axios.patch(
+        'http://localhost:3001/api/v1/calendar/modify-entry',
+        editedData
+      );
+      // Refetch calendar data after modification
+      fetchData();
+    } catch (error) {
+      console.error('Error editing entry', error);
     }
   };
 
@@ -132,13 +155,13 @@ export default function App() {
               <Text style={styles.entry}>
                 {event.start.dateTime} | {event.summary}
               </Text>
-              {/* Edit icon for task */}
+              {/* Edit icon for event */}
               <Ionicons
                 name='create-outline'
                 style={styles.icon}
                 size={24}
                 color='blue'
-                onPress={() => handleModification(event.id, 'event')}
+                onPress={() => handleEdit(event, 'event')}
               />
               {/* Delete icon for event */}
               <Ionicons
@@ -167,7 +190,7 @@ export default function App() {
                 style={styles.icon}
                 size={24}
                 color='blue'
-                onPress={() => handleModification(task.id, 'task')}
+                onPress={() => handleEdit(task, 'task')}
               />
               {/* Delete icon for task */}
               <Ionicons
@@ -181,6 +204,18 @@ export default function App() {
           ))}
         </View>
       </ScrollView>
+
+      {/* Edit Entry Window */}
+      {editModalVisible && (
+        <EditEntryWindow
+          entryData={selectedEntry} // Pass the selected entry to the EditEntryWindow
+          onClose={() => setEditModalVisible(false)}
+          onSubmit={(editedData) => {
+            handleEditSubmit(editedData);
+            setEditModalVisible(false);
+          }}
+        />
+      )}
 
       <StatusBar style='auto' />
     </View>
