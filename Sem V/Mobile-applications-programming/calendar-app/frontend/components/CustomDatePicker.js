@@ -16,6 +16,7 @@ const CustomDatePicker = ({ selected, onChange }) => {
         onClick={() => setShowDatePicker(!showDatePicker)}
         style={{
           padding: '0.5rem',
+          marginBottom: '10px',
           borderRadius: '0.25rem',
           border: '1px solid #ccc',
           display: 'flex',
@@ -47,7 +48,14 @@ const CustomDatePicker = ({ selected, onChange }) => {
         Select Date
       </button>
       {showDatePicker && (
-        <div style={{ position: 'absolute', zIndex: 999 }}>
+        <div
+          style={{
+            position: 'relative',
+            marginTop: -10,
+            marginBottom: 10,
+            zIndex: 999,
+          }}
+        >
           <DatePicker selected={selected} onChange={handleDateChange} inline />
         </div>
       )}
