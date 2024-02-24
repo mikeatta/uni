@@ -7,8 +7,10 @@ import {
   TextInput,
   View,
   Picker,
+  ScrollView,
 } from 'react-native';
 import CustomDatePicker from './components/CustomDatePicker.js';
+import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
 export default function App() {
@@ -45,24 +47,39 @@ export default function App() {
         dateTime: new Date(),
         type: 'event',
       });
+      // Refetch calendar data after submission
+      fetchData();
     } catch (error) {
       console.error('Error submitting new entry:', error);
     }
   };
 
-  // Fetch calendar data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          'http://localhost:3001/api/v1/calendar'
-        );
-        setCalendarData(response.data);
-      } catch (error) {
-        console.error('Error fetching calendar data:', error);
-      }
-    };
+  const handleRemoval = async (id, type) => {
+    try {
+      const response = await axios.delete(
+        'http://localhost:3001/api/v1/calendar/remove-entry',
+        {
+          data: { id, type },
+        }
+      );
+      // Refetch calendar data after removal
+      fetchData();
+    } catch (error) {
+      console.error('Error removing entry', error);
+    }
+  };
 
+  // Fetch calendar data
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/api/v1/calendar');
+      setCalendarData(response.data);
+    } catch (error) {
+      console.error('Error fetching calendar data:', error);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -72,6 +89,7 @@ export default function App() {
       <View style={styles.form}>
         <Text>Create New Entry</Text>
 
+        {/* Input fields for a new entry */}
         <TextInput
           style={styles.input}
           placeholder='Title'
@@ -104,64 +122,65 @@ export default function App() {
       {/* Calendar Data Display */}
       <Text>Calendar Data</Text>
 
-      <Text>Events:</Text>
-      {calendarData.events.length === 0 ? (
-        <Text>No events found.</Text>
-      ) : (
+      <ScrollView style={{ width: '100%' }}>
+        {/* Display Events */}
         <View>
-          {calendarData.events.map((event, index) => {
-            const start = () => {
-              return new Date(
-                event.start.dateTime || event.start.date
-              ).toLocaleString();
-            };
-
-            return (
-              <Text key={index}>
-                {start()} - {event.summary}
+          <Text style={styles.headerText}>Events:</Text>
+          {calendarData.events.map((event, index) => (
+            <View key={index} style={styles.itemContainer}>
+              {/* Event content */}
+              <Text style={styles.entry}>
+                {event.start.dateTime} | {event.summary}
               </Text>
-            );
-          })}
+              {/* Edit icon for task */}
+              <Ionicons
+                name='create-outline'
+                style={styles.icon}
+                size={24}
+                color='blue'
+                onPress={() => handleModification(event.id, 'event')}
+              />
+              {/* Delete icon for event */}
+              <Ionicons
+                name='trash-outline'
+                style={styles.icon}
+                size={24}
+                color='red'
+                onPress={() => handleRemoval(event.id, 'event')}
+              />
+            </View>
+          ))}
         </View>
-      )}
 
-      <Text>Tasklists:</Text>
-      {calendarData.tasklists.length === 0 ? (
-        <Text>No tasklists found.</Text>
-      ) : (
+        {/* Display tasks */}
         <View>
-          {calendarData.tasklists.map((tasklist, index) => {
-            const title = tasklist.title;
-            const id = tasklist.id;
-
-            return (
-              <Text key={index}>
-                {index + 1}. {title} - ID: {id}
+          <Text style={styles.headerText}>Tasks:</Text>
+          {calendarData.tasks.map((task, index) => (
+            <View key={index} style={styles.itemContainer}>
+              {/* Task content */}
+              <Text style={styles.entry}>
+                {task.due} | {task.title} - {task.notes}
               </Text>
-            );
-          })}
+              {/* Edit icon for task */}
+              <Ionicons
+                name='create-outline'
+                style={styles.icon}
+                size={24}
+                color='blue'
+                onPress={() => handleModification(task.id, 'task')}
+              />
+              {/* Delete icon for task */}
+              <Ionicons
+                name='trash-outline'
+                style={styles.icon}
+                size={24}
+                color='red'
+                onPress={() => handleRemoval(task.id, 'task')}
+              />
+            </View>
+          ))}
         </View>
-      )}
-
-      <Text>Tasks:</Text>
-      {calendarData.tasks.length === 0 ? (
-        <Text>No tasks found.</Text>
-      ) : (
-        <View>
-          {calendarData.tasks.map((task, index) => {
-            const due = new Date(task.due).toISOString().split('T')[0];
-            const title = task.title;
-            const notes = task.notes !== undefined ? task.notes : '';
-
-            // Conditional rendering based on the presence of notes
-            return (
-              <Text key={index}>
-                {notes ? `${due} - ${title}: ${notes}` : `${due} - ${title}`}
-              </Text>
-            );
-          })}
-        </View>
-      )}
+      </ScrollView>
 
       <StatusBar style='auto' />
     </View>
@@ -174,6 +193,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  headerText: {
+    textAlign: 'center',
   },
   form: {
     width: '80%',
@@ -194,5 +216,23 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    justifyContent: 'space-between',
+    width: '80%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    marginBottom: 10,
+  },
+  entry: {
+    flex: 1,
+    marginRight: 8,
+  },
+  icon: {
+    marginLeft: 8,
   },
 });
