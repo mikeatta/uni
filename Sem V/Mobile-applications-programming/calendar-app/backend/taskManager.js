@@ -33,6 +33,19 @@ async function addEvent(calendar, event) {
   }
 }
 
+async function editEvent(calendar, event) {
+  try {
+    const res = await calendar.events.patch({
+      calendarId: 'primary',
+      eventId: event.eventId,
+      resource: event,
+    });
+    console.log('Event modified successfully. Status: ', res.status);
+  } catch (error) {
+    console.error('Error modifying event', error);
+  }
+}
+
 async function removeEvent(calendar, { eventId }) {
   try {
     const res = await calendar.events.delete({
@@ -101,6 +114,19 @@ async function addTask(service, task) {
   }
 }
 
+async function editTask(service, task) {
+  try {
+    const res = await service.tasks.patch({
+      tasklist: 'MTI4NTk2NzEwNjY0MzQ5NjAzNzg6MDow',
+      task: task.id,
+      resource: task,
+    });
+    console.log('Task modified successfully. Status: ', res.status);
+  } catch (error) {
+    console.error('Error modifying task', error);
+  }
+}
+
 async function removeTask(service, { task }) {
   try {
     const res = await service.tasks.delete({
@@ -116,9 +142,11 @@ async function removeTask(service, { task }) {
 export {
   listEvents,
   addEvent,
+  editEvent,
   removeEvent,
   listTasklists,
   listTasks,
   addTask,
+  editTask,
   removeTask,
 };
