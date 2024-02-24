@@ -6,9 +6,11 @@ import { authenticateAndGetClient } from './auth.js';
 import {
   listEvents,
   addEvent,
+  removeEvent,
   listTasklists,
   listTasks,
   addTask,
+  removeTask,
 } from './taskManager.js';
 
 const app = express();
@@ -69,7 +71,33 @@ app.post('/api/v1/calendar/new-entry', async (req, res) => {
       await addTask(service, task);
     }
 
-    res.status(200).json({ message: 'Event added successfully!' });
+    res.status(200).json({ message: 'Entry added successfully!' });
+  } catch (err) {
+    console.error('Error', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.delete('/api/v1/calendar/remove-entry', async (req, res) => {
+  try {
+    const { id, type } = req.body;
+    const [calendar, service] = await authenticateAndGetClient();
+
+    if (type === 'event') {
+      const event = {
+        eventId: id,
+      };
+
+      await removeEvent(calendar, event);
+    } else {
+      const task = {
+        task: id,
+      };
+
+      await removeTask(service, task);
+    }
+
+    res.status(200).json({ message: 'Entry removed successfully!' });
   } catch (err) {
     console.error('Error', err);
     res.status(500).json({ error: 'Internal server error' });
