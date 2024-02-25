@@ -139,6 +139,18 @@ async function removeTask(service, { task }) {
   }
 }
 
+async function completeTask(service, task) {
+  try {
+    const res = await service.tasks.patch({
+      tasklist: 'MTI4NTk2NzEwNjY0MzQ5NjAzNzg6MDow',
+      task: task.id,
+      resource: task,
+    });
+  } catch (error) {
+    console.error('Error completing task', error);
+  }
+}
+
 export {
   listEvents,
   addEvent,
@@ -149,4 +161,5 @@ export {
   addTask,
   editTask,
   removeTask,
+  completeTask,
 };
