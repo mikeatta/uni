@@ -92,6 +92,18 @@ export default function App() {
     }
   };
 
+  const handleTaskCompletion = async (task) => {
+    try {
+      const response = await axios.patch(
+        'http://localhost:3001/api/v1/calendar/complete-task',
+        task
+      );
+      fetchData();
+    } catch (error) {
+      console.error('Error editing task status', error);
+    }
+  };
+
   // Fetch calendar data
   const fetchData = async () => {
     try {
@@ -184,6 +196,18 @@ export default function App() {
               <Text style={styles.entry}>
                 {task.due} | {task.title} - {task.notes}
               </Text>
+              {/* Completion checkbox for task */}
+              <Ionicons
+                name={
+                  task.status === 'completed'
+                    ? 'checkbox-outline'
+                    : 'square-outline'
+                }
+                style={styles.icon}
+                size={24}
+                color='green'
+                onPress={() => handleTaskCompletion(task)}
+              />
               {/* Edit icon for task */}
               <Ionicons
                 name='create-outline'
