@@ -95,7 +95,7 @@ export default function App() {
   const handleTaskCompletion = async (task) => {
     try {
       const response = await axios.patch(
-        'http://localhost:3001/api/v1/calendar/complete-task',
+        'http://localhost:3001/api/v1/calendar/update-task-status',
         task
       );
       fetchData();
