@@ -13,6 +13,7 @@ import {
   addTask,
   editTask,
   removeTask,
+  completeTask,
 } from './taskManager.js';
 
 const app = express();
@@ -113,6 +114,27 @@ app.patch('/api/v1/calendar/modify-entry', async (req, res) => {
     }
 
     res.status(200).json({ message: 'Entry modified successfully!' });
+  } catch (err) {
+    console.error('Error', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.patch('/api/v1/calendar/complete-task', async (req, res) => {
+  try {
+    let task = req.body;
+    const [calendar, service] = await authenticateAndGetClient();
+
+    // Toggle the task status
+    if (task.status === 'completed') {
+      task = { ...task, status: 'needsAction' };
+    } else {
+      task = { ...task, status: 'completed' };
+    }
+
+    await completeTask(service, task);
+
+    res.status(200).json({ message: 'Task successfully marked as complete!' });
   } catch (err) {
     console.error('Error', err);
     res.status(500).json({ error: 'Internal server error' });
