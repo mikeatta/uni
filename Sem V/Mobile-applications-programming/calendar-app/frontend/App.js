@@ -194,7 +194,7 @@ export default function App() {
             <View key={index} style={styles.itemContainer}>
               {/* Task content */}
               <Text style={styles.entry}>
-                {new Date(task.due).toLocaleString()} | {task.title} - {task.notes}
+                {new Date(task.due).toDateString()} | {task.title} - {task.notes}
               </Text>
               {/* Completion checkbox for task */}
               <Ionicons
