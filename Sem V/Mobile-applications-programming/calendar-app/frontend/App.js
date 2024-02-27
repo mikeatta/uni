@@ -165,7 +165,7 @@ export default function App() {
             <View key={index} style={styles.itemContainer}>
               {/* Event content */}
               <Text style={styles.entry}>
-                {event.start.dateTime} | {event.summary}
+                {new Date(event.start.dateTime).toLocaleString()} | {event.summary}
               </Text>
               {/* Edit icon for event */}
               <Ionicons
@@ -194,7 +194,7 @@ export default function App() {
             <View key={index} style={styles.itemContainer}>
               {/* Task content */}
               <Text style={styles.entry}>
-                {task.due} | {task.title} - {task.notes}
+                {new Date(task.due).toLocaleString()} | {task.title} - {task.notes}
               </Text>
               {/* Completion checkbox for task */}
               <Ionicons
