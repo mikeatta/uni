@@ -56,7 +56,16 @@ const CustomDatePicker = ({ selected, onChange }) => {
             zIndex: 999,
           }}
         >
-          <DatePicker selected={selected} onChange={handleDateChange} inline />
+          <DatePicker
+            selected={selected}
+            onChange={handleDateChange}
+            showTimeSelect
+            timeFormat='HH:mm'
+            timeIntervals={15}
+            timeCaption='Time'
+            dateFormat='MMMM d, yyyy h:mm aa'
+            inline
+          />
         </div>
       )}
     </div>

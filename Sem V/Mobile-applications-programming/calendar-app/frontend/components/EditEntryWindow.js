@@ -13,8 +13,8 @@ export default function EditEntryWindow({ entryData, onClose, onSubmit }) {
   const [editedData, setEditedData] = useState({
     title: '',
     description: '',
-    dateTime: entryData.dateTime,
-    type: entryData.type,
+    dateTime: '',
+    type: '',
   });
 
   useEffect(() => {
@@ -22,7 +22,10 @@ export default function EditEntryWindow({ entryData, onClose, onSubmit }) {
     setEditedData({
       title: entryData.title || entryData.summary || '',
       description: entryData.notes || entryData.description || '',
-      dateTime: entryData.dateTime || entryData.due || new Date(),
+      dateTime:
+        (entryData.start?.dateTime && new Date(entryData.start.dateTime)) || // Check if entryData.start exists (event)
+        new Date(entryData.due) || // Fall back to entryData.due if start.dateTime is not available (task)
+        new Date(), // Default value
       type: entryData.type,
     });
   }, [entryData]);
