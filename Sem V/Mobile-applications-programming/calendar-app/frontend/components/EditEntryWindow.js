@@ -22,7 +22,7 @@ export default function EditEntryWindow({ entryData, onClose, onSubmit }) {
     setEditedData({
       title: entryData.title || entryData.summary || '',
       description: entryData.notes || entryData.description || '',
-      dateTime: entryData.dateTime || entryData.data || new Date(),
+      dateTime: entryData.dateTime || entryData.due || new Date(),
       type: entryData.type,
     });
   }, [entryData]);
