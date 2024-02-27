@@ -19,6 +19,9 @@ import {
 const app = express();
 const port = 3001;
 
+let calendar;
+let service;
+
 // Enable CORS for all routes
 app.use(cors());
 
@@ -28,10 +31,20 @@ app.use(express.json());
 // Parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
 
+// Authenticate the client upon server startup
+(async () => {
+  try {
+    [calendar, service] = await authenticateAndGetClient();
+    console.log('User authenticated.');
+  } catch (err) {
+    console.error('User authentication error:', err);
+    process.exit(1);
+  }
+})();
+
 app.get('/api/v1/calendar', async (req, res) => {
   try {
     // Perform calendar related operations
-    const [calendar, service] = await authenticateAndGetClient();
     const events = (await listEvents(calendar)) || [];
     const tasklists = (await listTasklists(service)) || [];
     const tasks = (await listTasks(service)) || [];
@@ -47,7 +60,6 @@ app.get('/api/v1/calendar', async (req, res) => {
 app.post('/api/v1/calendar/new-entry', async (req, res) => {
   try {
     const { title, description, dateTime, type } = req.body;
-    const [calendar, service] = await authenticateAndGetClient();
 
     if (type === 'event') {
       const event = {
@@ -84,7 +96,6 @@ app.post('/api/v1/calendar/new-entry', async (req, res) => {
 app.patch('/api/v1/calendar/modify-entry', async (req, res) => {
   try {
     const { id, title, description, dateTime, type } = req.body;
-    const [calendar, service] = await authenticateAndGetClient();
 
     if (type === 'event') {
       const event = {
@@ -123,7 +134,6 @@ app.patch('/api/v1/calendar/modify-entry', async (req, res) => {
 app.patch('/api/v1/calendar/update-task-status', async (req, res) => {
   try {
     let task = req.body;
-    const [calendar, service] = await authenticateAndGetClient();
 
     // Toggle the task status
     if (task.status === 'completed') {
@@ -144,7 +154,6 @@ app.patch('/api/v1/calendar/update-task-status', async (req, res) => {
 app.delete('/api/v1/calendar/remove-entry', async (req, res) => {
   try {
     const { id, type } = req.body;
-    const [calendar, service] = await authenticateAndGetClient();
 
     if (type === 'event') {
       const event = {
