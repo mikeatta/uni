@@ -122,7 +122,7 @@ export default function App() {
     <View style={styles.container}>
       {/* New Entry Form */}
       <View style={styles.form}>
-        <Text>Create New Entry</Text>
+        <Text style={styles.formHeader}>Create New Entry</Text>
 
         {/* Input fields for a new entry */}
         <TextInput
@@ -155,7 +155,7 @@ export default function App() {
       </View>
 
       {/* Calendar Data Display */}
-      <Text>Calendar Data</Text>
+      <Text style={styles.headerText}>Calendar Data</Text>
 
       <ScrollView style={{ width: '100%' }}>
         {/* Display Events */}
@@ -165,7 +165,8 @@ export default function App() {
             <View key={index} style={styles.itemContainer}>
               {/* Event content */}
               <Text style={styles.entry}>
-                {new Date(event.start.dateTime).toLocaleString()} | {event.summary}
+                {new Date(event.start.dateTime).toLocaleString()} |{' '}
+                {event.summary} - {event.description}
               </Text>
               {/* Edit icon for event */}
               <Ionicons
@@ -194,7 +195,8 @@ export default function App() {
             <View key={index} style={styles.itemContainer}>
               {/* Task content */}
               <Text style={styles.entry}>
-                {new Date(task.due).toDateString()} | {task.title} - {task.notes}
+                {new Date(task.due).toDateString()} | {task.title} -{' '}
+                {task.notes}
               </Text>
               {/* Completion checkbox for task */}
               <Ionicons
@@ -254,7 +256,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    marginTop: 20,
     textAlign: 'center',
+  },
+  formHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    marginTop: 20,
   },
   form: {
     width: '80%',
