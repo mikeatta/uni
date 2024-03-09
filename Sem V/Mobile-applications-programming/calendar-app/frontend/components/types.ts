@@ -32,3 +32,42 @@ export type CalendarData = {
   tasklists: CalendarTasklist[]
   tasks: CalendarTask[]
 }
+
+export type DateTimeSelector = {
+  title: string
+  dateTime: Date
+  dateTimeType: 'start' | 'end'
+  setDateTime: React.Dispatch<
+    React.SetStateAction<{
+      title: string
+      description: string
+      start: {
+        dateTime: Date
+        timeZone: string
+      }
+      end: {
+        dateTime: Date
+        timeZone: string
+      }
+      type: 'event'
+    }>
+  >
+}
+
+export type FormData = {
+  title: string
+  description: string
+  start: {
+    dateTime: Date
+    timeZone: string
+  }
+  end: {
+    dateTime: Date
+    timeZone: string
+  }
+  type: 'event' | 'task'
+}
+
+export type EntryFormProps = {
+  onSubmit: (formData: FormData) => Promise<void>
+}
