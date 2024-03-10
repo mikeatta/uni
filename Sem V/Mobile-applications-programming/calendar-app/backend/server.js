@@ -59,20 +59,14 @@ app.get('/api/v1/calendar', async (req, res) => {
 
 app.post('/api/v1/calendar/new-entry', async (req, res) => {
   try {
-    const { title, description, dateTime, type } = req.body;
+    const { title, description, start, end, type } = req.body;
 
     if (type === 'event') {
       const event = {
         summary: title,
         description: description,
-        start: {
-          dateTime: dateTime,
-          timeZone: 'CET',
-        },
-        end: {
-          dateTime: dateTime,
-          timeZone: 'CET',
-        },
+        start: start,
+        end: end,
       };
 
       await addEvent(calendar, event);
@@ -80,7 +74,7 @@ app.post('/api/v1/calendar/new-entry', async (req, res) => {
       const task = {
         title: title,
         notes: description,
-        due: dateTime,
+        due: start.dateTime, // Time part of the task dateTime is being cut due to API limitations
       };
 
       await addTask(service, task);

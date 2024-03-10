@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { SelectList } from 'react-native-dropdown-select-list';
 import { EntryFormProps } from '../types';
 import DateTimePicker from '../common/DateTimePicker';
+import DateOnlyPicker from '../common/DateOnlyPicker';
 
 export default function EntryForm({ onSubmit }: EntryFormProps) {
   const currentDayTime: Date = new Date();
@@ -19,7 +20,7 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
       dateTime: currentDayTime,
       timeZone: deviceTimeZone,
     },
-    type: 'event' as const,
+    type: '',
   });
 
   const handleInput = (name: string, value: string | Date) => {
@@ -44,7 +45,7 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
           dateTime: currentDayTime,
           timeZone: deviceTimeZone,
         },
-        type: 'event' as const,
+        type: '',
       });
     } catch (error) {
       console.error('Error submitting form data', error);
@@ -53,6 +54,15 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
 
   return (
     <View>
+      <SelectList
+        setSelected={(selection: string) => handleInput('type', selection)}
+        data={[
+          { key: 'event', value: 'Event' },
+          { key: 'task', value: 'Task' },
+        ]}
+        defaultOption={{ key: 'event', value: 'Event' }}
+        search={false}
+      />
       <TextInput
         placeholder='Title'
         value={formData.title}
@@ -63,26 +73,33 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
         value={formData.description}
         onChangeText={(text) => handleInput('description', text)}
       />
-      <DateTimePicker
-        title={'Select start time'}
-        dateTime={formData.start.dateTime}
-        dateTimeType='start'
-        setDateTime={setFormData}
-      />
-      <DateTimePicker
-        title={'Select end time'}
-        dateTime={formData.end.dateTime}
-        dateTimeType='end'
-        setDateTime={setFormData}
-      />
-      <SelectList
-        setSelected={(selection: string) => handleInput('type', selection)}
-        data={[
-          { key: 'event', value: 'Event' },
-          { key: 'task', value: 'Task' },
-        ]}
-        search={false}
-      />
+      {formData.type === 'event' ? (
+        // Date and time picker for creating event entries
+        <View>
+          <DateTimePicker
+            title={'Select start time'}
+            dateTime={formData.start.dateTime}
+            dateTimeType='start'
+            setDateTime={setFormData}
+          />
+          <DateTimePicker
+            title={'Select end time'}
+            dateTime={formData.end.dateTime}
+            dateTimeType='end'
+            setDateTime={setFormData}
+          />
+        </View>
+      ) : (
+        // Date-only picker for creating task entries
+        <View>
+          <DateOnlyPicker
+            title={'Select due date'}
+            dateTime={formData.start.dateTime}
+            dateTimeType='start'
+            setDateTime={setFormData}
+          />
+        </View>
+      )}
       <Button title='Submit' onPress={handleSubmit} />
     </View>
   );
