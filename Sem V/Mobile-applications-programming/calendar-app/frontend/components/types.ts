@@ -1,3 +1,5 @@
+import React from 'react'
+
 export type CalendarEvent = {
   id: string
   summary: string
@@ -37,21 +39,7 @@ export type DateTimeSelector = {
   title: string
   dateTime: Date
   dateTimeType: 'start' | 'end'
-  setDateTime: React.Dispatch<
-    React.SetStateAction<{
-      title: string
-      description: string
-      start: {
-        dateTime: Date
-        timeZone: string
-      }
-      end: {
-        dateTime: Date
-        timeZone: string
-      }
-      type: 'event'
-    }>
-  >
+  setDateTime: React.Dispatch<React.SetStateAction<FormData>>
 }
 
 export type FormData = {
@@ -65,7 +53,7 @@ export type FormData = {
     dateTime: Date
     timeZone: string
   }
-  type: 'event' | 'task'
+  type: string
 }
 
 export type EntryFormProps = {
