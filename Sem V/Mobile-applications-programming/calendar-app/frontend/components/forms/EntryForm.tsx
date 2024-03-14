@@ -65,17 +65,19 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
       />
       <TextInput
         placeholder='Title'
+        style={styles.input}
         value={formData.title}
         onChangeText={(text) => handleInput('title', text)}
       />
       <TextInput
         placeholder='Description'
+        style={styles.input}
         value={formData.description}
         onChangeText={(text) => handleInput('description', text)}
       />
       {formData.type === 'event' ? (
         // Date and time picker for creating event entries
-        <View>
+        <View style={styles.picker}>
           <DateTimePicker
             title={'Select start time'}
             dateTime={formData.start.dateTime}
@@ -91,7 +93,7 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
         </View>
       ) : (
         // Date-only picker for creating task entries
-        <View>
+        <View style={styles.picker}>
           <DateOnlyPicker
             title={'Select due date'}
             dateTime={formData.start.dateTime}
@@ -105,4 +107,19 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  input: {
+    marginTop: 10,
+    paddingLeft: 22,
+    borderColor: '#808080',
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  picker: {
+    marginTop: 16,
+    marginBottom: 20,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 12,
+  },
+});
