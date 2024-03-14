@@ -8,11 +8,26 @@ export default function ListView({ events, tasks }: CalendarData) {
   return (
     <View>
       <ScrollView>
-        <Events events={events} />
-        <CalendarTasks tasks={tasks} />
+        <Events events={events} styles={styles} />
+        <CalendarTasks tasks={tasks} styles={styles} />
       </ScrollView>
     </View>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  entryTextHeader: {
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  entryBody: {
+    fontSize: 12,
+    padding: 10,
+    marginBottom: 10,
+    borderColor: '#808080',
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+});

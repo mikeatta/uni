@@ -1,19 +1,23 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleProp, Text, TextStyle, View } from 'react-native';
 import React from 'react';
 import { CalendarTask } from '../types';
 
 type CalendarTaskProps = {
   tasks: CalendarTask[];
+  styles?: {
+    entryTextHeader: StyleProp<TextStyle>;
+    entryBody: StyleProp<TextStyle>;
+  };
 };
 
-function Tasks({ tasks }: CalendarTaskProps) {
+function Tasks({ tasks, styles }: CalendarTaskProps) {
   return (
     <View>
-      <Text>Tasks:</Text>
+      <Text style={styles?.entryTextHeader}>Tasks:</Text>
       {tasks.map((task, index) => {
         const { title, notes, due } = task;
         return (
-          <View key={index}>
+          <View key={index} style={styles?.entryBody}>
             <Text>
               {new Date(due).toLocaleDateString()} | {title} - {notes}
             </Text>
@@ -25,5 +29,3 @@ function Tasks({ tasks }: CalendarTaskProps) {
 }
 
 export default Tasks;
-
-const styles = StyleSheet.create({});
