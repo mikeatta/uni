@@ -40,14 +40,14 @@ function App() {
   }, []);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
       <StatusBar />
-      <View>
-        <Text>Create New Entry</Text>
+      <View style={styles.contentContainer}>
+        <Text style={styles.headerText}>Create New Entry</Text>
         <EntryForm onSubmit={handleFormSubmit} />
       </View>
-      <View>
-        <Text>Calendar Data</Text>
+      <View style={styles.contentContainer}>
+        <Text style={styles.headerText}>Calendar Data</Text>
         <ListView
           events={calendarData.events}
           tasklists={calendarData.tasklists}
@@ -58,6 +58,26 @@ function App() {
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    maxWidth: '100%',
+    padding: 10,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+  },
+  contentContainer: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    marginTop: 20,
+    textAlign: 'center',
+  },
+});
 
 export default App;
