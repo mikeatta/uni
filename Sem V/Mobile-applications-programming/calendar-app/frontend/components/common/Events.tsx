@@ -19,9 +19,9 @@ function Events({ events, styles }: CalendarEventProps) {
         return (
           <View key={index} style={styles?.entryBody}>
             <Text>
-              {new Date(start.dateTime).toLocaleTimeString()} :{' '}
-              {new Date(end.dateTime).toLocaleTimeString()} | {summary} -{' '}
-              {description}
+              {new Date(start.dateTime).toLocaleString()} :{' '}
+              {new Date(end.dateTime).toLocaleString()} | {summary}{' '}
+              {description && `- ${description}`}
             </Text>
           </View>
         );
