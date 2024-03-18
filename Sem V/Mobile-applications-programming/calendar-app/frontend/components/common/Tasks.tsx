@@ -19,7 +19,8 @@ function Tasks({ tasks, styles }: CalendarTaskProps) {
         return (
           <View key={index} style={styles?.entryBody}>
             <Text>
-              {new Date(due).toLocaleDateString()} | {title} {notes && `- ${notes}`}
+              {new Date(due).toLocaleDateString()} | {title}{' '}
+              {notes && `- ${notes}`}
             </Text>
           </View>
         );

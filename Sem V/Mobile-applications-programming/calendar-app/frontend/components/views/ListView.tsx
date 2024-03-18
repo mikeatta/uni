@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, View } from 'react-native';
 import React from 'react';
 import Events from '../common/Events';
-import CalendarTasks from '../common/Tasks';
+import Tasks from '../common/Tasks';
 import { CalendarData } from '../types';
 
 export default function ListView({ events, tasks }: CalendarData) {
@@ -9,7 +9,7 @@ export default function ListView({ events, tasks }: CalendarData) {
     <View>
       <ScrollView>
         <Events events={events} styles={styles} />
-        <CalendarTasks tasks={tasks} styles={styles} />
+        <Tasks tasks={tasks} styles={styles} />
       </ScrollView>
     </View>
   );

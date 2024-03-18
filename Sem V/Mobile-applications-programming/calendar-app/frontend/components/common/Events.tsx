@@ -1,4 +1,4 @@
-import { StyleProp, StyleSheet, Text, TextStyle, View } from 'react-native';
+import { StyleProp, Text, TextStyle, View } from 'react-native';
 import React from 'react';
 import { CalendarEvent } from '../types';
 
