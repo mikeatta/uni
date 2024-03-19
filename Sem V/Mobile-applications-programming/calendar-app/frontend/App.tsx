@@ -1,4 +1,11 @@
-import { SafeAreaView, StatusBar, StyleSheet, View, Text } from 'react-native';
+import {
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+} from 'react-native';
 import React, { useState, useEffect } from 'react';
 import ListView from './components/views/ListView';
 import axios from 'axios';
@@ -42,18 +49,20 @@ function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar />
-      <View style={styles.contentContainer}>
-        <Text style={styles.headerText}>Create New Entry</Text>
-        <EntryForm onSubmit={handleFormSubmit} />
-      </View>
-      <View style={styles.contentContainer}>
-        <Text style={styles.headerText}>Calendar Data</Text>
-        <ListView
-          events={calendarData.events}
-          tasklists={calendarData.tasklists}
-          tasks={calendarData.tasks}
-        />
-      </View>
+      <ScrollView>
+        <View style={styles.contentContainer}>
+          <Text style={styles.headerText}>Create New Entry</Text>
+          <EntryForm onSubmit={handleFormSubmit} />
+        </View>
+        <View style={styles.contentContainer}>
+          <Text style={styles.headerText}>Calendar Data</Text>
+          <ListView
+            events={calendarData.events}
+            tasklists={calendarData.tasklists}
+            tasks={calendarData.tasks}
+          />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
