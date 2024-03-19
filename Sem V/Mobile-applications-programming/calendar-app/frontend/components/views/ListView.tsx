@@ -6,26 +6,45 @@ import { CalendarData } from '../types';
 
 export default function ListView({ events, tasks }: CalendarData) {
   return (
-    <View>
-      <Events events={events} styles={styles} />
-      <Tasks tasks={tasks} styles={styles} />
+    <View style={styles.contentContainer}>
+      <Events events={events} styles={entryStyles} />
+      <Tasks tasks={tasks} styles={entryStyles} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  entryTextHeader: {
-    fontSize: 16,
-    fontWeight: '600',
+  contentContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+});
+
+const entryStyles = StyleSheet.create({
+  textHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
+    marginTop: 20,
   },
-  entryBody: {
-    fontSize: 12,
+  contentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: '#ccc',
     padding: 10,
     marginBottom: 10,
-    borderColor: '#808080',
-    borderRadius: 10,
-    borderWidth: 1,
+  },
+  content: {
+    flex: 1,
+    marginRight: 8,
+  },
+  icon: {
+    margin: 8,
   },
 });

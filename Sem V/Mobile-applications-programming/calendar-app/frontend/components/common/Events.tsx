@@ -1,28 +1,43 @@
 import { StyleProp, Text, TextStyle, View } from 'react-native';
 import React from 'react';
 import { CalendarEvent } from '../types';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 type CalendarEventProps = {
   events: CalendarEvent[];
   styles?: {
-    entryTextHeader: StyleProp<TextStyle>;
-    entryBody: StyleProp<TextStyle>;
+    textHeader: StyleProp<TextStyle>;
+    contentContainer: StyleProp<TextStyle>;
+    content: StyleProp<TextStyle>;
+    icon: StyleProp<TextStyle>;
   };
 };
 
 function Events({ events, styles }: CalendarEventProps) {
   return (
     <View>
-      <Text style={styles?.entryTextHeader}>Events:</Text>
+      <Text style={styles?.textHeader}>Events:</Text>
       {events.map((event, index) => {
         const { summary, description, start, end } = event;
         return (
-          <View key={index} style={styles?.entryBody}>
-            <Text>
+          <View key={index} style={styles?.contentContainer}>
+            <Text style={styles?.content}>
               {new Date(start.dateTime).toLocaleString()} :{' '}
               {new Date(end.dateTime).toLocaleString()} | {summary}{' '}
               {description && `- ${description}`}
             </Text>
+            <Icon
+              name='create-outline'
+              style={styles?.icon}
+              size={24}
+              color='blue'
+            />
+            <Icon
+              name='trash-outline'
+              style={styles?.icon}
+              size={24}
+              color='red'
+            />
           </View>
         );
       })}
