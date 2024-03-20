@@ -53,7 +53,7 @@ export type FormData = {
     dateTime: Date
     timeZone: string
   }
-  type: string
+  type: 'event' | 'task'
 }
 
 export type EntryFormProps = {
