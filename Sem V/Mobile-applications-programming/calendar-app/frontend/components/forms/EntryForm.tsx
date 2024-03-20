@@ -1,7 +1,7 @@
 import { StyleSheet, TextInput, View, Button } from 'react-native';
 import React, { useState } from 'react';
 import { SelectList } from 'react-native-dropdown-select-list';
-import { EntryFormProps } from '../types';
+import { EntryFormProps, FormData } from '../types';
 import DateTimePicker from '../common/DateTimePicker';
 import DateOnlyPicker from '../common/DateOnlyPicker';
 
@@ -9,7 +9,7 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
   const currentDayTime: Date = new Date();
   const deviceTimeZone: string = currentDayTime.getTimezoneOffset().toString();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     title: '',
     description: '',
     start: {
@@ -20,7 +20,7 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
       dateTime: currentDayTime,
       timeZone: deviceTimeZone,
     },
-    type: '',
+    type: 'event', // Default option
   });
 
   const handleInput = (name: string, value: string | Date) => {
@@ -45,7 +45,7 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
           dateTime: currentDayTime,
           timeZone: deviceTimeZone,
         },
-        type: '',
+        type: 'event',
       });
     } catch (error) {
       console.error('Error submitting form data', error);
@@ -60,7 +60,10 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
           { key: 'event', value: 'Event' },
           { key: 'task', value: 'Task' },
         ]}
-        defaultOption={{ key: 'event', value: 'Event' }}
+        defaultOption={{
+          key: formData.type,
+          value: formData.type === 'event' ? 'Event' : 'Task',
+        }}
         search={false}
       />
       <TextInput
