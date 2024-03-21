@@ -10,7 +10,7 @@ import React, { useState, useEffect } from 'react';
 import ListView from './components/views/ListView';
 import axios from 'axios';
 import EntryForm from './components/forms/EntryForm';
-import { FormData } from './components/types';
+import { CalendarEvent, CalendarTask, FormData } from './components/types';
 
 function App() {
   const [calendarData, setCalendarData] = useState({
@@ -21,12 +21,47 @@ function App() {
 
   const handleFormSubmit = async (formData: FormData) => {
     try {
-      const response = await axios.post(
+      await axios.post(
         'http://192.168.0.114:3001/api/v1/calendar/new-entry',
         formData,
       );
     } catch (error) {
       console.error('Error submittng form data:', error);
+    }
+  };
+
+  const handleEntryEdit = async (formData: CalendarEvent | CalendarTask) => {
+    try {
+      await axios.patch(
+        'http://192.168.0.114/api/v1/calendar/modify-entry',
+        formData,
+      );
+    } catch (error) {
+      console.error('Error editing the entry:', error);
+    }
+  };
+
+  const handleEntryRemoval = async (id: string, type: string) => {
+    try {
+      await axios.delete(
+        'http://192.168.0.114:3001/api/v1/calendar/remove-entry',
+        {
+          data: { id, type },
+        },
+      );
+    } catch (error) {
+      console.error('Error removing the entry:', error);
+    }
+  };
+
+  const handleTaskStatusUpdate = async (taskData: CalendarTask) => {
+    try {
+      await axios.patch(
+        'http://192.168.0.114:3001/api/v1/calendar/update-task-status',
+        taskData,
+      );
+    } catch (error) {
+      console.error('Error changing task status:', error);
     }
   };
 
@@ -60,6 +95,9 @@ function App() {
             events={calendarData.events}
             tasklists={calendarData.tasklists}
             tasks={calendarData.tasks}
+            onStatusChange={handleTaskStatusUpdate}
+            onEdit={handleEntryEdit}
+            onRemove={handleEntryRemoval}
           />
         </View>
       </ScrollView>

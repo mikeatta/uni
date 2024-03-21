@@ -33,6 +33,9 @@ export type CalendarData = {
   events: CalendarEvent[]
   tasklists: CalendarTasklist[]
   tasks: CalendarTask[]
+  onStatusChange: (taskData: CalendarTask) => Promise<void>
+  onEdit: (formData: CalendarEvent | CalendarTask) => Promise<void>
+  onRemove: (id: string, type: string) => Promise<void>
 }
 
 export type DateTimeSelector = {

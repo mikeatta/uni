@@ -11,9 +11,14 @@ type CalendarTaskProps = {
     content: StyleProp<TextStyle>;
     icon: StyleProp<TextStyle>;
   };
+  functions: {
+    onStatusChange: (task: CalendarTask) => Promise<void>;
+    onEdit: (formData: CalendarTask) => Promise<void>;
+    onRemove: (id: string, type: 'task') => Promise<void>;
+  };
 };
 
-function Tasks({ tasks, styles }: CalendarTaskProps) {
+function Tasks({ tasks, styles, functions }: CalendarTaskProps) {
   return (
     <View>
       <Text style={styles?.textHeader}>Tasks:</Text>
@@ -34,6 +39,7 @@ function Tasks({ tasks, styles }: CalendarTaskProps) {
               style={styles?.icon}
               size={24}
               color='green'
+              onPress={() => functions.onStatusChange(task)}
             />
             <Icon
               name='create-outline'
@@ -46,6 +52,7 @@ function Tasks({ tasks, styles }: CalendarTaskProps) {
               style={styles?.icon}
               size={24}
               color='red'
+              onPress={() => functions.onRemove(task.id, 'task')}
             />
           </View>
         );

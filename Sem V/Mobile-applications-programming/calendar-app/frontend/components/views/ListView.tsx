@@ -4,11 +4,25 @@ import Events from '../common/Events';
 import Tasks from '../common/Tasks';
 import { CalendarData } from '../types';
 
-export default function ListView({ events, tasks }: CalendarData) {
+export default function ListView({
+  events,
+  tasks,
+  onStatusChange,
+  onEdit,
+  onRemove,
+}: CalendarData) {
   return (
     <View style={styles.contentContainer}>
-      <Events events={events} styles={entryStyles} />
-      <Tasks tasks={tasks} styles={entryStyles} />
+      <Events
+        events={events}
+        styles={entryStyles}
+        functions={{ onEdit, onRemove }}
+      />
+      <Tasks
+        tasks={tasks}
+        styles={entryStyles}
+        functions={{ onStatusChange, onEdit, onRemove }}
+      />
     </View>
   );
 }

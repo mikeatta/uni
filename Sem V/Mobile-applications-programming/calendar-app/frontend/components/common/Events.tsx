@@ -11,9 +11,13 @@ type CalendarEventProps = {
     content: StyleProp<TextStyle>;
     icon: StyleProp<TextStyle>;
   };
+  functions: {
+    onEdit: (formData: CalendarEvent) => Promise<void>;
+    onRemove: (id: string, type: 'event') => Promise<void>;
+  };
 };
 
-function Events({ events, styles }: CalendarEventProps) {
+function Events({ events, styles, functions }: CalendarEventProps) {
   return (
     <View>
       <Text style={styles?.textHeader}>Events:</Text>
@@ -37,6 +41,7 @@ function Events({ events, styles }: CalendarEventProps) {
               style={styles?.icon}
               size={24}
               color='red'
+              onPress={() => functions.onRemove(event.id, 'event')}
             />
           </View>
         );
