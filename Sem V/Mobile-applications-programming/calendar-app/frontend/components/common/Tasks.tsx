@@ -1,7 +1,8 @@
 import { StyleProp, Text, TextStyle, View } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { CalendarTask } from '../types';
 import Icon from 'react-native-vector-icons/Ionicons';
+import ConfirmationBox from '../overlays/ConfirmationBox';
 
 type CalendarTaskProps = {
   tasks: CalendarTask[];
@@ -19,6 +20,15 @@ type CalendarTaskProps = {
 };
 
 function Tasks({ tasks, styles, functions }: CalendarTaskProps) {
+  const [isBoxVisible, setIsBoxVisible] = useState<boolean>(false);
+
+  const handleConfirmationBox = () => setIsBoxVisible(!isBoxVisible);
+
+  const handleTaskRemoval = (taskId: string) => {
+    functions.onRemove(taskId, 'task');
+    handleConfirmationBox(); // Close ConfirmationBox
+  };
+
   return (
     <View>
       <Text style={styles?.textHeader}>Tasks:</Text>
@@ -52,7 +62,15 @@ function Tasks({ tasks, styles, functions }: CalendarTaskProps) {
               style={styles?.icon}
               size={24}
               color='red'
-              onPress={() => functions.onRemove(task.id, 'task')}
+              onPress={handleConfirmationBox}
+            />
+            <ConfirmationBox
+              isVisible={isBoxVisible}
+              alertMessage='delete the task'
+              onPressFunctions={{
+                confirm: () => handleTaskRemoval(task.id),
+                cancel: handleConfirmationBox,
+              }}
             />
           </View>
         );
