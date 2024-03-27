@@ -22,6 +22,7 @@ function DateOnlyPicker({ title, dateTime, setDateTime }: DateTimeSelector) {
             start: { ...prev.start, dateTime: date },
           }));
         }}
+        onCancel={() => setOpen(false)}
       />
     </View>
   );
