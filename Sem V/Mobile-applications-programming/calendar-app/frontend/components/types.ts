@@ -34,7 +34,7 @@ export type CalendarData = {
   tasklists: CalendarTasklist[]
   tasks: CalendarTask[]
   onStatusChange: (taskData: CalendarTask) => Promise<void>
-  onEdit: (formData: CalendarEvent | CalendarTask) => Promise<void>
+  onEdit: (formData: FormData) => Promise<void>
   onRemove: (id: string, type: string) => Promise<void>
 }
 
@@ -46,8 +46,9 @@ export type DateTimeSelector = {
 }
 
 export type FormData = {
+  id: string
   title: string
-  description: string
+  description?: string
   start: {
     dateTime: Date
     timeZone: string
