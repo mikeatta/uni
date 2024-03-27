@@ -89,21 +89,15 @@ app.post('/api/v1/calendar/new-entry', async (req, res) => {
 
 app.patch('/api/v1/calendar/modify-entry', async (req, res) => {
   try {
-    const { id, title, description, dateTime, type } = req.body;
+    const { id, title, description, start, end, type } = req.body;
 
     if (type === 'event') {
       const event = {
         eventId: id,
         summary: title,
         description: description,
-        start: {
-          dateTime: dateTime,
-          timeZone: 'CET',
-        },
-        end: {
-          dateTime: dateTime,
-          timeZone: 'CET',
-        },
+        start: start,
+        end: end,
       };
 
       await editEvent(calendar, event);
@@ -112,7 +106,7 @@ app.patch('/api/v1/calendar/modify-entry', async (req, res) => {
         id: id,
         title: title,
         notes: description,
-        due: dateTime,
+        due: start.dateTime,
       };
 
       await editTask(service, task);
