@@ -30,10 +30,10 @@ function App() {
     }
   };
 
-  const handleEntryEdit = async (formData: CalendarEvent | CalendarTask) => {
+  const handleEntryEdit = async (formData: FormData) => {
     try {
       await axios.patch(
-        'http://192.168.0.114/api/v1/calendar/modify-entry',
+        'http://192.168.0.114:3001/api/v1/calendar/modify-entry',
         formData,
       );
     } catch (error) {
