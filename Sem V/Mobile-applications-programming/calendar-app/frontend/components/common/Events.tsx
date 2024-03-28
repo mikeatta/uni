@@ -24,7 +24,9 @@ function Events({ events, styles, functions }: CalendarEventProps) {
     [key: string]: boolean;
   }>({});
 
-  const [isBoxVisible, setIsBoxVisible] = useState<boolean>(false);
+  const [isConfirmationVisible, setisConfirmationVisible] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const handleEditBox = (eventId: string) => {
     setIsEditVisible((prevState) => ({
@@ -33,7 +35,12 @@ function Events({ events, styles, functions }: CalendarEventProps) {
     }));
   };
 
-  const handleConfirmationBox = () => setIsBoxVisible(!isBoxVisible);
+  const handleConfirmationBox = (eventId: string) => {
+    setisConfirmationVisible((prevState) => ({
+      ...prevState,
+      [eventId]: !prevState[eventId],
+    }));
+  };
 
   const convertToFormData = (event: CalendarEvent): FormData => {
     return {
@@ -53,7 +60,7 @@ function Events({ events, styles, functions }: CalendarEventProps) {
 
   const handleEventRemoval = (eventId: string) => {
     functions.onRemove(eventId, 'event');
-    handleConfirmationBox(); // Close ConfirmationBox
+    handleConfirmationBox(eventId); // Close ConfirmationBox
   };
 
   return (
@@ -80,7 +87,7 @@ function Events({ events, styles, functions }: CalendarEventProps) {
               style={styles?.icon}
               size={24}
               color='red'
-              onPress={handleConfirmationBox}
+              onPress={() => handleConfirmationBox(id)}
             />
             {isEditVisible[id] && (
               <EditBox
@@ -93,14 +100,16 @@ function Events({ events, styles, functions }: CalendarEventProps) {
                 }}
               />
             )}
-            <ConfirmationBox
-              isVisible={isBoxVisible}
-              alertMessage='delete the task'
-              onPressFunctions={{
-                confirm: () => handleEventRemoval(id),
-                cancel: handleConfirmationBox,
-              }}
-            />
+            {isConfirmationVisible[id] && (
+              <ConfirmationBox
+                isVisible={isConfirmationVisible[id]}
+                alertMessage='delete the task'
+                onPressFunctions={{
+                  confirm: () => handleEventRemoval(id),
+                  cancel: () => handleConfirmationBox(id),
+                }}
+              />
+            )}
           </View>
         );
       })}
