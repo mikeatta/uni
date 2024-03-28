@@ -21,25 +21,17 @@ type CalendarTaskProps = {
 };
 
 function Tasks({ tasks, styles, functions }: CalendarTaskProps) {
-  const [isEditVisible, setIsEditVisible] = useState<{
-    [key: string]: boolean;
+  const [visibility, setVisibility] = useState<{
+    [key: string]: { edit: boolean; confirm: boolean };
   }>({});
 
-  const [isConfirmationVisible, setisConfirmationVisible] = useState<{
-    [key: string]: boolean;
-  }>({});
-
-  const handleEditBox = (taskId: string) => {
-    setIsEditVisible((prevState) => ({
+  const toggleVisibility = (taskId: string, type: 'edit' | 'confirm') => {
+    setVisibility((prevState) => ({
       ...prevState,
-      [taskId]: !prevState[taskId],
-    }));
-  };
-
-  const handleConfirmationBox = (taskId: string) => {
-    setisConfirmationVisible((prevState) => ({
-      ...prevState,
-      [taskId]: !prevState[taskId],
+      [taskId]: {
+        ...prevState[taskId],
+        [type]: !prevState[taskId]?.[type],
+      },
     }));
   };
 
@@ -62,12 +54,12 @@ function Tasks({ tasks, styles, functions }: CalendarTaskProps) {
 
   const handleTaskEdit = (task: FormData) => {
     functions.onEdit(task);
-    handleEditBox(task.id); // Close specified EditBox
+    toggleVisibility(task.id, 'edit');
   };
 
   const handleTaskRemoval = (taskId: string) => {
     functions.onRemove(taskId, 'task');
-    handleConfirmationBox(taskId); // Close ConfirmationBox
+    toggleVisibility(taskId, 'confirm');
   };
 
   return (
@@ -97,32 +89,32 @@ function Tasks({ tasks, styles, functions }: CalendarTaskProps) {
               style={styles?.icon}
               size={24}
               color='blue'
-              onPress={() => handleEditBox(id)}
+              onPress={() => toggleVisibility(id, 'edit')}
             />
             <Icon
               name='trash-outline'
               style={styles?.icon}
               size={24}
               color='red'
-              onPress={() => handleConfirmationBox(id)}
+              onPress={() => toggleVisibility(id, 'confirm')}
             />
-            {isEditVisible[id] && (
+            {visibility[id]?.edit && (
               <EditBox
                 entry={convertToFormData(task)}
-                isVisible={isEditVisible[id]}
+                isVisible={visibility[id]?.edit}
                 onPressFunctions={{
                   submit: handleTaskEdit,
-                  cancel: () => handleEditBox(id),
+                  cancel: () => toggleVisibility(id, 'edit'),
                 }}
               />
             )}
-            {isConfirmationVisible[id] && (
+            {visibility[id]?.confirm && (
               <ConfirmationBox
-                isVisible={isConfirmationVisible[id]}
+                isVisible={visibility[id]?.confirm}
                 alertMessage='delete the task'
                 onPressFunctions={{
                   confirm: () => handleTaskRemoval(id),
-                  cancel: () => handleConfirmationBox(id),
+                  cancel: () => toggleVisibility(id, 'confirm'),
                 }}
               />
             )}
