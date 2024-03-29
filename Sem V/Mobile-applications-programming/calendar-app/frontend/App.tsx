@@ -7,78 +7,26 @@ import {
   Text,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
+import {
+  handleFormSubmit,
+  handleEntryEdit,
+  handleEntryRemoval,
+  handleTaskStatusUpdate,
+  fetchData,
+} from './utils/api';
+import { ICalendarData } from './components/types';
 import ListView from './components/views/ListView';
-import axios from 'axios';
 import EntryForm from './components/forms/EntryForm';
-import { CalendarEvent, CalendarTask, FormData } from './components/types';
 
 function App() {
-  const [calendarData, setCalendarData] = useState({
+  const [calendarData, setCalendarData] = useState<ICalendarData>({
     events: [],
     tasklists: [],
     tasks: [],
   });
 
-  const handleFormSubmit = async (formData: FormData) => {
-    try {
-      await axios.post(
-        'http://192.168.0.114:3001/api/v1/calendar/new-entry',
-        formData,
-      );
-    } catch (error) {
-      console.error('Error submittng form data:', error);
-    }
-  };
-
-  const handleEntryEdit = async (formData: FormData) => {
-    try {
-      await axios.patch(
-        'http://192.168.0.114:3001/api/v1/calendar/modify-entry',
-        formData,
-      );
-    } catch (error) {
-      console.error('Error editing the entry:', error);
-    }
-  };
-
-  const handleEntryRemoval = async (id: string, type: string) => {
-    try {
-      await axios.delete(
-        'http://192.168.0.114:3001/api/v1/calendar/remove-entry',
-        {
-          data: { id, type },
-        },
-      );
-    } catch (error) {
-      console.error('Error removing the entry:', error);
-    }
-  };
-
-  const handleTaskStatusUpdate = async (taskData: CalendarTask) => {
-    try {
-      await axios.patch(
-        'http://192.168.0.114:3001/api/v1/calendar/update-task-status',
-        taskData,
-      );
-    } catch (error) {
-      console.error('Error changing task status:', error);
-    }
-  };
-
-  // Fetch calendar data
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(
-        'http://192.168.0.114:3001/api/v1/calendar',
-      );
-      setCalendarData(response.data);
-    } catch (error) {
-      console.error('Error fetching calendar data:', error);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
+    fetchData(setCalendarData);
   }, []);
 
   return (

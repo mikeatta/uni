@@ -29,6 +29,12 @@ export type CalendarTask = {
   due: string
 }
 
+export interface ICalendarData {
+  events: CalendarEvent[]
+  tasklists: CalendarTasklist[]
+  tasks: CalendarTask[]
+}
+
 export type CalendarData = {
   events: CalendarEvent[]
   tasklists: CalendarTasklist[]
