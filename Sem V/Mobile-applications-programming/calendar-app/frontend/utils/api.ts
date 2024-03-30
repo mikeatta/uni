@@ -1,13 +1,13 @@
 import axios from 'axios'
 import { CalendarTask, FormData, ICalendarData } from '../components/types'
 
+// Local development address
+const LOCAL_URL = 'http://10.0.2.2:3001'
+
 // Submit new entry
 const handleFormSubmit = async (formData: FormData) => {
   try {
-    await axios.post(
-      'http://192.168.0.114:3001/api/v1/calendar/new-entry',
-      formData,
-    )
+    await axios.post(`${LOCAL_URL}/api/v1/calendar/new-entry`, formData)
   } catch (error) {
     console.error('Error submittng form data:', error)
   }
@@ -16,10 +16,7 @@ const handleFormSubmit = async (formData: FormData) => {
 // Modify existing entry data
 const handleEntryEdit = async (formData: FormData) => {
   try {
-    await axios.patch(
-      'http://192.168.0.114:3001/api/v1/calendar/modify-entry',
-      formData,
-    )
+    await axios.patch(`${LOCAL_URL}/api/v1/calendar/modify-entry`, formData)
   } catch (error) {
     console.error('Error editing the entry:', error)
   }
@@ -28,12 +25,9 @@ const handleEntryEdit = async (formData: FormData) => {
 // Remove specified entry
 const handleEntryRemoval = async (id: string, type: string) => {
   try {
-    await axios.delete(
-      'http://192.168.0.114:3001/api/v1/calendar/remove-entry',
-      {
-        data: { id, type },
-      },
-    )
+    await axios.delete(`${LOCAL_URL}/api/v1/calendar/remove-entry`, {
+      data: { id, type },
+    })
   } catch (error) {
     console.error('Error removing the entry:', error)
   }
@@ -43,7 +37,7 @@ const handleEntryRemoval = async (id: string, type: string) => {
 const handleTaskStatusUpdate = async (taskData: CalendarTask) => {
   try {
     await axios.patch(
-      'http://192.168.0.114:3001/api/v1/calendar/update-task-status',
+      `${LOCAL_URL}/api/v1/calendar/update-task-status`,
       taskData,
     )
   } catch (error) {
@@ -56,9 +50,7 @@ const fetchData = async (
   setCalendarData: React.Dispatch<React.SetStateAction<ICalendarData>>,
 ) => {
   try {
-    const response = await axios.get(
-      'http://192.168.0.114:3001/api/v1/calendar',
-    )
+    const response = await axios.get(`${LOCAL_URL}/api/v1/calendar`)
     setCalendarData(response.data)
   } catch (error) {
     console.error('Error fetching calendar data:', error)
