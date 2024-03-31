@@ -23,7 +23,7 @@ function DateTimePicker({
           setOpen(false);
           setDateTime((prev) => ({
             ...prev,
-            [dateTimeType]: { dateTime: date },
+            [dateTimeType]: { ...prev[dateTimeType], dateTime: date },
           }));
         }}
         onCancel={() => setOpen(false)}
