@@ -2,12 +2,13 @@ import { StyleSheet, TextInput, View, Button } from 'react-native';
 import React, { useState } from 'react';
 import { SelectList } from 'react-native-dropdown-select-list';
 import { EntryFormProps, FormData } from '../types';
+import moment from 'moment-timezone';
 import DateTimePicker from '../common/DateTimePicker';
 import DateOnlyPicker from '../common/DateOnlyPicker';
 
 export default function EntryForm({ onSubmit }: EntryFormProps) {
   const currentDayTime: Date = new Date();
-  const deviceTimeZone: string = currentDayTime.getTimezoneOffset().toString();
+  const deviceTimeZone: string = moment.tz.guess(true);
 
   const [formData, setFormData] = useState<FormData>({
     id: '',
