@@ -39,8 +39,14 @@ function Events({ events, styles, functions }: CalendarEventProps) {
       id: event.id,
       title: event.summary,
       description: event.description,
-      start: event.start,
-      end: event.end,
+      start: {
+        dateTime: new Date(event.start.dateTime),
+        timeZone: event.start.timeZone,
+      },
+      end: {
+        dateTime: new Date(event.end.dateTime),
+        timeZone: event.end.timeZone,
+      },
       type: 'event',
     };
   };
