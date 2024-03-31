@@ -32,7 +32,7 @@ function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar />
-      <ScrollView>
+      <ScrollView style={{ width: '100%' }}>
         <View style={styles.contentContainer}>
           <Text style={styles.headerText}>Create New Entry</Text>
           <EntryForm onSubmit={handleFormSubmit} />

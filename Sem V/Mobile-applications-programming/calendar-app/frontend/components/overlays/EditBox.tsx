@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   popupContainer: {
+    width: '70%',
     backgroundColor: '#fff',
     padding: 20,
     borderRadius: 10,
