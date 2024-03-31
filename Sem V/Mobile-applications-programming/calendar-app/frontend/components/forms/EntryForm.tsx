@@ -10,6 +10,7 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
   const deviceTimeZone: string = currentDayTime.getTimezoneOffset().toString();
 
   const [formData, setFormData] = useState<FormData>({
+    id: '',
     title: '',
     description: '',
     start: {
@@ -35,6 +36,7 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
       await onSubmit(formData);
       // Reset the form fields
       setFormData({
+        id: '',
         title: '',
         description: '',
         start: {
