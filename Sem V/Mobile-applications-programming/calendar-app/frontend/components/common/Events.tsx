@@ -101,7 +101,7 @@ function Events({ events, styles, functions }: CalendarEventProps) {
             {visibility[id]?.confirm && (
               <ConfirmationBox
                 isVisible={visibility[id]?.confirm}
-                alertMessage='delete the task'
+                alertMessage='delete the event'
                 onPressFunctions={{
                   confirm: () => handleEventRemoval(id),
                   cancel: () => toggleVisibility(id, 'confirm'),
