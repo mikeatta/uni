@@ -10,10 +10,14 @@ function DateTimePicker({
   setDateTime,
 }: DateTimeSelector) {
   const [open, setOpen] = useState(false);
+  const selectedDate =
+    dateTimeType === 'start'
+      ? `🚩 ${dateTime.toLocaleDateString()} | ${dateTime.toLocaleTimeString()}`
+      : `🏁 ${dateTime.toLocaleDateString()} | ${dateTime.toLocaleTimeString()}`;
 
   return (
     <View>
-      <Button title='Open' onPress={() => setOpen(true)} />
+      <Button title={selectedDate} onPress={() => setOpen(true)} />
       <DatePicker
         modal
         title={title}

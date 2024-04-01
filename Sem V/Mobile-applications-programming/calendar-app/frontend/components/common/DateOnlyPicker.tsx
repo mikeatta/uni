@@ -5,10 +5,11 @@ import { DateTimeSelector } from '../types';
 
 function DateOnlyPicker({ title, dateTime, setDateTime }: DateTimeSelector) {
   const [open, setOpen] = useState(false);
+  const selectedDate = `⏰ ${dateTime.toLocaleDateString()}`;
 
   return (
     <View>
-      <Button title='Open' onPress={() => setOpen(true)} />
+      <Button title={selectedDate} onPress={() => setOpen(true)} />
       <DatePicker
         modal
         title={title}
