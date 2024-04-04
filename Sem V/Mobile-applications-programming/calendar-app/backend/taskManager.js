@@ -1,24 +1,33 @@
 'use strict';
 
+const PRIMARY_TASKLIST = {
+  id: null,
+  title: null,
+};
+
 async function listEvents(calendar) {
-  const res = await calendar.events.list({
-    calendarId: 'primary',
-    timeMin: new Date().toISOString(),
-    maxResults: 10,
-    singleEvents: true,
-    orderBy: 'startTime',
-  });
-  const events = res.data.items;
-  if (!events || events.length === 0) {
-    console.log('No upcoming events found.');
-    return;
+  try {
+    const res = await calendar.events.list({
+      calendarId: 'primary',
+      timeMin: new Date().toISOString(),
+      maxResults: 10,
+      singleEvents: true,
+      orderBy: 'startTime',
+    });
+    const events = res.data.items;
+    if (!events || events.length === 0) {
+      console.log('No upcoming events found.');
+      return;
+    }
+    console.log('Upcoming events:');
+    events.map((event, i) => {
+      const start = event.start.dateTime || event.start.date;
+      console.log(`${start} - ${event.summary}`);
+    });
+    return events;
+  } catch (error) {
+    console.log('Error getting events.', error);
   }
-  console.log('Upcoming events:');
-  events.map((event, i) => {
-    const start = event.start.dateTime || event.start.date;
-    console.log(`${start} - ${event.summary}`);
-  });
-  return events;
 }
 
 async function addEvent(calendar, event) {
@@ -59,52 +68,69 @@ async function removeEvent(calendar, { eventId }) {
 }
 
 async function listTasklists(service) {
-  const res = await service.tasklists.list({
-    maxResults: 10,
-  });
-  const tasklists = res.data.items;
-  if (!tasklists || tasklists.length === 0) {
-    console.log('No tasks found.');
-    return;
+  try {
+    const res = await service.tasklists.list({
+      maxResults: 10,
+    });
+    const tasklists = res.data.items;
+    if (!tasklists || tasklists.length === 0) {
+      console.log('No tasklists found.');
+      return;
+    }
+    let defaultTasklist = tasklists[0]; // Assign first found tasklist as the default
+    if (tasklists.length > 1) {
+      // Find the default tasklist with the title of 'My Tasks'
+      for (const tasklist of tasklists) {
+        if (tasklist.title === 'My Tasks') {
+          defaultTasklist = tasklist;
+          break;
+        }
+      }
+    }
+    // Update the primary tasklist properties
+    PRIMARY_TASKLIST.id = defaultTasklist.id;
+    PRIMARY_TASKLIST.title = defaultTasklist.title;
+    return defaultTasklist; // Return the first found tasklist as a fallback primary tasklist
+  } catch (error) {
+    console.log('Error getting tasklists.', error);
   }
-  console.log('Available tasklists:');
-  const tasklistObjects = tasklists.map((tasklist, i) => {
-    const title = tasklist.title;
-    const id = tasklist.id;
-    console.log(`${i + 1}. ${title} - ID: ${id}`);
-    return {
-      id: id,
-      title: title,
-    };
-  });
-  return tasklistObjects;
 }
 
 async function listTasks(service) {
-  const res = await service.tasks.list({
-    tasklist: 'MTI4NTk2NzEwNjY0MzQ5NjAzNzg6MDow',
-  });
-  const tasks = res.data.items;
-  if (!tasks || tasks.length === 0) {
-    console.log('No tasks found.');
-    return;
+  try {
+    if (!PRIMARY_TASKLIST) {
+      throw new Error('Primary tasklist not found.');
+    }
+    const res = await service.tasks.list({
+      tasklist: PRIMARY_TASKLIST.id,
+    });
+    const tasks = res.data.items;
+    if (!tasks || tasks.length === 0) {
+      console.log('No tasks found.');
+      return;
+    }
+    console.log('Found tasks:');
+    tasks.map((task, i) => {
+      // Extract just the due date from the string
+      const due = new Date(task.due).toISOString().split('T')[0];
+      const title = task.title;
+      const notes = task.notes !== undefined ? task.notes : '';
+      // Print notes if available, else print just the date and title
+      console.log(notes ? `${due} - ${title}: ${notes}` : `${due} - ${title}`);
+    });
+    return tasks;
+  } catch (error) {
+    console.log('Error getting tasks:', error);
   }
-  console.log('Found tasks:');
-  tasks.map((task, i) => {
-    // Extract just the due date from the string
-    const due = new Date(task.due).toISOString().split('T')[0];
-    const title = task.title;
-    const notes = task.notes !== undefined ? task.notes : '';
-    // Print notes if available, else print just the date and title
-    console.log(notes ? `${due} - ${title}: ${notes}` : `${due} - ${title}`);
-  });
-  return tasks;
 }
 
 async function addTask(service, task) {
   try {
+    if (!PRIMARY_TASKLIST) {
+      throw new Error('Primary tasklist not found.');
+    }
     const res = await service.tasks.insert({
-      tasklist: 'MTI4NTk2NzEwNjY0MzQ5NjAzNzg6MDow',
+      tasklist: PRIMARY_TASKLIST.id,
       resource: task,
     });
     console.log('Task added:', res.data);
@@ -116,8 +142,11 @@ async function addTask(service, task) {
 
 async function editTask(service, task) {
   try {
+    if (!PRIMARY_TASKLIST) {
+      throw new Error('Primary tasklist not found.');
+    }
     const res = await service.tasks.patch({
-      tasklist: 'MTI4NTk2NzEwNjY0MzQ5NjAzNzg6MDow',
+      tasklist: PRIMARY_TASKLIST.id,
       task: task.id,
       resource: task,
     });
@@ -129,8 +158,11 @@ async function editTask(service, task) {
 
 async function removeTask(service, { task }) {
   try {
+    if (!PRIMARY_TASKLIST) {
+      throw new Error('Primary tasklist not found.');
+    }
     const res = await service.tasks.delete({
-      tasklist: 'MTI4NTk2NzEwNjY0MzQ5NjAzNzg6MDow',
+      tasklist: PRIMARY_TASKLIST.id,
       task: task,
     });
     console.log('Task removed successfully. Status: ', res.status);
@@ -141,11 +173,15 @@ async function removeTask(service, { task }) {
 
 async function updateTaskStatus(service, task) {
   try {
+    if (!PRIMARY_TASKLIST) {
+      throw new Error('Primary tasklist not found.');
+    }
     const res = await service.tasks.patch({
-      tasklist: 'MTI4NTk2NzEwNjY0MzQ5NjAzNzg6MDow',
+      tasklist: PRIMARY_TASKLIST.id,
       task: task.id,
       resource: task,
     });
+    console.log('Task status changed successfully. Status: ', res.status);
   } catch (error) {
     console.error('Error completing task', error);
   }
