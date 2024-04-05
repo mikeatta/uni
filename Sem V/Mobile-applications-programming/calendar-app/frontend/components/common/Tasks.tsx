@@ -1,9 +1,16 @@
-import { StyleProp, Text, TextStyle, View } from 'react-native';
+import {
+  StyleProp,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, { useState } from 'react';
 import { CalendarTask, FormData } from '../types';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ConfirmationBox from '../overlays/ConfirmationBox';
 import EditBox from '../overlays/EditBox';
+import DetailsBox from '../overlays/DetailsBox';
 
 type CalendarTaskProps = {
   tasks: CalendarTask[];
@@ -22,10 +29,13 @@ type CalendarTaskProps = {
 
 function Tasks({ tasks, styles, functions }: CalendarTaskProps) {
   const [visibility, setVisibility] = useState<{
-    [key: string]: { edit: boolean; confirm: boolean };
+    [key: string]: { edit: boolean; confirm: boolean; details: boolean };
   }>({});
 
-  const toggleVisibility = (taskId: string, type: 'edit' | 'confirm') => {
+  const toggleVisibility = (
+    taskId: string,
+    type: 'edit' | 'confirm' | 'details',
+  ) => {
     setVisibility((prevState) => ({
       ...prevState,
       [taskId]: {
@@ -66,13 +76,19 @@ function Tasks({ tasks, styles, functions }: CalendarTaskProps) {
     <View>
       <Text style={styles?.textHeader}>Tasks:</Text>
       {tasks.map((task, index) => {
-        const { id, title, notes, due } = task;
+        const { id, title, due } = task;
         return (
           <View key={index} style={styles?.contentContainer}>
-            <Text style={styles?.content}>
-              {new Date(due).toLocaleDateString()} | {title}{' '}
-              {notes && `- ${notes}`}
-            </Text>
+            <TouchableOpacity
+              style={styles?.content}
+              activeOpacity={0.6}
+              onLongPress={() => toggleVisibility(id, 'details')}
+            >
+              <Text>
+                {new Date(due).toLocaleDateString()} |{' '}
+                {title ? title : 'No title found'}
+              </Text>
+            </TouchableOpacity>
             <Icon
               name={
                 task.status === 'completed'
@@ -115,6 +131,15 @@ function Tasks({ tasks, styles, functions }: CalendarTaskProps) {
                 onPressFunctions={{
                   confirm: () => handleTaskRemoval(id),
                   cancel: () => toggleVisibility(id, 'confirm'),
+                }}
+              />
+            )}
+            {visibility[id]?.details && (
+              <DetailsBox
+                entry={convertToFormData(task)}
+                isVisible={visibility[id]?.details}
+                onPressFunctions={{
+                  close: () => toggleVisibility(id, 'details'),
                 }}
               />
             )}

@@ -1,9 +1,16 @@
-import { StyleProp, Text, TextStyle, View } from 'react-native';
+import {
+  StyleProp,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, { useState } from 'react';
 import { CalendarEvent, FormData } from '../types';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ConfirmationBox from '../overlays/ConfirmationBox';
 import EditBox from '../overlays/EditBox';
+import DetailsBox from '../overlays/DetailsBox';
 
 type CalendarEventProps = {
   events: CalendarEvent[];
@@ -21,10 +28,13 @@ type CalendarEventProps = {
 
 function Events({ events, styles, functions }: CalendarEventProps) {
   const [visibility, setVisibility] = useState<{
-    [key: string]: { edit: boolean; confirm: boolean };
+    [key: string]: { edit: boolean; confirm: boolean; details: boolean };
   }>({});
 
-  const toggleVisibility = (eventId: string, type: 'edit' | 'confirm') => {
+  const toggleVisibility = (
+    eventId: string,
+    type: 'edit' | 'confirm' | 'details',
+  ) => {
     setVisibility((prevState) => ({
       ...prevState,
       [eventId]: {
@@ -65,14 +75,19 @@ function Events({ events, styles, functions }: CalendarEventProps) {
     <View>
       <Text style={styles?.textHeader}>Events:</Text>
       {events.map((event, index) => {
-        const { id, summary, description, start, end } = event;
+        const { id, summary, start } = event;
         return (
           <View key={index} style={styles?.contentContainer}>
-            <Text style={styles?.content}>
-              {new Date(start.dateTime).toLocaleString()} :{' '}
-              {new Date(end.dateTime).toLocaleString()} | {summary}{' '}
-              {description && `- ${description}`}
-            </Text>
+            <TouchableOpacity
+              style={styles?.content}
+              activeOpacity={0.6}
+              onLongPress={() => toggleVisibility(id, 'details')}
+            >
+              <Text>
+                {new Date(start.dateTime).toLocaleDateString()} |{' '}
+                {summary ? summary : 'No summary found'}
+              </Text>
+            </TouchableOpacity>
             <Icon
               name='create-outline'
               style={styles?.icon}
@@ -105,6 +120,15 @@ function Events({ events, styles, functions }: CalendarEventProps) {
                 onPressFunctions={{
                   confirm: () => handleEventRemoval(id),
                   cancel: () => toggleVisibility(id, 'confirm'),
+                }}
+              />
+            )}
+            {visibility[id]?.details && (
+              <DetailsBox
+                entry={convertToFormData(event)}
+                isVisible={visibility[id]?.details}
+                onPressFunctions={{
+                  close: () => toggleVisibility(id, 'details'),
                 }}
               />
             )}
