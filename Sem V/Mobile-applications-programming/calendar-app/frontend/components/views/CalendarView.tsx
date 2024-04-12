@@ -24,7 +24,14 @@ const getDatesBetween = (startDate: Date, endDate: Date): string[] => {
   return dates;
 };
 
+const getDateRangeOverlap = (dateRangeArray: string[]): string[] => {
+  return dateRangeArray.filter(
+    (value, index) => dateRangeArray.indexOf(value) !== index,
+  );
+};
+
 export default function CalendarView({ events, tasks }: ICalendarData) {
+  let eventDateRanges: string[][] = [];
   const markedEventDates: MarkedDates = events.reduce((acc, event) => {
     const startDate = event.start.dateTime.toString().split('T')[0];
     const endDate = event.end.dateTime.toString().split('T')[0];
@@ -32,7 +39,11 @@ export default function CalendarView({ events, tasks }: ICalendarData) {
     const multidayEventEnd = new Date(event.end.dateTime);
 
     if (startDate === endDate) {
-      acc[startDate] = { marked: true };
+      if (acc[startDate]) {
+        acc[startDate] = { ...acc[startDate], marked: true, dotColor: 'white' };
+      } else {
+        acc[startDate] = { marked: true };
+      }
     } else {
       // Create multi-day period marker
       const eventDateSpan = getDatesBetween(
@@ -40,12 +51,23 @@ export default function CalendarView({ events, tasks }: ICalendarData) {
         multidayEventEnd,
       );
 
+      eventDateRanges.push(eventDateSpan);
+
       // Add starting marker
-      acc[startDate] = {
-        startingDay: true,
-        color: '#0091E6',
-        textColor: 'white',
-      };
+      if (acc[startDate]) {
+        acc[startDate] = {
+          color: '#0091E6',
+          textColor: 'white',
+          marked: true,
+          dotColor: 'white',
+        };
+      } else {
+        acc[startDate] = {
+          startingDay: true,
+          color: '#0091E6',
+          textColor: 'white',
+        };
+      }
 
       // Fill in marked days
       eventDateSpan.forEach((date) => {
@@ -59,11 +81,15 @@ export default function CalendarView({ events, tasks }: ICalendarData) {
     return acc;
   }, {} as MarkedDates);
 
+  let overlappingEventDates: string[] = getDateRangeOverlap(
+    eventDateRanges.flatMap((array) => array),
+  );
+
   const markedTaskDates: MarkedDates = tasks.reduce((acc, task) => {
     const dueDate = task.due.split('T')[0];
 
     if (acc[dueDate]) {
-      acc[dueDate] = { ...acc[dueDate], marked: true };
+      acc[dueDate] = { ...acc[dueDate], marked: true, dotColor: 'white' };
     } else {
       acc[dueDate] = { marked: true };
     }
@@ -72,13 +98,30 @@ export default function CalendarView({ events, tasks }: ICalendarData) {
   }, {} as MarkedDates);
 
   let combinedMarkedDates: MarkedDates = {};
+  let eventCount = 0;
+  const totalEventKeys = Object.keys(markedEventDates).length;
 
   for (const key in markedEventDates) {
+    eventCount++;
+
     if (markedTaskDates[key]) {
       combinedMarkedDates[key] = {
         ...markedEventDates[key],
         ...markedTaskDates[key],
       };
+    } else if (
+      // Overlapping event with the same ending day
+      markedEventDates[key].endingDay === true &&
+      eventCount === totalEventKeys &&
+      overlappingEventDates.includes(key)
+    ) {
+      combinedMarkedDates[key] = { ...markedEventDates[key], endingDay: true };
+    } else if (
+      // Overlapping ending day within another event
+      markedEventDates[key].endingDay === true &&
+      overlappingEventDates.includes(key)
+    ) {
+      combinedMarkedDates[key] = { ...markedEventDates[key], endingDay: false };
     } else {
       combinedMarkedDates[key] = markedEventDates[key];
     }
