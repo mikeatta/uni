@@ -17,6 +17,8 @@ import {
 import { ICalendarData } from './components/types';
 import ListView from './components/views/ListView';
 import EntryForm from './components/forms/EntryForm';
+import Slider from './components/controls/Slider';
+import CalendarView from './components/views/CalendarView';
 
 function App() {
   const [calendarData, setCalendarData] = useState<ICalendarData>({
@@ -25,9 +27,15 @@ function App() {
     tasks: [],
   });
 
+  const [displayMode, setDisplayMode] = useState<string>('list');
+
   useEffect(() => {
     fetchData(setCalendarData);
   }, []);
+
+  const handleSliderChange = async (value: 'list' | 'calendar') => {
+    setDisplayMode(value);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -39,14 +47,23 @@ function App() {
         </View>
         <View style={styles.contentContainer}>
           <Text style={styles.headerText}>Calendar Data</Text>
-          <ListView
-            events={calendarData.events}
-            tasklists={calendarData.tasklists}
-            tasks={calendarData.tasks}
-            onStatusChange={handleTaskStatusUpdate}
-            onEdit={handleEntryEdit}
-            onRemove={handleEntryRemoval}
-          />
+          <Slider onValueChange={handleSliderChange} />
+          {displayMode === 'list' ? (
+            <ListView
+              events={calendarData.events}
+              tasklists={calendarData.tasklists}
+              tasks={calendarData.tasks}
+              onStatusChange={handleTaskStatusUpdate}
+              onEdit={handleEntryEdit}
+              onRemove={handleEntryRemoval}
+            />
+          ) : (
+            <CalendarView
+              events={calendarData.events}
+              tasklists={calendarData.tasklists}
+              tasks={calendarData.tasks}
+            />
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
