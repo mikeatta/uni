@@ -72,7 +72,7 @@ function App() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    display: 'flex',
     flexDirection: 'column',
     maxWidth: '100%',
     padding: 10,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   contentContainer: {
-    width: '100%',
+    flex: 1,
     marginBottom: 20,
   },
   headerText: {
