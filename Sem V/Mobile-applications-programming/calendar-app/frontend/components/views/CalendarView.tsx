@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import React from 'react';
 import { Calendar } from 'react-native-calendars';
-import { ICalendarData } from '../types';
+import { CalendarEvent, ICalendarData } from '../types';
 import { MarkedDates } from 'react-native-calendars/src/types';
 import { addDays, endOfDay, format, startOfDay } from 'date-fns';
 
@@ -28,6 +28,23 @@ const getDateRangeOverlap = (dateRangeArray: string[]): string[] => {
   return dateRangeArray.filter(
     (value, index) => dateRangeArray.indexOf(value) !== index,
   );
+};
+
+const getEventsInRange = (
+  events: CalendarEvent[],
+  dateString: string,
+): CalendarEvent[] => {
+  const date = new Date(dateString);
+
+  if (isNaN(date.getDate())) {
+    throw new Error('Invalid date string');
+  }
+
+  return events.filter((event) => {
+    const startDate = startOfDay(new Date(event.start.dateTime));
+    const endDate = endOfDay(new Date(event.end.dateTime));
+    return startDate <= date && date <= endDate;
+  });
 };
 
 export default function CalendarView({ events, tasks }: ICalendarData) {
@@ -138,6 +155,13 @@ export default function CalendarView({ events, tasks }: ICalendarData) {
       <Calendar
         markingType='period'
         markedDates={combinedMarkedDates}
+        onDayPress={(date) => {
+          console.log('Pressed date:', date.dateString);
+          const clickedDate = date.dateString;
+          const eventsInRange = getEventsInRange(events, clickedDate);
+          const eventSummaries = eventsInRange.map((event) => event.summary);
+          console.log('Events in range:', eventSummaries);
+        }}
         firstDay={1}
         enableSwipeMonths={true}
       />
