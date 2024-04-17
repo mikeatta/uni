@@ -161,6 +161,13 @@ export default function CalendarView({ events, tasks }: ICalendarData) {
           const eventsInRange = getEventsInRange(events, clickedDate);
           const eventSummaries = eventsInRange.map((event) => event.summary);
           console.log('Events in range:', eventSummaries);
+          const taskTitles = tasks
+            .filter((task) => {
+              const dueDateString = task.due.toString().split('T')[0];
+              return clickedDate === dueDateString;
+            })
+            .map((taskInRange) => taskInRange.title);
+          console.log('Tasks in range:', taskTitles);
         }}
         firstDay={1}
         enableSwipeMonths={true}
