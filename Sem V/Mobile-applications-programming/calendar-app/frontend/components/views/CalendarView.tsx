@@ -1,9 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 import React from 'react';
 import { Calendar } from 'react-native-calendars';
-import { CalendarEvent, ICalendarData } from '../types';
+import { CalendarEvent, CalendarTask, ICalendarData } from '../types';
 import { MarkedDates } from 'react-native-calendars/src/types';
-import { addDays, endOfDay, format, startOfDay } from 'date-fns';
+import { addDays, endOfDay, format, isSameDay, startOfDay } from 'date-fns';
 
 const getDatesBetween = (startDate: Date, endDate: Date): string[] => {
   const normalizedStart = startOfDay(startDate);
@@ -30,21 +30,33 @@ const getDateRangeOverlap = (dateRangeArray: string[]): string[] => {
   );
 };
 
-const getEventsInRange = (
+const getEntriesInRange = (
   events: CalendarEvent[],
+  tasks: CalendarTask[],
   dateString: string,
-): CalendarEvent[] => {
+): string[][] => {
   const date = new Date(dateString);
 
   if (isNaN(date.getDate())) {
     throw new Error('Invalid date string');
   }
 
-  return events.filter((event) => {
-    const startDate = startOfDay(new Date(event.start.dateTime));
-    const endDate = endOfDay(new Date(event.end.dateTime));
-    return startDate <= date && date <= endDate;
-  });
+  const eventsInRange = events
+    .filter((event) => {
+      const startDate = startOfDay(new Date(event.start.dateTime));
+      const endDate = endOfDay(new Date(event.end.dateTime));
+      return startDate <= date && date <= endDate;
+    })
+    .map((foundEvent) => foundEvent.summary);
+
+  const tasksInRange = tasks
+    .filter((task) => {
+      const dueDate = new Date(task.due);
+      return isSameDay(date, dueDate);
+    })
+    .map((foundTask) => foundTask.title);
+
+  return [eventsInRange, tasksInRange];
 };
 
 export default function CalendarView({ events, tasks }: ICalendarData) {
@@ -158,16 +170,12 @@ export default function CalendarView({ events, tasks }: ICalendarData) {
         onDayPress={(date) => {
           console.log('Pressed date:', date.dateString);
           const clickedDate = date.dateString;
-          const eventsInRange = getEventsInRange(events, clickedDate);
-          const eventSummaries = eventsInRange.map((event) => event.summary);
-          console.log('Events in range:', eventSummaries);
-          const taskTitles = tasks
-            .filter((task) => {
-              const dueDateString = task.due.toString().split('T')[0];
-              return clickedDate === dueDateString;
-            })
-            .map((taskInRange) => taskInRange.title);
-          console.log('Tasks in range:', taskTitles);
+          const [eventsInRange, tasksInRange] = getEntriesInRange(
+            events,
+            tasks,
+            clickedDate,
+          );
+          console.log('Entries in range:', eventsInRange, tasksInRange);
         }}
         firstDay={1}
         enableSwipeMonths={true}
