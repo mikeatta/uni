@@ -34,27 +34,23 @@ const getEntriesInRange = (
   events: CalendarEvent[],
   tasks: CalendarTask[],
   dateString: string,
-): string[][] => {
+): [CalendarEvent[], CalendarTask[]] => {
   const date = new Date(dateString);
 
   if (isNaN(date.getDate())) {
     throw new Error('Invalid date string');
   }
 
-  const eventsInRange = events
-    .filter((event) => {
-      const startDate = startOfDay(new Date(event.start.dateTime));
-      const endDate = endOfDay(new Date(event.end.dateTime));
-      return startDate <= date && date <= endDate;
-    })
-    .map((foundEvent) => foundEvent.summary);
+  const eventsInRange = events.filter((event) => {
+    const startDate = startOfDay(new Date(event.start.dateTime));
+    const endDate = endOfDay(new Date(event.end.dateTime));
+    return startDate <= date && date <= endDate;
+  });
 
-  const tasksInRange = tasks
-    .filter((task) => {
-      const dueDate = new Date(task.due);
-      return isSameDay(date, dueDate);
-    })
-    .map((foundTask) => foundTask.title);
+  const tasksInRange = tasks.filter((task) => {
+    const dueDate = new Date(task.due);
+    return isSameDay(date, dueDate);
+  });
 
   return [eventsInRange, tasksInRange];
 };
