@@ -1,9 +1,10 @@
 import { StyleSheet, View } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { Calendar } from 'react-native-calendars';
 import { CalendarEvent, CalendarTask, ICalendarData } from '../types';
 import { MarkedDates } from 'react-native-calendars/src/types';
 import { addDays, endOfDay, format, isSameDay, startOfDay } from 'date-fns';
+import DailyEntryList from '../common/DailyEntryList';
 
 const getDatesBetween = (startDate: Date, endDate: Date): string[] => {
   const normalizedStart = startOfDay(startDate);
@@ -34,7 +35,7 @@ const getEntriesInRange = (
   events: CalendarEvent[],
   tasks: CalendarTask[],
   dateString: string,
-): [CalendarEvent[], CalendarTask[]] => {
+): EntriesArray => {
   const date = new Date(dateString);
 
   if (isNaN(date.getDate())) {
@@ -55,7 +56,16 @@ const getEntriesInRange = (
   return [eventsInRange, tasksInRange];
 };
 
+type EntriesArray = [CalendarEvent[], CalendarTask[]];
+
 export default function CalendarView({ events, tasks }: ICalendarData) {
+  const [entriesInRange, setEntriesInRange] = useState<EntriesArray>([[], []]);
+
+  const [clickedDate, setClickedDate] = useState<string>(
+    new Date().toISOString().split('T')[0],
+  );
+  console.log(clickedDate);
+
   let eventDateRanges: string[][] = [];
   const markedEventDates: MarkedDates = events.reduce((acc, event) => {
     const startDate = event.start.dateTime.toString().split('T')[0];
@@ -164,18 +174,15 @@ export default function CalendarView({ events, tasks }: ICalendarData) {
         markingType='period'
         markedDates={combinedMarkedDates}
         onDayPress={(date) => {
-          console.log('Pressed date:', date.dateString);
-          const clickedDate = date.dateString;
-          const [eventsInRange, tasksInRange] = getEntriesInRange(
-            events,
-            tasks,
-            clickedDate,
-          );
-          console.log('Entries in range:', eventsInRange, tasksInRange);
+          const pressedDate = date.dateString;
+          console.log('Pressed date:', pressedDate);
+          setEntriesInRange(getEntriesInRange(events, tasks, pressedDate));
+          setClickedDate(pressedDate);
         }}
         firstDay={1}
         enableSwipeMonths={true}
       />
+      <DailyEntryList date={clickedDate} entries={entriesInRange} />
     </View>
   );
 }
