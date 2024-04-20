@@ -29,20 +29,23 @@ function DailyEntryList({ date, entries }: DailyEntryListProps) {
   }
 
   return (
-    <View>
-      <Text>Entries on {getFormattedDate()}</Text>
+    <View style={styles.container}>
+      <Text style={styles.headerText}>
+        Calendar entries for{' '}
+        <Text style={styles.boldText}>{getFormattedDate()}</Text>
+      </Text>
       {hasEvents && (
-        <View>
-          <Text>Events:</Text>
+        <View style={styles.eventContainer}>
+          <Text style={styles.subheaderText}>Events ({entries[0].length})</Text>
           {entries[0].map((event, index) => {
             const startTime = new Date(event.start.dateTime)
               .toTimeString()
               .split(' ')[0];
-            const summary = event.summary;
+            const summary = event.summary ?? 'No summary found';
             return (
               <View key={index}>
                 <Text>
-                  #{index + 1} {startTime} | {summary}
+                  {startTime} | {summary}
                 </Text>
               </View>
             );
@@ -50,15 +53,15 @@ function DailyEntryList({ date, entries }: DailyEntryListProps) {
         </View>
       )}
       {hasTasks && (
-        <View>
-          <Text>Tasks:</Text>
+        <View style={styles.taskContainer}>
+          <Text style={styles.subheaderText}>Tasks ({entries[1].length})</Text>
           {entries[1].map((task, index) => {
-            const title = task.title;
+            const title = task.title ?? 'No title found';
             const status = task.status;
             return (
               <View key={index}>
                 <Text>
-                  #{index + 1} {status} | {title}
+                  {status} | {title}
                 </Text>
               </View>
             );
@@ -71,4 +74,26 @@ function DailyEntryList({ date, entries }: DailyEntryListProps) {
 
 export default DailyEntryList;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  headerText: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  boldText: {
+    fontWeight: 'bold',
+  },
+  eventContainer: {
+    marginBottom: 10,
+  },
+  taskContainer: {},
+  subheaderText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 1,
+  },
+});
