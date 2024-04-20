@@ -22,8 +22,12 @@ function DailyEntryList({ date, entries }: DailyEntryListProps) {
 
   if (!hasEvents && !hasTasks) {
     return (
-      <View>
-        <Text>No entries on selected date / No date selected</Text>
+      <View style={styles.container}>
+        <Text style={styles.headerText}>
+          Calendar entries for{' '}
+          <Text style={styles.boldText}>{getFormattedDate()}</Text>
+        </Text>
+        <Text>No entries on selected date</Text>
       </View>
     );
   }
