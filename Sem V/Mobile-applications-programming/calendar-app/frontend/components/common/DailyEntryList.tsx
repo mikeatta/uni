@@ -1,13 +1,31 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleProp, StyleSheet, Text, TextStyle, View } from 'react-native';
 import React from 'react';
-import { CalendarEvent, CalendarTask } from '../types';
+import { CalendarEvent, CalendarTask, FormData } from '../types';
+import Events from './Events';
+import Tasks from './Tasks';
 
 type DailyEntryListProps = {
   date: string;
   entries: [CalendarEvent[], CalendarTask[]];
+  entryStyles?: {
+    textHeader: StyleProp<TextStyle>;
+    contentContainer: StyleProp<TextStyle>;
+    content: StyleProp<TextStyle>;
+    icon: StyleProp<TextStyle>;
+  };
+  entryFunctions: {
+    onStatusChange: (task: CalendarTask) => Promise<void>;
+    onEdit: (formData: FormData) => Promise<void>;
+    onRemove: (id: string, type: 'event' | 'task') => Promise<void>;
+  };
 };
 
-function DailyEntryList({ date, entries }: DailyEntryListProps) {
+function DailyEntryList({
+  date,
+  entries,
+  entryStyles,
+  entryFunctions,
+}: DailyEntryListProps) {
   const getFormattedDate = () => {
     return new Date(date).toDateString();
   };
@@ -39,38 +57,18 @@ function DailyEntryList({ date, entries }: DailyEntryListProps) {
         <Text style={styles.boldText}>{getFormattedDate()}</Text>
       </Text>
       {hasEvents && (
-        <View style={styles.eventContainer}>
-          <Text style={styles.subheaderText}>Events ({entries[0].length})</Text>
-          {entries[0].map((event, index) => {
-            const startTime = new Date(event.start.dateTime)
-              .toTimeString()
-              .split(' ')[0];
-            const summary = event.summary ?? 'No summary found';
-            return (
-              <View key={index}>
-                <Text>
-                  {startTime} | {summary}
-                </Text>
-              </View>
-            );
-          })}
-        </View>
+        <Events
+          events={entries[0]}
+          styles={entryStyles}
+          functions={entryFunctions}
+        />
       )}
       {hasTasks && (
-        <View style={styles.taskContainer}>
-          <Text style={styles.subheaderText}>Tasks ({entries[1].length})</Text>
-          {entries[1].map((task, index) => {
-            const title = task.title ?? 'No title found';
-            const status = task.status;
-            return (
-              <View key={index}>
-                <Text>
-                  {status} | {title}
-                </Text>
-              </View>
-            );
-          })}
-        </View>
+        <Tasks
+          tasks={entries[1]}
+          styles={entryStyles}
+          functions={entryFunctions}
+        />
       )}
     </View>
   );
@@ -90,14 +88,5 @@ const styles = StyleSheet.create({
   },
   boldText: {
     fontWeight: 'bold',
-  },
-  eventContainer: {
-    marginBottom: 10,
-  },
-  taskContainer: {},
-  subheaderText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 1,
   },
 });
