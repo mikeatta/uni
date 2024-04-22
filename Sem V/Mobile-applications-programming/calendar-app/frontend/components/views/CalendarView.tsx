@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import React, { useState } from 'react';
 import { Calendar } from 'react-native-calendars';
-import { CalendarEvent, CalendarTask, ICalendarData } from '../types';
+import { CalendarData, CalendarEvent, CalendarTask } from '../types';
 import { MarkedDates } from 'react-native-calendars/src/types';
 import { addDays, endOfDay, format, isSameDay, startOfDay } from 'date-fns';
 import DailyEntryList from '../common/DailyEntryList';
@@ -58,7 +58,13 @@ const getEntriesInRange = (
 
 type EntriesArray = [CalendarEvent[], CalendarTask[]];
 
-export default function CalendarView({ events, tasks }: ICalendarData) {
+export default function CalendarView({
+  events,
+  tasks,
+  onStatusChange,
+  onEdit,
+  onRemove,
+}: CalendarData) {
   const [entriesInRange, setEntriesInRange] = useState<EntriesArray>([[], []]);
 
   const [clickedDate, setClickedDate] = useState<string>(
@@ -182,7 +188,12 @@ export default function CalendarView({ events, tasks }: ICalendarData) {
         firstDay={1}
         enableSwipeMonths={true}
       />
-      <DailyEntryList date={clickedDate} entries={entriesInRange} />
+      <DailyEntryList
+        date={clickedDate}
+        entries={entriesInRange}
+        entryStyles={entryStyles}
+        entryFunctions={{ onStatusChange, onEdit, onRemove }}
+      />
     </View>
   );
 }
@@ -190,5 +201,34 @@ export default function CalendarView({ events, tasks }: ICalendarData) {
 const styles = StyleSheet.create({
   container: {
     marginTop: 5,
+  },
+});
+
+const entryStyles = StyleSheet.create({
+  textHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+    marginTop: 20,
+  },
+  contentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: '#ccc',
+    padding: 10,
+    marginBottom: 10,
+  },
+  content: {
+    flex: 1,
+    marginRight: 8,
+  },
+  icon: {
+    margin: 8,
   },
 });

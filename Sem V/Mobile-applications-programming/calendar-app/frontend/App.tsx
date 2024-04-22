@@ -62,6 +62,9 @@ function App() {
               events={calendarData.events}
               tasklists={calendarData.tasklists}
               tasks={calendarData.tasks}
+              onStatusChange={handleTaskStatusUpdate}
+              onEdit={handleEntryEdit}
+              onRemove={handleEntryRemoval}
             />
           )}
         </View>
