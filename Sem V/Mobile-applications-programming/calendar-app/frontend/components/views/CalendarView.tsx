@@ -129,8 +129,11 @@ export default function CalendarView({
   const markedTaskDates: MarkedDates = tasks.reduce((acc, task) => {
     const dueDate = task.due.split('T')[0];
 
-    if (acc[dueDate]) {
-      acc[dueDate] = { ...acc[dueDate], marked: true, dotColor: 'white' };
+    if (markedEventDates[dueDate]) {
+      acc[dueDate] = {
+        ...markedEventDates[dueDate],
+        marked: true,
+      };
     } else {
       acc[dueDate] = { marked: true };
     }
@@ -145,12 +148,7 @@ export default function CalendarView({
   for (const key in markedEventDates) {
     eventCount++;
 
-    if (markedTaskDates[key]) {
-      combinedMarkedDates[key] = {
-        ...markedEventDates[key],
-        ...markedTaskDates[key],
-      };
-    } else if (
+    if (
       // Overlapping event with the same ending day
       markedEventDates[key].endingDay === true &&
       eventCount === totalEventKeys &&
@@ -163,6 +161,11 @@ export default function CalendarView({
       overlappingEventDates.includes(key)
     ) {
       combinedMarkedDates[key] = { ...markedEventDates[key], endingDay: false };
+    } else if (markedTaskDates[key]) {
+      combinedMarkedDates[key] = {
+        ...markedEventDates[key],
+        ...markedTaskDates[key],
+      };
     } else {
       combinedMarkedDates[key] = markedEventDates[key];
     }
