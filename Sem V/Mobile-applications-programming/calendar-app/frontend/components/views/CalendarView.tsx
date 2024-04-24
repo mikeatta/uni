@@ -65,12 +65,16 @@ export default function CalendarView({
   onEdit,
   onRemove,
 }: CalendarData) {
-  const [entriesInRange, setEntriesInRange] = useState<EntriesArray>([[], []]);
+  const today = new Date().toISOString().split('T')[0];
+  const [clickedDate, setClickedDate] = useState<string>(today);
 
-  const [clickedDate, setClickedDate] = useState<string>(
-    new Date().toISOString().split('T')[0],
-  );
-  console.log(clickedDate);
+  const initialEntries = getEntriesInRange(events, tasks, clickedDate);
+  const [entriesInRange, setEntriesInRange] =
+    useState<EntriesArray>(initialEntries);
+
+  const updateDisplayedEntries = (date: string) => {
+    setEntriesInRange(getEntriesInRange(events, tasks, date));
+  };
 
   let eventDateRanges: string[][] = [];
   const markedEventDates: MarkedDates = events.reduce((acc, event) => {
@@ -185,7 +189,7 @@ export default function CalendarView({
         onDayPress={(date) => {
           const pressedDate = date.dateString;
           console.log('Pressed date:', pressedDate);
-          setEntriesInRange(getEntriesInRange(events, tasks, pressedDate));
+          updateDisplayedEntries(pressedDate);
           setClickedDate(pressedDate);
         }}
         firstDay={1}
