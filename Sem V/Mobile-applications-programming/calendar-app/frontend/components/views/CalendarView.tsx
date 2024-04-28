@@ -65,7 +65,7 @@ export default function CalendarView({
   onEdit,
   onRemove,
 }: CalendarData) {
-  const today = new Date().toISOString().split('T')[0];
+  const today = format(new Date(), 'yyyy-MM-dd');
   const [clickedDate, setClickedDate] = useState<string>(today);
 
   const initialEntries = getEntriesInRange(events, tasks, clickedDate);
@@ -78,8 +78,8 @@ export default function CalendarView({
 
   let eventDateRanges: string[][] = [];
   const markedEventDates: MarkedDates = events.reduce((acc, event) => {
-    const startDate = event.start.dateTime.toString().split('T')[0];
-    const endDate = event.end.dateTime.toString().split('T')[0];
+    const startDate = format(new Date(event.start.dateTime), 'yyyy-MM-dd');
+    const endDate = format(new Date(event.end.dateTime), 'yyyy-MM-dd');
     const multidayEventStart = new Date(event.start.dateTime);
     const multidayEventEnd = new Date(event.end.dateTime);
 
@@ -131,7 +131,7 @@ export default function CalendarView({
   );
 
   const markedTaskDates: MarkedDates = tasks.reduce((acc, task) => {
-    const dueDate = task.due.split('T')[0];
+    const dueDate = format(task.due, 'yyyy-MM-dd');
 
     if (markedEventDates[dueDate]) {
       acc[dueDate] = {
