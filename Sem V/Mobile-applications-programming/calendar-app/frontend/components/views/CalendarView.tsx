@@ -181,6 +181,55 @@ export default function CalendarView({
     }
   }
 
+  const markedDates: MarkedDates = events.reduce((markedDates, event) => {
+    const startDate = format(new Date(event.start.dateTime), 'yyyy-MM-dd');
+    const endDate = format(new Date(event.end.dateTime), 'yyyy-MM-dd');
+
+    const isSingleday = startDate === endDate;
+    const dateRange = getDatesBetween(
+      new Date(event.start.dateTime),
+      new Date(event.end.dateTime),
+    );
+
+    dateRange.forEach((date) => {
+      const isStart = date === startDate;
+      const isEnd = date === endDate;
+
+      const startOverlap =
+        markedDates[date] && !markedDates[date].startingDay && isStart;
+      const endOverlap =
+        markedDates[date] && !markedDates[date].endingDay && isEnd;
+      const overlapping = startOverlap || endOverlap;
+
+      const isAlreadyStart = isStart && markedDates[date];
+
+      const multidayStartOverlap =
+        !isSingleday &&
+        markedDates[date] &&
+        markedDates[date].startingDay &&
+        !isStart;
+      const multidayEndOverlap =
+        !isSingleday &&
+        markedDates[date] &&
+        markedDates[date].endingDay &&
+        !isEnd;
+
+      const unsetStartEndMark = { startingDay: false, endingDay: false };
+
+      markedDates[date] = {
+        ...(markedDates[date] || { color: '#0091E6', textColor: 'white' }),
+        ...(isStart && !startOverlap && { startingDay: true }),
+        ...(isEnd && !endOverlap && { endingDay: true }),
+        ...(isAlreadyStart && { dotColor: 'white', marked: true }),
+        ...(multidayStartOverlap && { startingDay: false }),
+        ...(multidayEndOverlap && { endingDay: false }),
+        ...(overlapping && !isSingleday && { ...unsetStartEndMark }),
+      };
+    });
+
+    return markedDates;
+  }, {} as MarkedDates);
+
   return (
     <View style={styles.container}>
       <Calendar
