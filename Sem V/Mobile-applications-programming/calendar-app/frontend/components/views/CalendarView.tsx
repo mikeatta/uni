@@ -230,6 +230,15 @@ export default function CalendarView({
     return markedDates;
   }, {} as MarkedDates);
 
+  tasks.forEach((task) => {
+    const dueDate = format(task.due, 'yyyy-MM-dd');
+
+    markedDates[dueDate] = {
+      ...(markedDates[dueDate] || {}),
+      marked: true,
+    };
+  });
+
   return (
     <View style={styles.container}>
       <Calendar
