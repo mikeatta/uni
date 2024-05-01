@@ -25,12 +25,6 @@ const getDatesBetween = (startDate: Date, endDate: Date): string[] => {
   return dates;
 };
 
-const getDateRangeOverlap = (dateRangeArray: string[]): string[] => {
-  return dateRangeArray.filter(
-    (value, index) => dateRangeArray.indexOf(value) !== index,
-  );
-};
-
 const getEntriesInRange = (
   events: CalendarEvent[],
   tasks: CalendarTask[],
@@ -75,111 +69,6 @@ export default function CalendarView({
   const updateDisplayedEntries = (date: string) => {
     setEntriesInRange(getEntriesInRange(events, tasks, date));
   };
-
-  let eventDateRanges: string[][] = [];
-  const markedEventDates: MarkedDates = events.reduce((acc, event) => {
-    const startDate = format(new Date(event.start.dateTime), 'yyyy-MM-dd');
-    const endDate = format(new Date(event.end.dateTime), 'yyyy-MM-dd');
-    const multidayEventStart = new Date(event.start.dateTime);
-    const multidayEventEnd = new Date(event.end.dateTime);
-
-    if (startDate === endDate) {
-      if (acc[startDate]) {
-        acc[startDate] = { ...acc[startDate], marked: true, dotColor: 'white' };
-      } else {
-        acc[startDate] = { marked: true };
-      }
-    } else {
-      // Create multi-day period marker
-      const eventDateSpan = getDatesBetween(
-        multidayEventStart,
-        multidayEventEnd,
-      );
-
-      eventDateRanges.push(eventDateSpan);
-
-      // Add starting marker
-      if (acc[startDate]) {
-        acc[startDate] = {
-          color: '#0091E6',
-          textColor: 'white',
-          marked: true,
-          dotColor: 'white',
-        };
-      } else {
-        acc[startDate] = {
-          startingDay: true,
-          color: '#0091E6',
-          textColor: 'white',
-        };
-      }
-
-      // Fill in marked days
-      eventDateSpan.forEach((date) => {
-        acc[date] = { ...acc[date], color: '#0091E6', textColor: 'white' };
-      });
-
-      // Add ending marker
-      acc[endDate] = { endingDay: true, color: '#0091E6', textColor: 'white' };
-    }
-
-    return acc;
-  }, {} as MarkedDates);
-
-  let overlappingEventDates: string[] = getDateRangeOverlap(
-    eventDateRanges.flatMap((array) => array),
-  );
-
-  const markedTaskDates: MarkedDates = tasks.reduce((acc, task) => {
-    const dueDate = format(task.due, 'yyyy-MM-dd');
-
-    if (markedEventDates[dueDate]) {
-      acc[dueDate] = {
-        ...markedEventDates[dueDate],
-        marked: true,
-      };
-    } else {
-      acc[dueDate] = { marked: true };
-    }
-
-    return acc;
-  }, {} as MarkedDates);
-
-  let combinedMarkedDates: MarkedDates = {};
-  let eventCount = 0;
-  const totalEventKeys = Object.keys(markedEventDates).length;
-
-  for (const key in markedEventDates) {
-    eventCount++;
-
-    if (
-      // Overlapping event with the same ending day
-      markedEventDates[key].endingDay === true &&
-      eventCount === totalEventKeys &&
-      overlappingEventDates.includes(key)
-    ) {
-      combinedMarkedDates[key] = { ...markedEventDates[key], endingDay: true };
-    } else if (
-      // Overlapping ending day within another event
-      markedEventDates[key].endingDay === true &&
-      overlappingEventDates.includes(key)
-    ) {
-      combinedMarkedDates[key] = { ...markedEventDates[key], endingDay: false };
-    } else if (markedTaskDates[key]) {
-      combinedMarkedDates[key] = {
-        ...markedEventDates[key],
-        ...markedTaskDates[key],
-      };
-    } else {
-      combinedMarkedDates[key] = markedEventDates[key];
-    }
-  }
-
-  for (const key in markedTaskDates) {
-    if (!combinedMarkedDates[key]) {
-      combinedMarkedDates[key] = markedTaskDates[key];
-    }
-  }
 
   const markedDates: MarkedDates = events.reduce((markedDates, event) => {
     const startDate = format(new Date(event.start.dateTime), 'yyyy-MM-dd');
@@ -243,10 +132,9 @@ export default function CalendarView({
     <View style={styles.container}>
       <Calendar
         markingType='period'
-        markedDates={combinedMarkedDates}
+        markedDates={markedDates}
         onDayPress={(date) => {
           const pressedDate = date.dateString;
-          console.log('Pressed date:', pressedDate);
           updateDisplayedEntries(pressedDate);
           setClickedDate(pressedDate);
         }}
