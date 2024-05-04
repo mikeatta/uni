@@ -36,7 +36,7 @@ export const createTables = async (db: SQLiteDatabase) => {
 
   const tasksQuery = `
       CREATE TABLE IF NOT EXISTS Tasks (
-        id TEXT NOT NULL,
+        id TEXT PRIMARY KEY,
         title TEXT,
         notes TEXT,
         status TEXT CHECK (status IN ('needsAction', 'completed')),
