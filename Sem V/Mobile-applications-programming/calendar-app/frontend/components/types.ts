@@ -69,3 +69,5 @@ export type FormData = {
 export type EntryFormProps = {
   onSubmit: (formData: FormData) => Promise<void>
 }
+
+export type Table = 'Settings' | 'Events' | 'Tasks'
