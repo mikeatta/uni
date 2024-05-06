@@ -2,7 +2,7 @@ import SQLite, { SQLiteDatabase } from 'react-native-sqlite-storage'
 
 SQLite.enablePromise(true)
 
-export const conntectToDatabase = async (): Promise<SQLiteDatabase> => {
+export const connectToDatabase = async (): Promise<SQLiteDatabase> => {
   try {
     const db = await SQLite.openDatabase({
       name: 'calendarDatabase.db',
