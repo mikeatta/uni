@@ -9,7 +9,7 @@ const handleFormSubmit = async (formData: FormData) => {
   try {
     await axios.post(`${LOCAL_URL}/api/v1/calendar/new-entry`, formData)
   } catch (error) {
-    console.error('Error submittng form data:', error)
+    console.error('Error submitting form data:', error)
   }
 }
 
