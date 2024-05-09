@@ -20,10 +20,18 @@ export async function getCalendarEvents(calendar) {
       console.log('No upcoming events found.');
       return;
     }
-    console.log('Upcoming events:');
-    events.map((event, i) => {
-      const start = event.start.dateTime || event.start.date;
-      console.log(`${start} - ${event.summary}`);
+
+    /*
+     * Map events to ensure each object from the Google API request holds the
+     * properties required for comparison with the events stored in the local
+     * database.
+     * If the summary or description are missing, set their values to 'null'
+     * for consistency.
+     */
+    events.forEach((event) => {
+      event.summary = event.summary || null;
+      event.description = event.description || null;
+      return event;
     });
 
     return events;
@@ -122,14 +130,17 @@ export async function getCalendarTasks(service) {
       console.log('No tasks found.');
       return;
     }
-    console.log('Found tasks:');
-    tasks.map((task, i) => {
-      // Extract just the due date from the string
-      const due = new Date(task.due).toISOString().split('T')[0];
-      const title = task.title;
-      const notes = task.notes !== undefined ? task.notes : '';
-      // Print notes if available, else print just the date and title
-      console.log(notes ? `${due} - ${title}: ${notes}` : `${due} - ${title}`);
+
+    /*
+     * Map tasks to ensure each object from the Google API request holds the
+     * properties required for comparison with the tasks stored in the local
+     * database.
+     * If the title or notes are missing, set their values to 'null' for consistency.
+     */
+    tasks.map((task) => {
+      task.title = task.title || null;
+      task.notes = task.notes || null;
+      return task;
     });
 
     return tasks;
