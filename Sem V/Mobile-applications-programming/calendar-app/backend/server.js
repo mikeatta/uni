@@ -4,16 +4,16 @@ import express from 'express';
 import cors from 'cors';
 import { authenticateAndGetClient } from './auth.js';
 import {
-  listEvents,
-  addEvent,
-  editEvent,
-  removeEvent,
-  listTasklists,
-  listTasks,
-  addTask,
-  editTask,
-  removeTask,
-  updateTaskStatus,
+  getCalendarEvents,
+  addCalendarEvent,
+  editCalendarEvent,
+  removeCalendarEvent,
+  getCalendarTasklists,
+  getCalendarTasks,
+  addCalendarTask,
+  editCalendarTask,
+  removeCalendarTask,
+  updateCalendarTaskStatus,
 } from './taskManager.js';
 
 const app = express();
@@ -45,9 +45,9 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/api/v1/calendar', async (req, res) => {
   try {
     // Perform calendar related operations
-    const events = (await listEvents(calendar)) || [];
-    const tasklists = (await listTasklists(service)) || [];
-    const tasks = (await listTasks(service)) || [];
+    const events = (await getCalendarEvents(calendar)) || [];
+    const tasklists = (await getCalendarTasklists(service)) || [];
+    const tasks = (await getCalendarTasks(service)) || [];
 
     // Send the response back to the frontend
     res.json({ events, tasklists, tasks });
@@ -69,7 +69,7 @@ app.post('/api/v1/calendar/new-entry', async (req, res) => {
         end: end,
       };
 
-      await addEvent(calendar, event);
+      await addCalendarEvent(calendar, event);
     } else {
       const task = {
         title: title,
@@ -77,7 +77,7 @@ app.post('/api/v1/calendar/new-entry', async (req, res) => {
         due: start.dateTime, // Time part of the task dateTime is being cut due to API limitations
       };
 
-      await addTask(service, task);
+      await addCalendarTask(service, task);
     }
 
     res.status(200).json({ message: 'Entry added successfully!' });
@@ -100,7 +100,7 @@ app.patch('/api/v1/calendar/modify-entry', async (req, res) => {
         end: end,
       };
 
-      await editEvent(calendar, event);
+      await editCalendarEvent(calendar, event);
     } else {
       const task = {
         id: id,
@@ -109,7 +109,7 @@ app.patch('/api/v1/calendar/modify-entry', async (req, res) => {
         due: start.dateTime,
       };
 
-      await editTask(service, task);
+      await editCalendarTask(service, task);
     }
 
     res.status(200).json({ message: 'Entry modified successfully!' });
@@ -130,7 +130,7 @@ app.patch('/api/v1/calendar/update-task-status', async (req, res) => {
       task = { ...task, status: 'completed' };
     }
 
-    await updateTaskStatus(service, task);
+    await updateCalendarTaskStatus(service, task);
 
     res.status(200).json({ message: 'Task status updated successfully!' });
   } catch (err) {
@@ -148,13 +148,13 @@ app.delete('/api/v1/calendar/remove-entry', async (req, res) => {
         eventId: id,
       };
 
-      await removeEvent(calendar, event);
+      await removeCalendarEvent(calendar, event);
     } else {
       const task = {
         task: id,
       };
 
-      await removeTask(service, task);
+      await removeCalendarTask(service, task);
     }
 
     res.status(200).json({ message: 'Entry removed successfully!' });
