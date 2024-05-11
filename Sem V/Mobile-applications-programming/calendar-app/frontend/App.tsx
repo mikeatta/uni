@@ -1,3 +1,6 @@
+import { connectToDatabase, createTables } from './db/db';
+import { getEvents } from './db/events';
+import { getTasks } from './db/tasks';
 import {
   SafeAreaView,
   StatusBar,
@@ -6,7 +9,7 @@ import {
   View,
   Text,
 } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   handleFormSubmit,
   handleEntryEdit,
@@ -21,6 +24,12 @@ import Slider from './components/controls/Slider';
 import CalendarView from './components/views/CalendarView';
 
 function App() {
+  const [localData, setLocalData] = useState<ICalendarData>({
+    events: [],
+    tasklists: [],
+    tasks: [],
+  });
+
   const [calendarData, setCalendarData] = useState<ICalendarData>({
     events: [],
     tasklists: [],
@@ -28,10 +37,55 @@ function App() {
   });
 
   const [displayMode, setDisplayMode] = useState<string>('list');
+  const [isDatabaseSetup, setIsDatabaseSetup] = useState<boolean>(false);
+
+  const setupLocalDatabase = useCallback(async () => {
+    try {
+      const db = await connectToDatabase();
+      await createTables(db);
+      setIsDatabaseSetup(true);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  const fetchLocalData = useCallback(async () => {
+    try {
+      const db = await connectToDatabase();
+
+      const tempLocalData: ICalendarData = {
+        events: await getEvents(db),
+        tasklists: [],
+        tasks: await getTasks(db),
+      };
+
+      console.log('\nLocal events:');
+      tempLocalData.events.map((event) =>
+        console.log(event.summary, event.description),
+      );
+
+      console.log('\nLocal tasks:');
+      tempLocalData.tasks.map((task) => console.log(task.title));
+
+      setLocalData(tempLocalData);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  useEffect(() => {
+    setupLocalDatabase();
+  }, [setupLocalDatabase]);
 
   useEffect(() => {
     fetchData(setCalendarData);
   }, []);
+
+  useEffect(() => {
+    if (isDatabaseSetup) {
+      fetchLocalData();
+    }
+  }, [isDatabaseSetup, fetchLocalData]);
 
   const handleSliderChange = async (value: 'list' | 'calendar') => {
     setDisplayMode(value);
