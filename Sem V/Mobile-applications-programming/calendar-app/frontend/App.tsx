@@ -1,6 +1,6 @@
 import { connectToDatabase, createTables } from './db/db';
-import { getEvents } from './db/events';
-import { getTasks } from './db/tasks';
+import { addEvent, getEvents } from './db/events';
+import { addTask, getTasks } from './db/tasks';
 import {
   SafeAreaView,
   StatusBar,
@@ -38,6 +38,7 @@ function App() {
 
   const [displayMode, setDisplayMode] = useState<string>('list');
   const [isDatabaseSetup, setIsDatabaseSetup] = useState<boolean>(false);
+  const [isDatabaseInSync, setIsDatabaseInSync] = useState<boolean>(false);
 
   const setupLocalDatabase = useCallback(async () => {
     try {
@@ -48,6 +49,23 @@ function App() {
       console.error(error);
     }
   }, []);
+
+  const updateLocalData = useCallback(async () => {
+    try {
+      const db = await connectToDatabase();
+
+      for (const event of calendarData.events) {
+        await addEvent(db, event);
+      }
+
+      for (const task of calendarData.tasks) {
+        await addTask(db, task);
+      }
+    } catch (error) {
+      console.error(error);
+      throw Error('Failed to update the database');
+    }
+  }, [isDatabaseInSync, calendarData]);
 
   const fetchLocalData = useCallback(async () => {
     try {
@@ -71,7 +89,7 @@ function App() {
     } catch (error) {
       console.error(error);
     }
-  }, []);
+  }, [updateLocalData]);
 
   useEffect(() => {
     setupLocalDatabase();
@@ -85,7 +103,18 @@ function App() {
     if (isDatabaseSetup) {
       fetchLocalData();
     }
-  }, [isDatabaseSetup, fetchLocalData]);
+  }, [isDatabaseSetup]);
+
+  useEffect(() => {
+    if (isDatabaseSetup && !isDatabaseInSync) {
+      const updateAndFetchLocalData = async () => {
+        await updateLocalData();
+        await fetchLocalData();
+      };
+
+      updateAndFetchLocalData().catch((error) => console.log(error));
+    }
+  }, [fetchLocalData, updateLocalData]);
 
   const handleSliderChange = async (value: 'list' | 'calendar') => {
     setDisplayMode(value);
