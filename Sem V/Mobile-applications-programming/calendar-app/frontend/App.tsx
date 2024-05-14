@@ -40,7 +40,7 @@ function App() {
   const [isDatabaseSetup, setIsDatabaseSetup] = useState<boolean>(false);
   const [isDatabaseInSync, setIsDatabaseInSync] = useState<boolean>(false);
 
-  const setupLocalDatabase = useCallback(async () => {
+  const setupLocalDatabase = async () => {
     try {
       const db = await connectToDatabase();
       await createTables(db);
@@ -48,7 +48,7 @@ function App() {
     } catch (error) {
       console.error(error);
     }
-  }, []);
+  };
 
   const updateLocalData = useCallback(async () => {
     try {
@@ -93,7 +93,7 @@ function App() {
 
   useEffect(() => {
     setupLocalDatabase();
-  }, [setupLocalDatabase]);
+  }, []);
 
   useEffect(() => {
     fetchData(setCalendarData);
