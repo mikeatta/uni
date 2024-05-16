@@ -31,11 +31,23 @@ export const getEvents = async (
   try {
     const events: CalendarEvent[] = []
     const results = await db.executeSql('SELECT * FROM Events')
-    results?.forEach((result) => {
-      for (let index = 0; index < result.rows.length; index++) {
-        events.push(result.rows.item(index))
+
+    for (let index = 0; index < results[0].rows.length; index++) {
+      const row = results[0].rows.item(index)
+
+      const parsedStart = JSON.parse(row.start)
+      const parsedEnd = JSON.parse(row.end)
+
+      const event: CalendarEvent = {
+        id: row.id,
+        summary: row.summary,
+        description: row.description,
+        start: parsedStart,
+        end: parsedEnd,
       }
-    })
+
+      events.push(event)
+    }
     return events
   } catch (error) {
     console.error(error)
