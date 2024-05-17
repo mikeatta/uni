@@ -91,6 +91,42 @@ function App() {
     }
   }, [updateLocalData]);
 
+  const getDatabaseSyncStatus = useCallback(async () => {
+    const eventsToAdd = calendarData.events.filter(
+      (remoteEvent) =>
+        !localData.events.some(
+          (localEvent) => localEvent.id === remoteEvent.id,
+        ),
+    );
+
+    const eventsToRemove = localData.events.filter(
+      (localEvent) =>
+        !calendarData.events.some(
+          (remoteEvent) => localEvent.id === remoteEvent.id,
+        ),
+    );
+
+    const eventsToUpdate = calendarData.events.filter((remoteEvent) =>
+      localData.events.some((localEvent) => {
+        return (
+          localEvent.id === remoteEvent.id &&
+          (localEvent.summary !== remoteEvent.summary ||
+            localEvent.description !== remoteEvent.description ||
+            localEvent.start.dateTime !== remoteEvent.start.dateTime ||
+            localEvent.start.timeZone !== remoteEvent.end.timeZone ||
+            localEvent.end.dateTime !== remoteEvent.end.dateTime ||
+            localEvent.end.timeZone !== remoteEvent.end.timeZone)
+        );
+      }),
+    );
+
+    return (
+      eventsToAdd.length === 0 &&
+      eventsToRemove.length === 0 &&
+      eventsToUpdate.length === 0
+    );
+  }, [updateLocalData]);
+
   useEffect(() => {
     setupLocalDatabase();
   }, []);
@@ -104,6 +140,17 @@ function App() {
       fetchLocalData();
     }
   }, [isDatabaseSetup]);
+
+  useEffect(() => {
+    if (isDatabaseSetup) {
+      const checkForRemoteChanges = async () => {
+        const databaseSyncStatus = await getDatabaseSyncStatus();
+        setIsDatabaseInSync(databaseSyncStatus);
+      };
+
+      checkForRemoteChanges().catch((error) => console.error(error));
+    }
+  }, [getDatabaseSyncStatus]);
 
   useEffect(() => {
     if (isDatabaseSetup && !isDatabaseInSync) {
