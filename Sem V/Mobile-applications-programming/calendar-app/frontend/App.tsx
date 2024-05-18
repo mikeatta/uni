@@ -77,14 +77,6 @@ function App() {
         tasks: await getTasks(db),
       };
 
-      console.log('\nLocal events:');
-      tempLocalData.events.map((event) =>
-        console.log(event.summary, event.description),
-      );
-
-      console.log('\nLocal tasks:');
-      tempLocalData.tasks.map((task) => console.log(task.title));
-
       setLocalData(tempLocalData);
     } catch (error) {
       console.error(error);
