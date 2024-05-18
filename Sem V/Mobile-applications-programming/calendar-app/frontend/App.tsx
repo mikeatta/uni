@@ -65,7 +65,7 @@ function App() {
       console.error(error);
       throw Error('Failed to update the database');
     }
-  }, [isDatabaseInSync, calendarData]);
+  }, [calendarData]);
 
   const fetchLocalData = useCallback(async () => {
     try {
