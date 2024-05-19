@@ -19,6 +19,18 @@ export const addTask = async (db: SQLiteDatabase, task: CalendarTask) => {
   }
 }
 
+export const removeTask = async (db: SQLiteDatabase, task: CalendarTask) => {
+  const deleteQuery = 'DELETE FROM Tasks WHERE id = ?'
+  const values = [task.id]
+
+  try {
+    return await db.executeSql(deleteQuery, values)
+  } catch (error) {
+    console.error(error)
+    throw Error('Failed to remove task')
+  }
+}
+
 export const getTasks = async (db: SQLiteDatabase): Promise<CalendarTask[]> => {
   try {
     const tasks: CalendarTask[] = []

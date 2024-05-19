@@ -25,6 +25,18 @@ export const addEvent = async (db: SQLiteDatabase, event: CalendarEvent) => {
   }
 }
 
+export const removeEvent = async (db: SQLiteDatabase, event: CalendarEvent) => {
+  const deleteQuery = 'DELETE FROM Events WHERE id = ?'
+  const values = [event.id]
+
+  try {
+    return await db.executeSql(deleteQuery, values)
+  } catch (error) {
+    console.error(error)
+    throw Error('Failed to remove event')
+  }
+}
+
 export const getEvents = async (
   db: SQLiteDatabase,
 ): Promise<CalendarEvent[]> => {
