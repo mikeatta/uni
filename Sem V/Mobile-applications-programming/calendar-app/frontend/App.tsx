@@ -9,7 +9,7 @@ import {
   View,
   Text,
 } from 'react-native';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   handleFormSubmit,
   handleEntryEdit,
@@ -17,7 +17,7 @@ import {
   handleTaskStatusUpdate,
   fetchData,
 } from './utils/api';
-import { ICalendarData } from './components/types';
+import { CalendarEvent, ICalendarData } from './components/types';
 import ListView from './components/views/ListView';
 import EntryForm from './components/forms/EntryForm';
 import Slider from './components/controls/Slider';
@@ -34,6 +34,18 @@ function App() {
     events: [],
     tasklists: [],
     tasks: [],
+  });
+
+  interface ISyncStatusRef {
+    eventsToAdd: CalendarEvent[];
+    eventsToRemove: CalendarEvent[];
+    eventsToUpdate: CalendarEvent[];
+  }
+
+  const syncStatusRef = useRef<ISyncStatusRef>({
+    eventsToAdd: [],
+    eventsToRemove: [],
+    eventsToUpdate: [],
   });
 
   const [displayMode, setDisplayMode] = useState<string>('list');
@@ -54,7 +66,7 @@ function App() {
     try {
       const db = await connectToDatabase();
 
-      for (const event of calendarData.events) {
+      for (const event of syncStatusRef.current.eventsToAdd) {
         await addEvent(db, event);
       }
 
@@ -111,6 +123,10 @@ function App() {
         );
       }),
     );
+
+    syncStatusRef.current.eventsToAdd = eventsToAdd;
+    syncStatusRef.current.eventsToRemove = eventsToRemove;
+    syncStatusRef.current.eventsToUpdate = eventsToUpdate;
 
     return (
       eventsToAdd.length === 0 &&
