@@ -1,6 +1,6 @@
 import { connectToDatabase, createTables } from './db/db';
-import { addEvent, getEvents } from './db/events';
 import { addTask, getTasks } from './db/tasks';
+import { addEvent, getEvents, removeEvent } from './db/events';
 import {
   SafeAreaView,
   StatusBar,
@@ -66,11 +66,20 @@ function App() {
     try {
       const db = await connectToDatabase();
 
-      for (const event of syncStatusRef.current.eventsToAdd) {
+      const eventsToAddAndUpdate = [
+        ...syncStatusRef.current.eventsToAdd,
+        ...syncStatusRef.current.eventsToUpdate,
+      ];
+
+      for (const event of eventsToAddAndUpdate) {
         await addEvent(db, event);
       }
 
       for (const task of calendarData.tasks) {
+      for (const event of syncStatusRef.current.eventsToRemove) {
+        await removeEvent(db, event);
+      }
+
         await addTask(db, task);
       }
     } catch (error) {
