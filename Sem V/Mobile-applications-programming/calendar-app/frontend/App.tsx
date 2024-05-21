@@ -1,6 +1,6 @@
 import { connectToDatabase, createTables } from './db/db';
-import { addTask, getTasks } from './db/tasks';
 import { addEvent, getEvents, removeEvent } from './db/events';
+import { addTask, getTasks, removeTask } from './db/tasks';
 import {
   SafeAreaView,
   StatusBar,
@@ -17,7 +17,7 @@ import {
   handleTaskStatusUpdate,
   fetchData,
 } from './utils/api';
-import { CalendarEvent, ICalendarData } from './components/types';
+import { CalendarEvent, CalendarTask, ICalendarData } from './components/types';
 import ListView from './components/views/ListView';
 import EntryForm from './components/forms/EntryForm';
 import Slider from './components/controls/Slider';
@@ -40,12 +40,18 @@ function App() {
     eventsToAdd: CalendarEvent[];
     eventsToRemove: CalendarEvent[];
     eventsToUpdate: CalendarEvent[];
+    tasksToAdd: CalendarTask[];
+    tasksToRemove: CalendarTask[];
+    tasksToUpdate: CalendarTask[];
   }
 
   const syncStatusRef = useRef<ISyncStatusRef>({
     eventsToAdd: [],
     eventsToRemove: [],
     eventsToUpdate: [],
+    tasksToAdd: [],
+    tasksToRemove: [],
+    tasksToUpdate: [],
   });
 
   const [displayMode, setDisplayMode] = useState<string>('list');
@@ -71,16 +77,25 @@ function App() {
         ...syncStatusRef.current.eventsToUpdate,
       ];
 
+      const tasksToAddAndUpdate = [
+        ...syncStatusRef.current.tasksToAdd,
+        ...syncStatusRef.current.tasksToUpdate,
+      ];
+
       for (const event of eventsToAddAndUpdate) {
         await addEvent(db, event);
       }
 
-      for (const task of calendarData.tasks) {
       for (const event of syncStatusRef.current.eventsToRemove) {
         await removeEvent(db, event);
       }
 
+      for (const task of tasksToAddAndUpdate) {
         await addTask(db, task);
+      }
+
+      for (const task of syncStatusRef.current.tasksToRemove) {
+        await removeTask(db, task);
       }
     } catch (error) {
       console.error(error);
@@ -133,14 +148,44 @@ function App() {
       }),
     );
 
+    const tasksToAdd = calendarData.tasks.filter(
+      (remoteTask) =>
+        !localData.tasks.some((localTask) => localTask.id === remoteTask.id),
+    );
+
+    const tasksToRemove = localData.tasks.filter(
+      (localTask) =>
+        !calendarData.tasks.some(
+          (remoteTask) => localTask.id === remoteTask.id,
+        ),
+    );
+
+    const tasksToUpdate = calendarData.tasks.filter((remoteTask) =>
+      localData.tasks.some((localTask) => {
+        return (
+          localTask.id === remoteTask.id &&
+          (localTask.title !== remoteTask.title ||
+            localTask.notes !== remoteTask.notes ||
+            localTask.status !== remoteTask.status ||
+            localTask.due !== remoteTask.due)
+        );
+      }),
+    );
+
     syncStatusRef.current.eventsToAdd = eventsToAdd;
     syncStatusRef.current.eventsToRemove = eventsToRemove;
     syncStatusRef.current.eventsToUpdate = eventsToUpdate;
+    syncStatusRef.current.tasksToAdd = tasksToAdd;
+    syncStatusRef.current.tasksToRemove = tasksToRemove;
+    syncStatusRef.current.tasksToUpdate = tasksToUpdate;
 
     return (
       eventsToAdd.length === 0 &&
       eventsToRemove.length === 0 &&
-      eventsToUpdate.length === 0
+      eventsToUpdate.length === 0 &&
+      tasksToAdd.length === 0 &&
+      tasksToRemove.length === 0 &&
+      tasksToUpdate.length === 0
     );
   }, [updateLocalData]);
 
