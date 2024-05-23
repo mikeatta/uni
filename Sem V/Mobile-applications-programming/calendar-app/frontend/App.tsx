@@ -15,7 +15,6 @@ import {
   handleEntryEdit,
   handleEntryRemoval,
   handleTaskStatusUpdate,
-  fetchData,
 } from './utils/api';
 import { ICalendarData } from './components/types';
 import ListView from './components/views/ListView';
@@ -23,6 +22,7 @@ import EntryForm from './components/forms/EntryForm';
 import Slider from './components/controls/Slider';
 import CalendarView from './components/views/CalendarView';
 import { useSyncStatus } from './hooks/useSyncStatus';
+import { useFetchRemoteData } from './hooks/useFetchRemoteData';
 
 function App() {
   const [localData, setLocalData] = useState<ICalendarData>({
@@ -31,11 +31,7 @@ function App() {
     tasks: [],
   });
 
-  const [calendarData, setCalendarData] = useState<ICalendarData>({
-    events: [],
-    tasklists: [],
-    tasks: [],
-  });
+  const calendarData = useFetchRemoteData();
 
   const { syncStatusRef, getDatabaseSyncStatus } = useSyncStatus(
     localData,
@@ -110,10 +106,6 @@ function App() {
 
   useEffect(() => {
     setupLocalDatabase();
-  }, []);
-
-  useEffect(() => {
-    fetchData(setCalendarData);
   }, []);
 
   useEffect(() => {
