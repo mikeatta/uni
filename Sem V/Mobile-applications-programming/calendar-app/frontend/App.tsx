@@ -1,6 +1,6 @@
 import { connectToDatabase, createTables } from './db/db';
-import { addEvent, getEvents, removeEvent } from './db/events';
-import { addTask, getTasks, removeTask } from './db/tasks';
+import { addEvent, removeEvent } from './db/events';
+import { addTask, removeTask } from './db/tasks';
 import {
   SafeAreaView,
   StatusBar,
@@ -16,31 +16,30 @@ import {
   handleEntryRemoval,
   handleTaskStatusUpdate,
 } from './utils/api';
-import { ICalendarData } from './components/types';
 import ListView from './components/views/ListView';
 import EntryForm from './components/forms/EntryForm';
 import Slider from './components/controls/Slider';
 import CalendarView from './components/views/CalendarView';
 import { useSyncStatus } from './hooks/useSyncStatus';
 import { useFetchRemoteData } from './hooks/useFetchRemoteData';
+import { useFetchLocalData } from './hooks/useFetchLocalData';
 
 function App() {
-  const [localData, setLocalData] = useState<ICalendarData>({
-    events: [],
-    tasklists: [],
-    tasks: [],
-  });
+  const [displayMode, setDisplayMode] = useState<string>('list');
+  const [isDatabaseSetup, setIsDatabaseSetup] = useState<boolean>(false);
+  const [isDatabaseInSync, setIsDatabaseInSync] = useState<boolean>(false);
 
   const calendarData = useFetchRemoteData();
+  const { localData, refetchLocalData } = useFetchLocalData(
+    isDatabaseSetup,
+    calendarData,
+  );
 
   const { syncStatusRef, getDatabaseSyncStatus } = useSyncStatus(
     localData,
     calendarData,
   );
 
-  const [displayMode, setDisplayMode] = useState<string>('list');
-  const [isDatabaseSetup, setIsDatabaseSetup] = useState<boolean>(false);
-  const [isDatabaseInSync, setIsDatabaseInSync] = useState<boolean>(false);
 
   const setupLocalDatabase = async () => {
     try {
@@ -87,32 +86,9 @@ function App() {
     }
   }, [calendarData]);
 
-  const fetchLocalData = useCallback(async () => {
-    try {
-      const db = await connectToDatabase();
-
-      const tempLocalData: ICalendarData = {
-        events: await getEvents(db),
-        tasklists: [],
-        tasks: await getTasks(db),
-      };
-
-      setLocalData(tempLocalData);
-    } catch (error) {
-      console.error(error);
-    }
-  }, [updateLocalData]);
-
-
   useEffect(() => {
     setupLocalDatabase();
   }, []);
-
-  useEffect(() => {
-    if (isDatabaseSetup) {
-      fetchLocalData();
-    }
-  }, [isDatabaseSetup]);
 
   useEffect(() => {
     if (isDatabaseSetup) {
