@@ -1,6 +1,4 @@
 import { connectToDatabase, createTables } from './db/db';
-import { addEvent, removeEvent } from './db/events';
-import { addTask, removeTask } from './db/tasks';
 import {
   SafeAreaView,
   StatusBar,
@@ -9,7 +7,7 @@ import {
   View,
   Text,
 } from 'react-native';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   handleFormSubmit,
   handleEntryEdit,
@@ -35,11 +33,17 @@ function App() {
     calendarData,
   );
 
-  const { syncStatusRef, getDatabaseSyncStatus } = useSyncStatus(
+  const { getDatabaseSyncStatus, updateLocalData } = useSyncStatus(
     localData,
     calendarData,
+    refetchLocalData,
   );
 
+    try {
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const setupLocalDatabase = async () => {
     try {
@@ -50,41 +54,6 @@ function App() {
       console.error(error);
     }
   };
-
-  const updateLocalData = useCallback(async () => {
-    try {
-      const db = await connectToDatabase();
-
-      const eventsToAddAndUpdate = [
-        ...syncStatusRef.current.eventsToAdd,
-        ...syncStatusRef.current.eventsToUpdate,
-      ];
-
-      const tasksToAddAndUpdate = [
-        ...syncStatusRef.current.tasksToAdd,
-        ...syncStatusRef.current.tasksToUpdate,
-      ];
-
-      for (const event of eventsToAddAndUpdate) {
-        await addEvent(db, event);
-      }
-
-      for (const event of syncStatusRef.current.eventsToRemove) {
-        await removeEvent(db, event);
-      }
-
-      for (const task of tasksToAddAndUpdate) {
-        await addTask(db, task);
-      }
-
-      for (const task of syncStatusRef.current.tasksToRemove) {
-        await removeTask(db, task);
-      }
-    } catch (error) {
-      console.error(error);
-      throw Error('Failed to update the database');
-    }
-  }, [calendarData]);
 
   useEffect(() => {
     setupLocalDatabase();
@@ -105,12 +74,12 @@ function App() {
     if (isDatabaseSetup && !isDatabaseInSync) {
       const updateAndFetchLocalData = async () => {
         await updateLocalData();
-        await fetchLocalData();
+        await refetchLocalData();
       };
 
       updateAndFetchLocalData().catch((error) => console.log(error));
     }
-  }, [fetchLocalData, updateLocalData]);
+  }, [refetchLocalData, updateLocalData]);
 
   const handleSliderChange = async (value: 'list' | 'calendar') => {
     setDisplayMode(value);
