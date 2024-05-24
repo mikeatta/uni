@@ -1,4 +1,3 @@
-import { connectToDatabase, createTables } from './db/db';
 import {
   SafeAreaView,
   StatusBar,
@@ -7,7 +6,7 @@ import {
   View,
   Text,
 } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   handleFormSubmit,
   handleEntryEdit,
@@ -21,11 +20,12 @@ import CalendarView from './components/views/CalendarView';
 import { useSyncStatus } from './hooks/useSyncStatus';
 import { useFetchRemoteData } from './hooks/useFetchRemoteData';
 import { useFetchLocalData } from './hooks/useFetchLocalData';
+import { useSetupDatabase } from './hooks/useSetupDatabase';
 
 function App() {
   const [displayMode, setDisplayMode] = useState<string>('list');
-  const [isDatabaseSetup, setIsDatabaseSetup] = useState<boolean>(false);
 
+  const isDatabaseSetup = useSetupDatabase();
   const calendarData = useFetchRemoteData();
   const { localData, refetchLocalData } = useFetchLocalData(
     isDatabaseSetup,
@@ -33,26 +33,6 @@ function App() {
   );
 
   useSyncStatus(localData, calendarData, isDatabaseSetup, refetchLocalData);
-
-    try {
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const setupLocalDatabase = async () => {
-    try {
-      const db = await connectToDatabase();
-      await createTables(db);
-      setIsDatabaseSetup(true);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    setupLocalDatabase();
-  }, []);
 
   const handleSliderChange = async (value: 'list' | 'calendar') => {
     setDisplayMode(value);
