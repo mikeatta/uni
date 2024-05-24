@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { CalendarEvent, CalendarTask, ICalendarData } from '../components/types'
 import { connectToDatabase } from '../db/db'
 import { addEvent, removeEvent } from '../db/events'
@@ -7,8 +7,11 @@ import { addTask, removeTask } from '../db/tasks'
 export const useSyncStatus = (
   localData: ICalendarData,
   calendarData: ICalendarData,
+  isDatabaseSetup: boolean,
   refetchLocalData: () => Promise<void>,
 ) => {
+  const [isDatabaseInSync, setIsDatabaseInSync] = useState<boolean>(false)
+
   interface ISyncStatusRef {
     eventsToAdd: CalendarEvent[]
     eventsToRemove: CalendarEvent[]
@@ -134,7 +137,7 @@ export const useSyncStatus = (
 
   const updateLocalData = useCallback(async () => {
     try {
-      const db = await connectToDatabase('updateLocalData')
+      const db = await connectToDatabase()
 
       const eventsToAddAndUpdate = [...eventsToAdd, ...eventsToUpdate]
 
@@ -161,5 +164,25 @@ export const useSyncStatus = (
     }
   }, [refetchLocalData])
 
-  return { getDatabaseSyncStatus, updateLocalData }
+  useEffect(() => {
+    if (isDatabaseSetup) {
+      const checkForRemoteChanges = async () => {
+        const databaseSyncStatus = await getDatabaseSyncStatus()
+        setIsDatabaseInSync(databaseSyncStatus)
+      }
+
+      checkForRemoteChanges().catch((error) => console.error(error))
+    }
+  }, [getDatabaseSyncStatus])
+
+  useEffect(() => {
+    if (isDatabaseSetup && !isDatabaseInSync) {
+      const updateAndFetchLocalData = async () => {
+        await updateLocalData()
+        await refetchLocalData()
+      }
+
+      updateAndFetchLocalData().catch((error) => console.log(error))
+    }
+  }, [refetchLocalData, updateLocalData])
 }

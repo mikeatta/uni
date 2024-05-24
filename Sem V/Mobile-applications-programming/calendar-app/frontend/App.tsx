@@ -25,7 +25,6 @@ import { useFetchLocalData } from './hooks/useFetchLocalData';
 function App() {
   const [displayMode, setDisplayMode] = useState<string>('list');
   const [isDatabaseSetup, setIsDatabaseSetup] = useState<boolean>(false);
-  const [isDatabaseInSync, setIsDatabaseInSync] = useState<boolean>(false);
 
   const calendarData = useFetchRemoteData();
   const { localData, refetchLocalData } = useFetchLocalData(
@@ -33,11 +32,7 @@ function App() {
     calendarData,
   );
 
-  const { getDatabaseSyncStatus, updateLocalData } = useSyncStatus(
-    localData,
-    calendarData,
-    refetchLocalData,
-  );
+  useSyncStatus(localData, calendarData, isDatabaseSetup, refetchLocalData);
 
     try {
     } catch (error) {
@@ -58,28 +53,6 @@ function App() {
   useEffect(() => {
     setupLocalDatabase();
   }, []);
-
-  useEffect(() => {
-    if (isDatabaseSetup) {
-      const checkForRemoteChanges = async () => {
-        const databaseSyncStatus = await getDatabaseSyncStatus();
-        setIsDatabaseInSync(databaseSyncStatus);
-      };
-
-      checkForRemoteChanges().catch((error) => console.error(error));
-    }
-  }, [getDatabaseSyncStatus]);
-
-  useEffect(() => {
-    if (isDatabaseSetup && !isDatabaseInSync) {
-      const updateAndFetchLocalData = async () => {
-        await updateLocalData();
-        await refetchLocalData();
-      };
-
-      updateAndFetchLocalData().catch((error) => console.log(error));
-    }
-  }, [refetchLocalData, updateLocalData]);
 
   const handleSliderChange = async (value: 'list' | 'calendar') => {
     setDisplayMode(value);
