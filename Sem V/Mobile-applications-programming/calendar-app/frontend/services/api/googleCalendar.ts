@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { CalendarTask, FormData, ICalendarData } from '../components/types'
+import { CalendarTask, FormData, ICalendarData } from '../../components/types'
 
 // Local development address
 const LOCAL_URL = 'http://10.0.2.2:3001'

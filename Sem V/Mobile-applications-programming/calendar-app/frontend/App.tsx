@@ -12,7 +12,7 @@ import {
   handleEntryEdit,
   handleEntryRemoval,
   handleTaskStatusUpdate,
-} from './utils/api';
+} from './services/api/googleCalendar';
 import ListView from './components/views/ListView';
 import EntryForm from './components/forms/EntryForm';
 import Slider from './components/controls/Slider';

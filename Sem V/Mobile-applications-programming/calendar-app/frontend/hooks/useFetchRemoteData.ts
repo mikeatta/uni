@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ICalendarData } from '../components/types'
-import { fetchData } from '../services/api/api'
+import { fetchData } from '../services/api/googleCalendar'
 
 export const useFetchRemoteData = () => {
   const [calendarData, setCalendarData] = useState<ICalendarData>({
