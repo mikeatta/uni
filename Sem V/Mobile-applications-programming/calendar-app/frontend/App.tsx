@@ -41,7 +41,7 @@ function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar />
-      <ScrollView style={{ width: '100%' }}>
+      <ScrollView style={styles.scrollView}>
         <View style={styles.contentContainer}>
           <Text style={styles.headerText}>Create New Entry</Text>
           <EntryForm onSubmit={handleFormSubmit} />
@@ -79,9 +79,12 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     maxWidth: '100%',
-    padding: 10,
+    height: '100%',
     backgroundColor: '#fff',
     alignItems: 'center',
+  },
+  scrollView: {
+    width: '96%',
   },
   contentContainer: {
     flex: 1,
