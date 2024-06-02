@@ -1,10 +1,10 @@
 import {
   Animated,
-  Dimensions,
   SafeAreaView,
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -13,8 +13,9 @@ type SliderProps = {
 };
 
 function Slider({ onValueChange }: SliderProps) {
-  const [active, setActive] = useState(false);
+  const [active, setActive] = useState<boolean>(false);
   let translation = useRef(new Animated.Value(0)).current;
+  const { width: deviceScreenWidth } = useWindowDimensions();
 
   useEffect(() => {
     if (active) {
@@ -34,7 +35,7 @@ function Slider({ onValueChange }: SliderProps) {
 
   const translationX = translation.interpolate({
     inputRange: [0, 1],
-    outputRange: [2, Dimensions.get('screen').width / 2 - 2 * 5 * 2],
+    outputRange: [2, (deviceScreenWidth / 2) * 0.96 - 5],
   });
 
   return (
@@ -47,7 +48,6 @@ function Slider({ onValueChange }: SliderProps) {
       <View
         style={{
           flexDirection: 'row',
-          position: 'relative',
           height: 50,
           borderRadius: 10,
           backgroundColor: '#efebf0',
@@ -61,7 +61,7 @@ function Slider({ onValueChange }: SliderProps) {
             top: 2,
             bottom: 2,
             borderRadius: 10,
-            width: Dimensions.get('screen').width / 2 - 2 - 5 * 2,
+            width: (deviceScreenWidth / 2) * 0.96 - 7,
             transform: [
               {
                 translateX: translationX,
@@ -69,7 +69,7 @@ function Slider({ onValueChange }: SliderProps) {
             ],
             backgroundColor: 'white',
           }}
-        ></Animated.View>
+        />
         <TouchableOpacity
           style={{
             flex: 1,
