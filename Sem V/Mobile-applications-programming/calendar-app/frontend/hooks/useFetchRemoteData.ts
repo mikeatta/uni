@@ -9,9 +9,13 @@ export const useFetchRemoteData = () => {
     tasks: [],
   })
 
-  useEffect(() => {
+  const fetchRemoteData = () => {
     fetchData(setCalendarData)
+  }
+
+  useEffect(() => {
+    fetchRemoteData()
   }, [])
 
-  return calendarData
+  return { calendarData, refetchRemoteData: fetchRemoteData }
 }

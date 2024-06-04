@@ -184,5 +184,5 @@ export const useSyncStatus = (
 
       updateAndFetchLocalData().catch((error) => console.log(error))
     }
-  }, [refetchLocalData, updateLocalData])
+  }, [refetchLocalData, updateLocalData, isDatabaseInSync])
 }

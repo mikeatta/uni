@@ -21,12 +21,13 @@ import { useSyncStatus } from './hooks/useSyncStatus';
 import { useFetchRemoteData } from './hooks/useFetchRemoteData';
 import { useFetchLocalData } from './hooks/useFetchLocalData';
 import { useSetupDatabase } from './hooks/useSetupDatabase';
+import { withFunction } from './utils/helpers';
 
 function App() {
   const [displayMode, setDisplayMode] = useState<string>('list');
 
   const isDatabaseSetup = useSetupDatabase();
-  const calendarData = useFetchRemoteData();
+  const { calendarData, refetchRemoteData } = useFetchRemoteData();
   const { localData, refetchLocalData } = useFetchLocalData(
     isDatabaseSetup,
     calendarData,
@@ -38,13 +39,15 @@ function App() {
     setDisplayMode(value);
   };
 
+  const withRefetch = withFunction(refetchRemoteData);
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar />
       <ScrollView style={styles.scrollView}>
         <View style={styles.contentContainer}>
           <Text style={styles.headerText}>Create New Entry</Text>
-          <EntryForm onSubmit={handleFormSubmit} />
+          <EntryForm onSubmit={withRefetch(handleFormSubmit)} />
         </View>
         <View style={styles.contentContainer}>
           <Text style={styles.headerText}>Calendar Data</Text>
@@ -54,18 +57,18 @@ function App() {
               events={calendarData.events}
               tasklists={calendarData.tasklists}
               tasks={calendarData.tasks}
-              onStatusChange={handleTaskStatusUpdate}
-              onEdit={handleEntryEdit}
-              onRemove={handleEntryRemoval}
+              onStatusChange={withRefetch(handleTaskStatusUpdate)}
+              onEdit={withRefetch(handleEntryEdit)}
+              onRemove={withRefetch(handleEntryRemoval)}
             />
           ) : (
             <CalendarView
               events={calendarData.events}
               tasklists={calendarData.tasklists}
               tasks={calendarData.tasks}
-              onStatusChange={handleTaskStatusUpdate}
-              onEdit={handleEntryEdit}
-              onRemove={handleEntryRemoval}
+              onStatusChange={withRefetch(handleTaskStatusUpdate)}
+              onEdit={withRefetch(handleEntryEdit)}
+              onRemove={withRefetch(handleEntryRemoval)}
             />
           )}
         </View>
