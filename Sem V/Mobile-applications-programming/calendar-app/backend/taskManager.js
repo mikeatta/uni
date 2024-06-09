@@ -135,7 +135,8 @@ export async function getCalendarTasks(service) {
      * Map tasks to ensure each object from the Google API request holds the
      * properties required for comparison with the tasks stored in the local
      * database.
-     * If the title or notes are missing, set their values to 'null' for consistency.
+     * If the title or notes are missing, set their values to 'null' for
+     * consistency.
      */
     tasks.map((task) => {
       task.title = task.title || null;
