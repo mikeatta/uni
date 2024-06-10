@@ -43,3 +43,48 @@ function isCalendarTask(
 ): entry is CalendarTask {
   return (entry as CalendarTask).title !== undefined
 }
+
+/*
+ * Function: 'toCalendarEntry'
+ *
+ * Converts the formData object obtained from the 'EntryForm.tsx' component
+ * into a calendar entry object.
+ *
+ * For task entries, the 'status' field is set to 'needsAction' (incomplete).
+ *
+ * Return type varies based on the entry type.
+ */
+export const toCalendarEntry = (
+  formData: FormData,
+): CalendarEvent | CalendarTask => {
+  const { id, title, description, start, end } = formData
+  const type = formData.type
+
+  if (type === 'event') {
+    return {
+      id: id,
+      summary: title,
+      description: description,
+      start: {
+        date: new Date(start.dateTime),
+        dateTime: start.dateTime,
+        timeZone: start.timeZone,
+      },
+      end: {
+        date: new Date(end.dateTime),
+        dateTime: end.dateTime,
+        timeZone: end.timeZone,
+      },
+    }
+  } else if (type === 'task') {
+    return {
+      id: id,
+      title: title,
+      notes: description,
+      status: 'needsAction', // Set status to 'needsAction' for new tasks
+      due: start.dateTime.toString(),
+    }
+  } else {
+    throw Error('Undefined type of formData object')
+  }
+}
