@@ -1,40 +1,51 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ICalendarData } from '../components/types'
 import { connectToDatabase } from '../db/db'
 import { getEvents } from '../db/events'
 import { getTasks } from '../db/tasks'
 
-export const useFetchLocalData = (
-  isDatabaseSetup: boolean,
-  calendarData: ICalendarData,
-) => {
+export const useFetchLocalData = (isDatabaseSetup: boolean) => {
   const [localData, setLocalData] = useState<ICalendarData>({
     events: [],
     tasklists: [],
     tasks: [],
   })
 
-  const fetchLocalData = useCallback(async () => {
+  const fetchLocalData = async () => {
     try {
       const db = await connectToDatabase()
 
-      const tempLocalData: ICalendarData = {
+      const fetchedData: ICalendarData = {
         events: await getEvents(db),
         tasklists: [],
         tasks: await getTasks(db),
       }
 
-      setLocalData(tempLocalData)
+      if (!fetchedData) {
+        throw Error('Local data returned undefined')
+      }
+
+      return fetchedData
     } catch (error) {
       console.error(error)
+      throw Error('Error fetching local data')
     }
-  }, [calendarData])
+  }
+
+  const refreshLocalData = async () => {
+    try {
+      const newLocalData = await fetchLocalData()
+      setLocalData(newLocalData)
+    } catch (error) {
+      console.error('Failed to refresh local data:', error)
+    }
+  }
 
   useEffect(() => {
     if (isDatabaseSetup) {
-      fetchLocalData()
+      refreshLocalData()
     }
   }, [isDatabaseSetup])
 
-  return { localData, refetchLocalData: fetchLocalData }
+  return { localData, setLocalData, refreshLocalData }
 }
