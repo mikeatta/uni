@@ -90,6 +90,54 @@ export const toCalendarEntry = (
 }
 
 /*
+ * Function: 'toFormData'
+ *
+ * Converts and returns the provided calendar entry as a 'FormData' object.
+ */
+export const toFormData = (
+  calendarEntry: CalendarEvent | CalendarTask,
+): FormData => {
+  const entryType = getDataType(calendarEntry)
+
+  if (entryType === 'event') {
+    const tempEntry = calendarEntry as CalendarEvent
+
+    return {
+      id: tempEntry.id,
+      title: tempEntry.summary,
+      description: tempEntry.description || '',
+      start: {
+        dateTime: new Date(tempEntry.start.dateTime),
+        timeZone: tempEntry.start.timeZone,
+      },
+      end: {
+        dateTime: new Date(tempEntry.end.dateTime),
+        timeZone: tempEntry.end.timeZone,
+      },
+      type: 'event' as const,
+    }
+  } else if (entryType === 'task') {
+    const tempEntry = calendarEntry as CalendarTask
+
+    const startPropertyFromDue = {
+      dateTime: new Date(tempEntry.due),
+      timeZone: new Date().getTimezoneOffset().toString(),
+    }
+
+    return {
+      id: tempEntry.id,
+      title: tempEntry.title,
+      description: tempEntry.notes || '',
+      start: startPropertyFromDue,
+      end: startPropertyFromDue,
+      type: 'task' as const,
+    }
+  } else {
+    throw Error('Failed to convert entry to FormData type')
+  }
+}
+
+/*
  * Function: 'fillTempEntryId'
  *
  * Fills the entry's ID property with a temporary ID and returns the modified
