@@ -102,12 +102,10 @@ export const updateRemoteTaskStatus = async (taskData: CalendarTask) => {
 }
 
 // Fetch calendar data
-export const fetchRemoteData = async (
-  setCalendarData: React.Dispatch<React.SetStateAction<ICalendarData>>,
-) => {
+export const fetchRemoteData = async () => {
   try {
     const response = await axios.get(`${LOCAL_URL}/api/v1/calendar`)
-    setCalendarData(response.data)
+    return response.data
   } catch (error) {
     console.error('Error fetching calendar data:', error)
   }
