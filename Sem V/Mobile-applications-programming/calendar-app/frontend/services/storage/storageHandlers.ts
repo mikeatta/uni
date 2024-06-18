@@ -8,13 +8,13 @@ import { getDataType } from '../../utils/helpers'
 
 export const addLocalEntry = async (
   submittedEntry: CalendarEvent | CalendarTask,
-  setCalendarData: React.Dispatch<React.SetStateAction<ICalendarData>>,
+  setLocalData: React.Dispatch<React.SetStateAction<ICalendarData>>,
 ) => {
   try {
     const entryType = getDataType(submittedEntry)
 
     if (entryType === 'event') {
-      setCalendarData((prevLocalData) => {
+      setLocalData((prevLocalData) => {
         const updatedEvents = [
           ...prevLocalData.events,
           submittedEntry as CalendarEvent,
@@ -26,7 +26,7 @@ export const addLocalEntry = async (
         }
       })
     } else if (entryType === 'task') {
-      setCalendarData((prevLocalData) => {
+      setLocalData((prevLocalData) => {
         const updatedTasks = [
           ...prevLocalData.tasks,
           submittedEntry as CalendarTask,
@@ -46,11 +46,11 @@ export const addLocalEntry = async (
 export const removeLocalEntry = (
   id: string,
   type: string,
-  setCalendarData: React.Dispatch<React.SetStateAction<ICalendarData>>,
+  setLocalData: React.Dispatch<React.SetStateAction<ICalendarData>>,
 ) => {
   try {
     if (type === 'event') {
-      setCalendarData((prevLocalData) => {
+      setLocalData((prevLocalData) => {
         const updatedEvents = [
           ...prevLocalData.events.filter(
             (eventToRemove) => id !== eventToRemove.id,
@@ -63,7 +63,7 @@ export const removeLocalEntry = (
         }
       })
     } else if (type === 'task') {
-      setCalendarData((prevLocalData) => {
+      setLocalData((prevLocalData) => {
         const updatedTasks = [
           ...prevLocalData.tasks.filter(
             (taskToRemove) => id !== taskToRemove.id,
