@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ICalendarData } from '../components/types'
-import { fetchData } from '../services/api/googleCalendar'
+import { fetchRemoteData } from '../services/api/googleCalendar'
 
 export const useFetchRemoteData = () => {
   const [calendarData, setCalendarData] = useState<ICalendarData>({
@@ -9,13 +9,19 @@ export const useFetchRemoteData = () => {
     tasks: [],
   })
 
-  const fetchRemoteData = () => {
-    fetchData(setCalendarData)
+  const fetchCalendarData = async () => {
+    const data = await fetchRemoteData()
+
+    if (data === undefined) {
+      return
+    }
+
+    setCalendarData(data)
   }
 
   useEffect(() => {
-    fetchRemoteData()
+    fetchCalendarData()
   }, [])
 
-  return { calendarData, refetchRemoteData: fetchRemoteData }
+  return { calendarData, refetchRemoteData: fetchCalendarData }
 }
