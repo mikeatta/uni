@@ -8,32 +8,29 @@ import { getDataType } from '../../utils/helpers'
 
 export const addLocalEntry = async (
   submittedEntry: CalendarEvent | CalendarTask,
-  setLocalData: React.Dispatch<React.SetStateAction<ICalendarData>>,
+  setData: React.Dispatch<React.SetStateAction<ICalendarData>>,
 ) => {
   try {
     const entryType = getDataType(submittedEntry)
 
     if (entryType === 'event') {
-      setLocalData((prevLocalData) => {
+      setData((prevData) => {
         const updatedEvents = [
-          ...prevLocalData.events,
+          ...prevData.events,
           submittedEntry as CalendarEvent,
         ]
 
         return {
-          ...prevLocalData,
+          ...prevData,
           events: updatedEvents,
         }
       })
     } else if (entryType === 'task') {
-      setLocalData((prevLocalData) => {
-        const updatedTasks = [
-          ...prevLocalData.tasks,
-          submittedEntry as CalendarTask,
-        ]
+      setData((prevData) => {
+        const updatedTasks = [...prevData.tasks, submittedEntry as CalendarTask]
 
         return {
-          ...prevLocalData,
+          ...prevData,
           tasks: updatedTasks,
         }
       })
@@ -46,32 +43,28 @@ export const addLocalEntry = async (
 export const removeLocalEntry = (
   id: string,
   type: string,
-  setLocalData: React.Dispatch<React.SetStateAction<ICalendarData>>,
+  setData: React.Dispatch<React.SetStateAction<ICalendarData>>,
 ) => {
   try {
     if (type === 'event') {
-      setLocalData((prevLocalData) => {
+      setData((prevData) => {
         const updatedEvents = [
-          ...prevLocalData.events.filter(
-            (eventToRemove) => id !== eventToRemove.id,
-          ),
+          ...prevData.events.filter((eventToRemove) => id !== eventToRemove.id),
         ]
 
         return {
-          ...prevLocalData,
+          ...prevData,
           events: updatedEvents,
         }
       })
     } else if (type === 'task') {
-      setLocalData((prevLocalData) => {
+      setData((prevData) => {
         const updatedTasks = [
-          ...prevLocalData.tasks.filter(
-            (taskToRemove) => id !== taskToRemove.id,
-          ),
+          ...prevData.tasks.filter((taskToRemove) => id !== taskToRemove.id),
         ]
 
         return {
-          ...prevLocalData,
+          ...prevData,
           tasks: updatedTasks,
         }
       })
