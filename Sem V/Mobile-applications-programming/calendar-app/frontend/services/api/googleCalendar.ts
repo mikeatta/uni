@@ -18,7 +18,7 @@ const getSubmittedEntry = async (
     const oldTasks = calendarData.tasks
     const type = formData.type
 
-    const updatedData = await fetchRemoteData()
+    const updatedData = await fetchGoogleCalendarData()
 
     if (type === 'event') {
       const foundEvent = updatedData.events.find(
@@ -101,12 +101,13 @@ export const updateRemoteTaskStatus = async (taskData: CalendarTask) => {
   }
 }
 
-// Fetch calendar data
-export const fetchRemoteData = async () => {
+export const fetchGoogleCalendarData = async () => {
   try {
     const response = await axios.get(`${LOCAL_URL}/api/v1/calendar`)
-    return response.data
+    const calendarData: ICalendarData = response.data
+    return calendarData
   } catch (error) {
     console.error('Error fetching calendar data:', error)
+    throw Error
   }
 }
