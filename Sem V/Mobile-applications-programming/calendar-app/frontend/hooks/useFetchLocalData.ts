@@ -32,10 +32,10 @@ export const useFetchLocalData = (isDatabaseSetup: boolean) => {
     }
   }
 
-  const refreshLocalData = async () => {
+  const assignLocalData = async () => {
     try {
-      const newLocalData = await fetchLocalData()
-      setLocalData(newLocalData)
+      const fetchedData = await fetchLocalData()
+      setLocalData(fetchedData)
     } catch (error) {
       console.error('Failed to refresh local data:', error)
     }
@@ -43,9 +43,13 @@ export const useFetchLocalData = (isDatabaseSetup: boolean) => {
 
   useEffect(() => {
     if (isDatabaseSetup) {
-      refreshLocalData()
+      assignLocalData()
     }
   }, [isDatabaseSetup])
 
-  return { localData, setLocalData, refreshLocalData }
+  return {
+    localData,
+    setLocalData,
+    refreshLocalEntryList: assignLocalData,
+  }
 }
