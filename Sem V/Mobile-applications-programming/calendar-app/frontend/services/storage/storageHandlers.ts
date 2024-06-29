@@ -40,6 +40,63 @@ export const addLocalEntry = async (
   }
 }
 
+export const overwriteOfflineEntry = async (
+  submittedEntry: CalendarEvent | CalendarTask,
+  setData: React.Dispatch<React.SetStateAction<ICalendarData>>,
+) => {
+  try {
+    const entryType = getDataType(submittedEntry)
+
+    if (entryType === 'event') {
+      const updatedEvent = submittedEntry as CalendarEvent
+
+      setData((prevData) => {
+        const prevDataWithoutOfflineEvent = prevData.events.filter(
+          (events) =>
+            !(
+              events.id.startsWith('offline') &&
+              events.summary === updatedEvent.summary &&
+              events.description === updatedEvent.description &&
+              events.start.dateTime === updatedEvent.start.dateTime &&
+              events.start.timeZone === updatedEvent.start.timeZone &&
+              events.end.dateTime === updatedEvent.end.dateTime &&
+              events.end.timeZone === updatedEvent.end.timeZone
+            ),
+        )
+
+        prevDataWithoutOfflineEvent[0] = updatedEvent
+
+        const updatedEvents = [...prevDataWithoutOfflineEvent]
+
+        return { ...prevData, events: updatedEvents }
+      })
+    } else if (entryType === 'task') {
+      const updatedTask = submittedEntry as CalendarTask
+
+      setData((prevData) => {
+        const prevDataWithoutOfflineTask = prevData.tasks.filter(
+          (tasks) =>
+            !(
+              tasks.id.startsWith('offline') &&
+              tasks.title === updatedTask.title &&
+              tasks.notes === updatedTask.notes &&
+              tasks.due === updatedTask.due &&
+              tasks.status === updatedTask.status
+            ),
+        )
+
+        prevDataWithoutOfflineTask[0] = updatedTask
+
+        const updatedTasks = [...prevDataWithoutOfflineTask]
+
+        return { ...prevData, tasks: updatedTasks }
+      })
+    }
+  } catch (error) {
+    console.error('Error overwriting offline entry:', error)
+  }
+}
+
 export const removeLocalEntry = (
   id: string,
   type: string,
