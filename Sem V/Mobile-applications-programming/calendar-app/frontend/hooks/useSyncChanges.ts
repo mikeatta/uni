@@ -1,19 +1,33 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { CalendarEvent, CalendarTask, ICalendarData } from '../components/types'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  CalendarEvent,
+  CalendarTask,
+  FormData,
+  ICalendarData,
+} from '../components/types'
 import { connectToDatabase } from '../db/db'
 import { addEvent, removeEvent } from '../db/events'
 import { addTask, removeTask } from '../db/tasks'
-import { fetchGoogleCalendarData } from '../services/api/googleCalendar'
+import {
+  addRemoteEntry,
+  editRemoteEntry,
+  fetchGoogleCalendarData,
+  removeRemoteEntry,
+} from '../services/api/googleCalendar'
+import { toFormData } from '../utils/helpers'
+import { overwriteOfflineEntry } from '../services/storage/storageHandlers'
 
 export const useSyncChanges = async (
   localData: ICalendarData,
   isConnected: boolean,
+  setLocalData: React.Dispatch<React.SetStateAction<ICalendarData>>,
   refreshLocalEntryList: () => Promise<void>,
 ) => {
   const [lastSyncedLocalData, setLastSyncedLocalData] =
     useState<ICalendarData>(localData)
 
   const localDataNeedsUpdates = useRef<boolean>(false)
+  const isFirstLoad = useRef<boolean>(true)
 
   type DataStatus = {
     eventsToAdd: CalendarEvent[]
@@ -127,11 +141,88 @@ export const useSyncChanges = async (
     [calendarUpdatesNeeded],
   )
 
+  type SubmittableEntries = {
+    eventsToAdd: FormData[]
+    eventsToRemove: string[][]
+    eventsToUpdate: FormData[]
+    tasksToAdd: FormData[]
+    tasksToRemove: string[][]
+    tasksToUpdate: FormData[]
+  }
+
+  const updateGoogleCalendar = useCallback(
+    async ({
+      eventsToAdd,
+      eventsToRemove,
+      eventsToUpdate,
+      tasksToAdd,
+      tasksToRemove,
+      tasksToUpdate,
+    }: SubmittableEntries) => {
+      const entriesToAdd = [...eventsToAdd, ...tasksToAdd]
+      const entriesToRemove = [...eventsToRemove, ...tasksToRemove]
+      const entriesToUpdate = [...eventsToUpdate, ...tasksToUpdate]
+
+      for (const entry of entriesToAdd) {
+        const submittedEntry = await addRemoteEntry(entry, localData)
+        await overwriteOfflineEntry(submittedEntry, setLocalData)
+      }
+
+      for (const [id, type] of entriesToRemove) {
+        await removeRemoteEntry(id, type)
+      }
+
+      for (const entry of entriesToUpdate) {
+        await editRemoteEntry(entry)
+      }
+    },
+    [calendarUpdatesNeeded],
+  )
+
   const updateLocalData = useCallback(async () => {
     if (localDataNeedsUpdates.current === true) {
       await refreshLocalEntryList()
     }
   }, [calendarUpdatesNeeded])
+
+  const convertToSubmittableEntries = (
+    calendarChanges: DataStatus,
+  ): SubmittableEntries => {
+    const eventsToAdd = calendarChanges.eventsToAdd.map((eventToAdd) =>
+      toFormData(eventToAdd),
+    )
+    const eventsToRemove = calendarChanges.eventsToRemove.map(
+      (eventToRemove) => {
+        const id = eventToRemove.id
+        const type = 'event'
+        return [id, type]
+      },
+    )
+    const eventsToUpdate = calendarChanges.eventsToUpdate.map((eventToUpdate) =>
+      toFormData(eventToUpdate),
+    )
+
+    const tasksToAdd = calendarChanges.tasksToAdd.map((taskToAdd) =>
+      toFormData(taskToAdd),
+    )
+    const tasksToRemove = calendarChanges.tasksToRemove.map((taskToRemove) => {
+      const id = taskToRemove.id
+      const type = 'task'
+      return [id, type]
+    })
+    const tasksToUpdate = calendarChanges.tasksToUpdate.map((taskToUpdate) =>
+      toFormData(taskToUpdate),
+    )
+
+    return {
+      eventsToAdd,
+      eventsToRemove,
+      eventsToUpdate,
+      tasksToAdd,
+      tasksToRemove,
+      tasksToUpdate,
+    }
+  }
 
   useEffect(() => {
     const syncChangesWithLocalDatabase = async () => {
@@ -165,8 +256,30 @@ export const useSyncChanges = async (
       }
     }
 
-    if (isConnected) {
+    if (isConnected && isFirstLoad.current.valueOf()) {
       syncLocalDatabaseWithGoogleCalendar()
     }
-  }, [isConnected, compareCalendarData])
+  }, [compareCalendarData])
+
+  useEffect(() => {
+    const syncGoogleCalendarWithLocalDatabase = async () => {
+      const currentGoogleData = await fetchGoogleCalendarData()
+      const changesToUpdate = await compareCalendarData(
+        localData,
+        currentGoogleData,
+      )
+
+      if (calendarUpdatesNeeded(changesToUpdate)) {
+        const submittableEntries = convertToSubmittableEntries(changesToUpdate)
+        await updateGoogleCalendar(submittableEntries)
+        await setLastSyncedLocalData(localData)
+      }
+    }
+
+    if (isConnected && !isFirstLoad.current.valueOf()) {
+      syncGoogleCalendarWithLocalDatabase()
+    } else if (!isConnected) {
+      isFirstLoad.current = false
+    }
+  }, [isConnected])
 }
