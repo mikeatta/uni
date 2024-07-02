@@ -9,21 +9,24 @@ import {
 // Local development address
 const LOCAL_URL = 'http://10.0.2.2:3001'
 
-const getSubmittedEntry = async (
-  formData: FormData,
-  calendarData: ICalendarData,
+export const returnSubmittedEntry = async (
+  entryToReturn: FormData,
+  updatedData: ICalendarData,
 ): Promise<CalendarEvent | CalendarTask> => {
   try {
-    const oldEvents = calendarData.events
-    const oldTasks = calendarData.tasks
-    const type = formData.type
+    const { id, title, description, type } = entryToReturn
 
-    const updatedData = await fetchGoogleCalendarData()
+    const normalizeEmptyString = (string: string | null | undefined) =>
+      string === null || string === undefined || string === '' ? null : string
 
     if (type === 'event') {
       const foundEvent = updatedData.events.find(
         (newEvent: CalendarEvent) =>
-          !oldEvents.some((oldEvent) => newEvent.id === oldEvent.id),
+          newEvent.id !== id &&
+          normalizeEmptyString(newEvent.summary) ===
+            normalizeEmptyString(title) &&
+          normalizeEmptyString(newEvent.description) ===
+            normalizeEmptyString(description),
       )
 
       if (!foundEvent) {
@@ -34,7 +37,10 @@ const getSubmittedEntry = async (
     } else if (type === 'task') {
       const foundTask = updatedData.tasks.find(
         (newTask: CalendarTask) =>
-          !oldTasks.some((oldTask) => newTask.id === oldTask.id),
+          newTask.id !== id &&
+          normalizeEmptyString(newTask.title) === normalizeEmptyString(title) &&
+          normalizeEmptyString(newTask.notes) ===
+            normalizeEmptyString(description),
       )
 
       if (!foundTask) {
@@ -44,7 +50,7 @@ const getSubmittedEntry = async (
       return foundTask
     }
 
-    throw new Error('Invalid entry type')
+    throw Error('Invalid entry type')
   } catch (error) {
     console.error('Error getting entry ID', error)
     throw error
@@ -52,17 +58,9 @@ const getSubmittedEntry = async (
 }
 
 // Submit new entry
-export const addRemoteEntry = async (
-  formData: FormData,
-  calendarData: ICalendarData,
-) => {
+export const addRemoteEntry = async (formData: FormData) => {
   try {
     await axios.post(`${LOCAL_URL}/api/v1/calendar/new-entry`, formData)
-
-    // Get id from the server
-    const submittedEntry = await getSubmittedEntry(formData, calendarData)
-
-    return submittedEntry
   } catch (error) {
     console.error('Error submitting form data:', error)
     throw error
