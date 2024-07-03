@@ -41,55 +41,84 @@ export const addLocalEntry = async (
 }
 
 export const overwriteOfflineEntry = async (
+  offlineEntry: CalendarEvent | CalendarTask,
   submittedEntry: CalendarEvent | CalendarTask,
   setData: React.Dispatch<React.SetStateAction<ICalendarData>>,
 ) => {
   try {
     const entryType = getDataType(submittedEntry)
 
+    const normalizeDateTime = (dateTime: Date) =>
+      new Date(dateTime).toISOString()
+
     if (entryType === 'event') {
-      const updatedEvent = submittedEntry as CalendarEvent
+      const offlineEvent = offlineEntry as CalendarEvent
+      const googleEvent = submittedEntry as CalendarEvent
 
       setData((prevData) => {
-        const prevDataWithoutOfflineEvent = prevData.events.filter(
-          (events) =>
-            !(
-              events.id.startsWith('offline') &&
-              events.summary === updatedEvent.summary &&
-              events.description === updatedEvent.description &&
-              events.start.dateTime === updatedEvent.start.dateTime &&
-              events.start.timeZone === updatedEvent.start.timeZone &&
-              events.end.dateTime === updatedEvent.end.dateTime &&
-              events.end.timeZone === updatedEvent.end.timeZone
-            ),
+        const isMatchingEntry = (
+          eventToMatch: CalendarEvent,
+          eventToCheck: CalendarEvent,
+        ) => {
+          return Object.keys(eventToMatch).every((key) => {
+            if (key === 'start' || key === 'end') {
+              return (
+                normalizeDateTime(eventToMatch[key].dateTime) ===
+                  normalizeDateTime(eventToCheck[key].dateTime) &&
+                eventToMatch[key].timeZone === eventToCheck[key].timeZone
+              )
+            }
+            return (
+              eventToMatch[key as keyof typeof eventToCheck] ===
+              eventToCheck[key as keyof typeof eventToCheck]
+            )
+          })
+        }
+
+        const offlineEventIndex = prevData.events.findIndex((event) =>
+          isMatchingEntry(offlineEvent, event),
         )
 
-        prevDataWithoutOfflineEvent[0] = updatedEvent
+        // Overwrite the offline entry
+        if (offlineEventIndex !== -1) {
+          const updatedEvents = [...prevData.events]
+          updatedEvents[offlineEventIndex] = googleEvent
 
-        const updatedEvents = [...prevDataWithoutOfflineEvent]
+          return { ...prevData, events: updatedEvents }
+        }
 
-        return { ...prevData, events: updatedEvents }
+
+        return prevData
       })
     } else if (entryType === 'task') {
-      const updatedTask = submittedEntry as CalendarTask
+      const offlineTask = offlineEntry as CalendarTask
+      const googleTask = submittedEntry as CalendarTask
 
       setData((prevData) => {
-        const prevDataWithoutOfflineTask = prevData.tasks.filter(
-          (tasks) =>
-            !(
-              tasks.id.startsWith('offline') &&
-              tasks.title === updatedTask.title &&
-              tasks.notes === updatedTask.notes &&
-              tasks.due === updatedTask.due &&
-              tasks.status === updatedTask.status
-            ),
+        const isMatchingEntry = (
+          taskToMatch: CalendarTask,
+          taskToCheck: CalendarTask,
+        ) => {
+          return Object.keys(taskToMatch).every(
+            (key) =>
+              taskToMatch[key as keyof typeof taskToCheck] ===
+              taskToCheck[key as keyof typeof taskToCheck],
+          )
+        }
+
+        const offlineTaskIndex = prevData.tasks.findIndex((task) =>
+          isMatchingEntry(offlineTask, task),
         )
 
-        prevDataWithoutOfflineTask[0] = updatedTask
+        if (offlineTaskIndex !== -1) {
+          const updatedTasks = [...prevData.tasks]
+          updatedTasks[offlineTaskIndex] = googleTask
 
-        const updatedTasks = [...prevDataWithoutOfflineTask]
+          return { ...prevData, tasks: updatedTasks }
+        }
 
-        return { ...prevData, tasks: updatedTasks }
+
+        return prevData
       })
     }
   } catch (error) {
