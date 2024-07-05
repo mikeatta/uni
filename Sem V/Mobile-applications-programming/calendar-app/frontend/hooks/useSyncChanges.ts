@@ -13,8 +13,9 @@ import {
   editRemoteEntry,
   fetchGoogleCalendarData,
   removeRemoteEntry,
+  returnSubmittedEntry,
 } from '../services/api/googleCalendar'
-import { toFormData } from '../utils/helpers'
+import { toCalendarEntry, toFormData } from '../utils/helpers'
 import { overwriteOfflineEntry } from '../services/storage/storageHandlers'
 
 export const useSyncChanges = async (
@@ -150,6 +151,22 @@ export const useSyncChanges = async (
     tasksToUpdate: FormData[]
   }
 
+  const updateSubmittedEntryDetails = async (submittedEntries: FormData[]) => {
+    const updatedData = await fetchGoogleCalendarData()
+    const entryPairs = []
+
+    for (const entry of submittedEntries) {
+      const offlineEntry = toCalendarEntry(entry)
+      const submittedEntry = await returnSubmittedEntry(entry, updatedData)
+      entryPairs.push([offlineEntry, submittedEntry])
+    }
+
+    for (const entry of entryPairs) {
+      const [offlineEntry, submittedEntry] = entry
+      await overwriteOfflineEntry(offlineEntry, submittedEntry, setLocalData)
+    }
+  }
+
   const updateGoogleCalendar = useCallback(
     async ({
       eventsToAdd,
@@ -164,9 +181,10 @@ export const useSyncChanges = async (
       const entriesToUpdate = [...eventsToUpdate, ...tasksToUpdate]
 
       for (const entry of entriesToAdd) {
-        const submittedEntry = await addRemoteEntry(entry, localData)
-        await overwriteOfflineEntry(submittedEntry, setLocalData)
+        await addRemoteEntry(entry)
       }
+
+      await updateSubmittedEntryDetails(entriesToAdd)
 
       for (const [id, type] of entriesToRemove) {
         await removeRemoteEntry(id, type)
