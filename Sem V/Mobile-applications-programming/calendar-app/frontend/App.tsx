@@ -8,38 +8,63 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 import {
-  handleFormSubmit,
-  handleEntryEdit,
-  handleEntryRemoval,
-  handleTaskStatusUpdate,
+  addRemoteEntry,
+  editRemoteEntry,
+  fetchGoogleCalendarData,
+  removeRemoteEntry,
+  returnSubmittedEntry,
+  updateRemoteTaskStatus,
 } from './services/api/googleCalendar';
 import ListView from './components/views/ListView';
 import EntryForm from './components/forms/EntryForm';
 import Slider from './components/controls/Slider';
 import CalendarView from './components/views/CalendarView';
-import { useSyncStatus } from './hooks/useSyncStatus';
-import { useFetchRemoteData } from './hooks/useFetchRemoteData';
 import { useFetchLocalData } from './hooks/useFetchLocalData';
 import { useSetupDatabase } from './hooks/useSetupDatabase';
-import { withFunction } from './utils/helpers';
+import { useNetworkStatus } from './hooks/useNetworkStatus';
+import { useSyncChanges } from './hooks/useSyncChanges';
+import { fillTempEntryId, toCalendarEntry } from './utils/helpers';
+import {
+  addLocalEntry,
+  removeLocalEntry,
+} from './services/storage/storageHandlers';
+import { FormData } from './components/types';
 
 function App() {
   const [displayMode, setDisplayMode] = useState<string>('list');
 
+  const isConnected = useNetworkStatus();
   const isDatabaseSetup = useSetupDatabase();
-  const { calendarData, refetchRemoteData } = useFetchRemoteData();
-  const { localData, refetchLocalData } = useFetchLocalData(
-    isDatabaseSetup,
-    calendarData,
-  );
+  const { localData, setLocalData, refreshLocalEntryList } =
+    useFetchLocalData(isDatabaseSetup);
 
-  useSyncStatus(localData, calendarData, isDatabaseSetup, refetchLocalData);
+  useSyncChanges(localData, isConnected, setLocalData, refreshLocalEntryList);
+
 
   const handleSliderChange = async (value: 'list' | 'calendar') => {
     setDisplayMode(value);
   };
 
-  const withRefetch = withFunction(refetchRemoteData);
+  const handleFormSubmit = async (formData: FormData) => {
+    if (isConnected) {
+      await addRemoteEntry(formData);
+      const updatedData = await fetchGoogleCalendarData();
+      const submittedEntry = await returnSubmittedEntry(formData, updatedData);
+      await addLocalEntry(submittedEntry, setLocalData);
+    } else {
+      let tempOfflineEntry = await toCalendarEntry(formData);
+      tempOfflineEntry = fillTempEntryId(tempOfflineEntry);
+      await addLocalEntry(tempOfflineEntry, setLocalData);
+    }
+  };
+
+  const handleEntryRemoval = async (id: string, type: string) => {
+    if (isConnected) {
+      await removeRemoteEntry(id, type);
+    }
+
+    await removeLocalEntry(id, type, setLocalData);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -47,28 +72,29 @@ function App() {
       <ScrollView style={styles.scrollView}>
         <View style={styles.contentContainer}>
           <Text style={styles.headerText}>Create New Entry</Text>
-          <EntryForm onSubmit={withRefetch(handleFormSubmit)} />
+          <EntryForm onSubmit={handleFormSubmit} />
+            />
         </View>
         <View style={styles.contentContainer}>
           <Text style={styles.headerText}>Calendar Data</Text>
           <Slider onValueChange={handleSliderChange} />
           {displayMode === 'list' ? (
             <ListView
-              events={calendarData.events}
-              tasklists={calendarData.tasklists}
-              tasks={calendarData.tasks}
-              onStatusChange={withRefetch(handleTaskStatusUpdate)}
-              onEdit={withRefetch(handleEntryEdit)}
-              onRemove={withRefetch(handleEntryRemoval)}
+              events={localData.events}
+              tasklists={localData.tasklists}
+              tasks={localData.tasks}
+              onStatusChange={updateRemoteTaskStatus}
+              onEdit={editRemoteEntry}
+              onRemove={handleEntryRemoval}
             />
           ) : (
             <CalendarView
-              events={calendarData.events}
-              tasklists={calendarData.tasklists}
-              tasks={calendarData.tasks}
-              onStatusChange={withRefetch(handleTaskStatusUpdate)}
-              onEdit={withRefetch(handleEntryEdit)}
-              onRemove={withRefetch(handleEntryRemoval)}
+              events={localData.events}
+              tasklists={localData.tasklists}
+              tasks={localData.tasks}
+              onStatusChange={updateRemoteTaskStatus}
+              onEdit={editRemoteEntry}
+              onRemove={handleEntryRemoval}
             />
           )}
         </View>
