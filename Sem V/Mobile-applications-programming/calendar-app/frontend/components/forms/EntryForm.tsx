@@ -7,8 +7,11 @@ import DateTimePicker from '../common/DateTimePicker';
 import DateOnlyPicker from '../common/DateOnlyPicker';
 
 export default function EntryForm({ onSubmit }: EntryFormProps) {
-  const currentDayTime: Date = new Date();
   const deviceTimeZone: string = moment.tz.guess(true);
+  const currentDayTime: Date = new Date();
+
+  // For the purpose of comparing times when syncing events
+  currentDayTime.setUTCMilliseconds(0);
 
   const [formData, setFormData] = useState<FormData>({
     id: '',
