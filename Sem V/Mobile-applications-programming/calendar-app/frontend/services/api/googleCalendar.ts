@@ -14,10 +14,13 @@ export const returnSubmittedEntry = async (
   updatedData: ICalendarData,
 ): Promise<CalendarEvent | CalendarTask> => {
   try {
-    const { id, title, description, type } = entryToReturn
+    const { id, title, description, start, end, type } = entryToReturn
 
     const normalizeEmptyString = (string: string | null | undefined) =>
       string === null || string === undefined || string === '' ? null : string
+
+    const normalizeDateTime = (dateTime: Date) =>
+      new Date(dateTime).toISOString()
 
     if (type === 'event') {
       const foundEvent = updatedData.events.find(
@@ -26,7 +29,15 @@ export const returnSubmittedEntry = async (
           normalizeEmptyString(newEvent.summary) ===
             normalizeEmptyString(title) &&
           normalizeEmptyString(newEvent.description) ===
-            normalizeEmptyString(description),
+            normalizeEmptyString(description) &&
+          normalizeDateTime(newEvent.start.dateTime) ===
+            normalizeDateTime(start.dateTime) &&
+          normalizeEmptyString(newEvent.start.timeZone) ===
+            normalizeEmptyString(start.timeZone) &&
+          normalizeDateTime(newEvent.end.dateTime) ===
+            normalizeDateTime(end.dateTime) &&
+          normalizeEmptyString(newEvent.end.timeZone) ===
+            normalizeEmptyString(end.timeZone),
       )
 
       if (!foundEvent) {
@@ -40,7 +51,9 @@ export const returnSubmittedEntry = async (
           newTask.id !== id &&
           normalizeEmptyString(newTask.title) === normalizeEmptyString(title) &&
           normalizeEmptyString(newTask.notes) ===
-            normalizeEmptyString(description),
+            normalizeEmptyString(description) &&
+          normalizeEmptyString(newTask.due) === // ISOString format by default, no need to normalize
+            normalizeEmptyString(normalizeDateTime(start.dateTime)),
       )
 
       if (!foundTask) {
