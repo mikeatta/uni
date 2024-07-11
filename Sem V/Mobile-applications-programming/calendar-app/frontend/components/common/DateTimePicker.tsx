@@ -10,10 +10,6 @@ function DateTimePicker({
   setDateTime,
 }: DateTimeSelector) {
   const [open, setOpen] = useState(false);
-  const selectedDate =
-    dateTimeType === 'start'
-      ? `🚩 ${dateTime.toLocaleDateString()} | ${dateTime.toLocaleTimeString()}`
-      : `🏁 ${dateTime.toLocaleDateString()} | ${dateTime.toLocaleTimeString()}`;
 
   const selectValidInterval = (timestamp: Date) => {
     const timestampHours = timestamp.getHours();
@@ -58,14 +54,33 @@ function DateTimePicker({
     return validNextDateTime;
   };
 
+  const formatTime = (date: Date) => {
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const period = hours >= 12 ? 'PM' : 'AM';
+
+    // Convert to 12-hour format
+    hours = hours % 12 || 12;
+    const minutesStr = minutes < 10 ? `0${minutes}` : `${minutes}`;
+
+    return `${hours}:${minutesStr} ${period}`;
+  };
+
   const minimumDate =
     dateTimeType === 'start'
       ? selectValidInterval(dateTime)
       : selectNextInterval(dateTime);
 
+  const formattedTime = formatTime(minimumDate);
+
+  const selectedTimestamp =
+    dateTimeType === 'start'
+      ? `🚩 ${minimumDate.toLocaleDateString()} | ${formattedTime}`
+      : `🏁 ${minimumDate.toLocaleDateString()} | ${formattedTime}`;
+
   return (
     <View>
-      <Button title={selectedDate} onPress={() => setOpen(true)} />
+      <Button title={selectedTimestamp} onPress={() => setOpen(true)} />
       <DatePicker
         modal
         title={title}
