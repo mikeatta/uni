@@ -13,16 +13,62 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
   // For the purpose of comparing times when syncing events
   currentDayTime.setUTCMilliseconds(0);
 
+  const selectValidInterval = (timestamp: Date) => {
+    const timestampHours = timestamp.getHours();
+    const timestampMinutes = timestamp.getMinutes();
+
+    const minuteIntervals = [0, 15, 30, 45];
+
+    const validInterval =
+      minuteIntervals.find((interval) => interval > timestampMinutes) || 0;
+
+    if (validInterval === undefined) {
+      throw Error('Error setting valid timestamp interval');
+    }
+
+    const validDateTime = new Date(timestamp);
+
+    // For intervals above 45, set the hour to next hour
+    if (validInterval === 0 && timestampMinutes >= 45) {
+      validDateTime.setHours(timestampHours + 1, validInterval, 0, 0);
+    } else {
+      validDateTime.setMinutes(validInterval, 0, 0);
+    }
+
+    return validDateTime;
+  };
+
+  const selectNextInterval = (timestamp: Date) => {
+    const timestampHours = timestamp.getHours();
+    const timestampMinutes = timestamp.getMinutes();
+
+    const nextTimestamp = new Date(timestamp);
+
+    // Set the time to the next interval past the 'start' timestamp interval
+    if (timestampMinutes >= 45) {
+      nextTimestamp.setHours(timestampHours + 1, 0, 0, 0);
+    } else {
+      nextTimestamp.setMinutes(timestampMinutes + 15, 0, 0);
+    }
+
+    const validNextDateTime = selectValidInterval(nextTimestamp);
+
+    return validNextDateTime;
+  };
+
+  const minimumStartingTime = selectValidInterval(currentDayTime);
+  const minimumEndingTime = selectNextInterval(currentDayTime);
+
   const [formData, setFormData] = useState<FormData>({
     id: '',
     title: '',
     description: '',
     start: {
-      dateTime: currentDayTime,
+      dateTime: minimumStartingTime,
       timeZone: deviceTimeZone,
     },
     end: {
-      dateTime: currentDayTime,
+      dateTime: minimumEndingTime,
       timeZone: deviceTimeZone,
     },
     type: 'event', // Default option
@@ -44,11 +90,11 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
         title: '',
         description: '',
         start: {
-          dateTime: currentDayTime,
+          dateTime: minimumStartingTime,
           timeZone: deviceTimeZone,
         },
         end: {
-          dateTime: currentDayTime,
+          dateTime: minimumEndingTime,
           timeZone: deviceTimeZone,
         },
         type: 'event',
