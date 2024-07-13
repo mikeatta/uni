@@ -28,6 +28,7 @@ function DateOnlyPicker({ title, dateTime, setDateTime }: DateTimeSelector) {
         open={open}
         mode='date'
         date={dateTime}
+        minimumDate={dateTime}
         onConfirm={(date) => {
           setOpen(false);
           setDateTime((prev) => ({
