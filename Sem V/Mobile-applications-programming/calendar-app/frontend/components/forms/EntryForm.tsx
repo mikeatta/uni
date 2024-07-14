@@ -56,6 +56,17 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
     return validNextDateTime;
   };
 
+  /*
+   * Setting time to midnight due to Google API limitations and to properly
+   * handle task syncing.
+   *
+   * Google API does not allow time-setting for task entries. The entries
+   * pulled from the Google Calendar are automatically set to midnight on the
+   * given date. To account for that during entry-syncing, we set the task time
+   * to 'T00:00:00.000Z'.
+   */
+  const setTimeToMidnight = (date: Date) => new Date(date.setHours(0, 0, 0, 0));
+
   const minimumStartingTime = selectValidInterval(currentDayTime);
   const minimumEndingTime = selectNextInterval(currentDayTime);
 
@@ -151,7 +162,7 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
         <View style={styles.picker}>
           <DateOnlyPicker
             title={'Select due date'}
-            dateTime={formData.start.dateTime}
+            dateTime={setTimeToMidnight(formData.start.dateTime)}
             dateTimeType='start'
             setDateTime={setFormData}
           />
