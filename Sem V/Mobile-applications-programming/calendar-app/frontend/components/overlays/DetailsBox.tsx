@@ -22,7 +22,7 @@ function DetailsBox({ entry, isVisible, onPressFunctions }: DetailsBoxProps) {
     <Modal
       visible={isVisible}
       transparent
-      animationType='fade'
+      animationType={'fade'}
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onPressFunctions.close}>
@@ -31,10 +31,10 @@ function DetailsBox({ entry, isVisible, onPressFunctions }: DetailsBoxProps) {
             <View style={styles.headerContainer}>
               <Text style={styles.popupHeader}>Entry Details</Text>
               <Icon
-                name='close-outline'
+                name={'close-outline'}
                 style={styles.closeIcon}
                 size={24}
-                color='grey'
+                color={'grey'}
                 onPress={onPressFunctions.close}
               />
             </View>

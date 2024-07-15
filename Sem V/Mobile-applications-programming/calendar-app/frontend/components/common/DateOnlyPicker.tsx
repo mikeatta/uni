@@ -14,7 +14,7 @@ function DateOnlyPicker({ title, dateTime, setDateTime }: DateTimeSelector) {
         modal
         title={title}
         open={open}
-        mode='date'
+        mode={'date'}
         date={dateTime}
         minimumDate={dateTime}
         onConfirm={(date) => {

@@ -2,7 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import React, { useState } from 'react';
 import { Calendar } from 'react-native-calendars';
 import { CalendarData, CalendarEvent, CalendarTask } from '../types';
-import { MarkedDates } from 'react-native-calendars/src/types';
+import { DateData, MarkedDates } from 'react-native-calendars/src/types';
 import { addDays, endOfDay, format, isSameDay, startOfDay } from 'date-fns';
 import DailyEntryList from '../common/DailyEntryList';
 
@@ -70,7 +70,7 @@ export default function CalendarView({
     setEntriesInRange(getEntriesInRange(events, tasks, date));
   };
 
-  const markedDates: MarkedDates = events.reduce((markedDates, event) => {
+  const markedDates: MarkedDates = events.reduce((calendarMarks, event) => {
     const startDate = format(new Date(event.start.dateTime), 'yyyy-MM-dd');
     const endDate = format(new Date(event.end.dateTime), 'yyyy-MM-dd');
 
@@ -85,28 +85,31 @@ export default function CalendarView({
       const isEnd = date === endDate;
 
       const startOverlap =
-        markedDates[date] && !markedDates[date].startingDay && isStart;
+        calendarMarks[date] && !calendarMarks[date].startingDay && isStart;
+
       const endOverlap =
-        markedDates[date] && !markedDates[date].endingDay && isEnd;
+        calendarMarks[date] && !calendarMarks[date].endingDay && isEnd;
+
       const overlapping = startOverlap || endOverlap;
 
-      const isAlreadyStart = isStart && markedDates[date];
+      const isAlreadyStart = isStart && calendarMarks[date];
 
       const multidayStartOverlap =
         !isSingleday &&
-        markedDates[date] &&
-        markedDates[date].startingDay &&
+        calendarMarks[date] &&
+        calendarMarks[date].startingDay &&
         !isStart;
+
       const multidayEndOverlap =
         !isSingleday &&
-        markedDates[date] &&
-        markedDates[date].endingDay &&
+        calendarMarks[date] &&
+        calendarMarks[date].endingDay &&
         !isEnd;
 
       const unsetStartEndMark = { startingDay: false, endingDay: false };
 
-      markedDates[date] = {
-        ...(markedDates[date] || { color: '#0091E6', textColor: 'white' }),
+      calendarMarks[date] = {
+        ...(calendarMarks[date] || { color: '#0091E6', textColor: 'white' }),
         ...(isStart && !startOverlap && { startingDay: true }),
         ...(isEnd && !endOverlap && { endingDay: true }),
         ...(isAlreadyStart && { dotColor: 'white', marked: true }),
@@ -116,7 +119,7 @@ export default function CalendarView({
       };
     });
 
-    return markedDates;
+    return calendarMarks;
   }, {} as MarkedDates);
 
   tasks.forEach((task) => {
@@ -131,9 +134,9 @@ export default function CalendarView({
   return (
     <View style={styles.container}>
       <Calendar
-        markingType='period'
+        markingType={'period'}
         markedDates={markedDates}
-        onDayPress={(date) => {
+        onDayPress={(date: DateData) => {
           const pressedDate = date.dateString;
           updateDisplayedEntries(pressedDate);
           setClickedDate(pressedDate);

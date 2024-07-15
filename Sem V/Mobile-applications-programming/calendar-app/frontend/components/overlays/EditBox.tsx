@@ -39,7 +39,7 @@ function EditBox({ entry, isVisible, onPressFunctions }: EditBoxProps) {
     <Modal
       visible={isVisible}
       transparent
-      animationType='fade'
+      animationType={'fade'}
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onPressFunctions.cancel}>
@@ -47,13 +47,13 @@ function EditBox({ entry, isVisible, onPressFunctions }: EditBoxProps) {
           <View style={styles.popupContainer}>
             <Text style={styles.popupHeader}>Edit entry</Text>
             <TextInput
-              placeholder='Title'
+              placeholder={'Title'}
               style={styles.input}
               value={editFormData.title}
               onChangeText={(text) => handleInput('title', text)}
             />
             <TextInput
-              placeholder='Description'
+              placeholder={'Description'}
               style={styles.input}
               value={editFormData.description}
               onChangeText={(text) => handleInput('description', text)}
@@ -64,13 +64,13 @@ function EditBox({ entry, isVisible, onPressFunctions }: EditBoxProps) {
                 <DateTimePicker
                   title={'Change start time'}
                   dateTime={editFormData.start.dateTime}
-                  dateTimeType='start'
+                  dateTimeType={'start'}
                   setDateTime={setEditFormData}
                 />
                 <DateTimePicker
                   title={'Change end time'}
                   dateTime={editFormData.end.dateTime}
-                  dateTimeType='end'
+                  dateTimeType={'end'}
                   setDateTime={setEditFormData}
                 />
               </View>
@@ -80,14 +80,14 @@ function EditBox({ entry, isVisible, onPressFunctions }: EditBoxProps) {
                 <DateOnlyPicker
                   title={'Change due date'}
                   dateTime={editFormData.start.dateTime}
-                  dateTimeType='start'
+                  dateTimeType={'start'}
                   setDateTime={setEditFormData}
                 />
               </View>
             )}
             <View style={styles.buttonContainer}>
-              <Button title='cancel' onPress={onPressFunctions.cancel} />
-              <Button title='confirm' onPress={handleSubmit} />
+              <Button title={'cancel'} onPress={onPressFunctions.cancel} />
+              <Button title={'confirm'} onPress={handleSubmit} />
             </View>
           </View>
         </View>

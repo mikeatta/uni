@@ -130,13 +130,13 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
         search={false}
       />
       <TextInput
-        placeholder='Title'
+        placeholder={'Title'}
         style={styles.input}
         value={formData.title}
         onChangeText={(text) => handleInput('title', text)}
       />
       <TextInput
-        placeholder='Description'
+        placeholder={'Description'}
         style={styles.input}
         value={formData.description}
         onChangeText={(text) => handleInput('description', text)}
@@ -147,13 +147,13 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
           <DateTimePicker
             title={'Select start time'}
             dateTime={formData.start.dateTime}
-            dateTimeType='start'
+            dateTimeType={'start'}
             setDateTime={setFormData}
           />
           <DateTimePicker
             title={'Select end time'}
             dateTime={formData.end.dateTime}
-            dateTimeType='end'
+            dateTimeType={'end'}
             setDateTime={setFormData}
           />
         </View>
@@ -163,12 +163,12 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
           <DateOnlyPicker
             title={'Select due date'}
             dateTime={setTimeToMidnight(formData.start.dateTime)}
-            dateTimeType='start'
+            dateTimeType={'start'}
             setDateTime={setFormData}
           />
         </View>
       )}
-      <Button title='Submit' onPress={handleSubmit} />
+      <Button title={'Submit'} onPress={handleSubmit} />
     </View>
   );
 }

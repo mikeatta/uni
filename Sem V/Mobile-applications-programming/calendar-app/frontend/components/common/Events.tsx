@@ -89,17 +89,17 @@ function Events({ events, styles, functions }: CalendarEventProps) {
               </Text>
             </TouchableOpacity>
             <Icon
-              name='create-outline'
+              name={'create-outline'}
               style={styles?.icon}
               size={24}
-              color='blue'
+              color={'blue'}
               onPress={() => toggleVisibility(id, 'edit')}
             />
             <Icon
-              name='trash-outline'
+              name={'trash-outline'}
               style={styles?.icon}
               size={24}
-              color='red'
+              color={'red'}
               onPress={() => toggleVisibility(id, 'confirm')}
             />
             {visibility[id]?.edit && (
@@ -116,7 +116,7 @@ function Events({ events, styles, functions }: CalendarEventProps) {
             {visibility[id]?.confirm && (
               <ConfirmationBox
                 isVisible={visibility[id]?.confirm}
-                alertMessage='delete the event'
+                alertMessage={'delete the event'}
                 onPressFunctions={{
                   confirm: () => handleEventRemoval(id),
                   cancel: () => toggleVisibility(id, 'confirm'),

@@ -97,21 +97,21 @@ function Tasks({ tasks, styles, functions }: CalendarTaskProps) {
               }
               style={styles?.icon}
               size={24}
-              color='green'
+              color={'green'}
               onPress={() => functions.onStatusChange(task)}
             />
             <Icon
-              name='create-outline'
+              name={'create-outline'}
               style={styles?.icon}
               size={24}
-              color='blue'
+              color={'blue'}
               onPress={() => toggleVisibility(id, 'edit')}
             />
             <Icon
-              name='trash-outline'
+              name={'trash-outline'}
               style={styles?.icon}
               size={24}
-              color='red'
+              color={'red'}
               onPress={() => toggleVisibility(id, 'confirm')}
             />
             {visibility[id]?.edit && (
@@ -127,7 +127,7 @@ function Tasks({ tasks, styles, functions }: CalendarTaskProps) {
             {visibility[id]?.confirm && (
               <ConfirmationBox
                 isVisible={visibility[id]?.confirm}
-                alertMessage='delete the task'
+                alertMessage={'delete the task'}
                 onPressFunctions={{
                   confirm: () => handleTaskRemoval(id),
                   cancel: () => toggleVisibility(id, 'confirm'),

@@ -26,7 +26,7 @@ function ConfirmationBox({
     <Modal
       visible={isVisible}
       transparent
-      animationType='fade'
+      animationType={'fade'}
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onPressFunctions.cancel}>
@@ -37,8 +37,8 @@ function ConfirmationBox({
               Are you sure you want to {alertMessage}?
             </Text>
             <View style={styles.buttonContainer}>
-              <Button title='cancel' onPress={onPressFunctions.cancel} />
-              <Button title='confirm' onPress={onPressFunctions.confirm} />
+              <Button title={'cancel'} onPress={onPressFunctions.cancel} />
+              <Button title={'confirm'} onPress={onPressFunctions.confirm} />
             </View>
           </View>
         </View>
