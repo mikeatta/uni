@@ -10,9 +10,6 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
   const deviceTimeZone: string = moment.tz.guess(true);
   const currentDayTime: Date = new Date();
 
-  // For the purpose of comparing times when syncing events
-  currentDayTime.setUTCMilliseconds(0);
-
   const selectValidInterval = (timestamp: Date) => {
     const timestampHours = timestamp.getHours();
     const timestampMinutes = timestamp.getMinutes();
@@ -65,7 +62,29 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
    * given date. To account for that during entry-syncing, we set the task time
    * to 'T00:00:00.000Z'.
    */
-  const setTimeToMidnight = (date: Date) => new Date(date.setHours(0, 0, 0, 0));
+  const setTimeToMidnight = (date: Date) =>
+    new Date(date.setUTCHours(0, 0, 0, 0));
+
+  /*
+   * Setting the 'dateTime' milliseconds to '000' to prevent from time value
+   * mismatches during event entry comparison.
+   */
+  const resetMilliseconds = (date: Date) => new Date(date.setMilliseconds(0));
+
+  const normalizeFormDataTimes = (formData: FormData) => {
+    const submittedEntryType = formData.type;
+
+    if (submittedEntryType === 'event') {
+      resetMilliseconds(formData.start.dateTime);
+      resetMilliseconds(formData.end.dateTime);
+    } else if (submittedEntryType === 'task') {
+      setTimeToMidnight(formData.start.dateTime);
+    } else {
+      throw Error('Unknown entry type while normalizing FormData times');
+    }
+
+    return formData;
+  };
 
   const minimumStartingTime = selectValidInterval(currentDayTime);
   const minimumEndingTime = selectNextInterval(currentDayTime);
@@ -94,7 +113,8 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
 
   const handleSubmit = async () => {
     try {
-      await onSubmit(formData);
+      const normalizedFormData = normalizeFormDataTimes(formData);
+      await onSubmit(normalizedFormData);
       // Reset the form fields
       setFormData({
         id: '',
@@ -162,7 +182,7 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
         <View style={styles.picker}>
           <DateOnlyPicker
             title={'Select due date'}
-            dateTime={setTimeToMidnight(formData.start.dateTime)}
+            dateTime={formData.start.dateTime}
             dateTimeType={'start'}
             setDateTime={setFormData}
           />
