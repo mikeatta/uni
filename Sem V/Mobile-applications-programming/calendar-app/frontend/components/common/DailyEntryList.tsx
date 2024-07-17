@@ -3,10 +3,14 @@ import React from 'react';
 import { CalendarEvent, CalendarTask, FormData } from '../types';
 import Events from './Events';
 import Tasks from './Tasks';
+import { endOfDay, isSameDay, startOfDay } from 'date-fns';
 
 type DailyEntryListProps = {
   date: string;
-  entries: [CalendarEvent[], CalendarTask[]];
+  entries: {
+    events: CalendarEvent[];
+    tasks: CalendarTask[];
+  };
   entryStyles?: {
     textHeader: StyleProp<TextStyle>;
     contentContainer: StyleProp<TextStyle>;
@@ -30,13 +34,44 @@ function DailyEntryList({
     return new Date(date).toDateString();
   };
 
+  const getEntriesInRange = (
+    events: CalendarEvent[],
+    tasks: CalendarTask[],
+    dateString: string,
+  ) => {
+    const passedDate = new Date(dateString);
+
+    if (isNaN(passedDate.getDate())) {
+      throw new Error('Invalid date string');
+    }
+
+    const eventsInRange = events.filter((event) => {
+      const startDate = startOfDay(new Date(event.start.dateTime));
+      const endDate = endOfDay(new Date(event.end.dateTime));
+      return startDate <= passedDate && passedDate <= endDate;
+    });
+
+    const tasksInRange = tasks.filter((task) => {
+      const dueDate = new Date(task.due);
+      return isSameDay(passedDate, dueDate);
+    });
+
+    return { eventsInRange, tasksInRange };
+  };
+
   const getFoundEntriesOnDate = () => {
-    const hasEvents = entries[0].length > 0;
-    const hasTasks = entries[1].length > 0;
+    const hasEvents = entries.events.length > 0;
+    const hasTasks = entries.tasks.length > 0;
     return [hasEvents, hasTasks];
   };
 
   const [hasEvents, hasTasks] = getFoundEntriesOnDate();
+
+  const { eventsInRange, tasksInRange } = getEntriesInRange(
+    entries.events,
+    entries.tasks,
+    date,
+  );
 
   if (!hasEvents && !hasTasks) {
     return (
@@ -58,14 +93,14 @@ function DailyEntryList({
       </Text>
       {hasEvents && (
         <Events
-          events={entries[0]}
+          events={eventsInRange}
           styles={entryStyles}
           functions={entryFunctions}
         />
       )}
       {hasTasks && (
         <Tasks
-          tasks={entries[1]}
+          tasks={tasksInRange}
           styles={entryStyles}
           functions={entryFunctions}
         />

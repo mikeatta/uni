@@ -29,7 +29,7 @@ const getEntriesInRange = (
   events: CalendarEvent[],
   tasks: CalendarTask[],
   dateString: string,
-): EntriesArray => {
+) => {
   const date = new Date(dateString);
 
   if (isNaN(date.getDate())) {
@@ -47,10 +47,13 @@ const getEntriesInRange = (
     return isSameDay(date, dueDate);
   });
 
-  return [eventsInRange, tasksInRange];
+  return { eventsInRange, tasksInRange };
 };
 
-type EntriesArray = [CalendarEvent[], CalendarTask[]];
+type EntriesInRange = {
+  eventsInRange: CalendarEvent[];
+  tasksInRange: CalendarTask[];
+};
 
 export default function CalendarView({
   events,
@@ -64,7 +67,7 @@ export default function CalendarView({
 
   const initialEntries = getEntriesInRange(events, tasks, clickedDate);
   const [entriesInRange, setEntriesInRange] =
-    useState<EntriesArray>(initialEntries);
+    useState<EntriesInRange>(initialEntries);
 
   const updateDisplayedEntries = (date: string) => {
     setEntriesInRange(getEntriesInRange(events, tasks, date));
@@ -146,7 +149,7 @@ export default function CalendarView({
       />
       <DailyEntryList
         date={clickedDate}
-        entries={entriesInRange}
+        entries={{ events, tasks }}
         entryStyles={entryStyles}
         entryFunctions={{ onStatusChange, onEdit, onRemove }}
       />
