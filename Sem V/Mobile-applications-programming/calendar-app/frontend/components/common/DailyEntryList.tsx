@@ -34,44 +34,36 @@ function DailyEntryList({
     return new Date(date).toDateString();
   };
 
-  const getEntriesInRange = (
-    events: CalendarEvent[],
-    tasks: CalendarTask[],
-    dateString: string,
-  ) => {
-    const passedDate = new Date(dateString);
+  const getEntriesInRange = () => {
+    const selectedDate = new Date(date);
 
-    if (isNaN(passedDate.getDate())) {
+    if (isNaN(selectedDate.getDate())) {
       throw new Error('Invalid date string');
     }
 
-    const eventsInRange = events.filter((event) => {
+    const eventsInRange = entries.events.filter((event) => {
       const startDate = startOfDay(new Date(event.start.dateTime));
       const endDate = endOfDay(new Date(event.end.dateTime));
-      return startDate <= passedDate && passedDate <= endDate;
+      return startDate <= selectedDate && selectedDate <= endDate;
     });
 
-    const tasksInRange = tasks.filter((task) => {
+    const tasksInRange = entries.tasks.filter((task) => {
       const dueDate = new Date(task.due);
-      return isSameDay(passedDate, dueDate);
+      return isSameDay(selectedDate, dueDate);
     });
 
     return { eventsInRange, tasksInRange };
   };
 
   const getFoundEntriesOnDate = () => {
-    const hasEvents = entries.events.length > 0;
-    const hasTasks = entries.tasks.length > 0;
+    const hasEvents = eventsInRange.length > 0;
+    const hasTasks = tasksInRange.length > 0;
     return [hasEvents, hasTasks];
   };
 
-  const [hasEvents, hasTasks] = getFoundEntriesOnDate();
+  const { eventsInRange, tasksInRange } = getEntriesInRange();
 
-  const { eventsInRange, tasksInRange } = getEntriesInRange(
-    entries.events,
-    entries.tasks,
-    date,
-  );
+  const [hasEvents, hasTasks] = getFoundEntriesOnDate();
 
   if (!hasEvents && !hasTasks) {
     return (
