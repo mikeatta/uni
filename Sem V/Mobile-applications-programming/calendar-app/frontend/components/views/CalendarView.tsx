@@ -1,9 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 import React, { useState } from 'react';
 import { Calendar } from 'react-native-calendars';
-import { CalendarData, CalendarEvent, CalendarTask } from '../types';
+import { CalendarData } from '../types';
 import { DateData, MarkedDates } from 'react-native-calendars/src/types';
-import { addDays, endOfDay, format, isSameDay, startOfDay } from 'date-fns';
+import { addDays, endOfDay, format, startOfDay } from 'date-fns';
 import DailyEntryList from '../common/DailyEntryList';
 
 const getDatesBetween = (startDate: Date, endDate: Date): string[] => {
@@ -25,36 +25,6 @@ const getDatesBetween = (startDate: Date, endDate: Date): string[] => {
   return dates;
 };
 
-const getEntriesInRange = (
-  events: CalendarEvent[],
-  tasks: CalendarTask[],
-  dateString: string,
-) => {
-  const date = new Date(dateString);
-
-  if (isNaN(date.getDate())) {
-    throw new Error('Invalid date string');
-  }
-
-  const eventsInRange = events.filter((event) => {
-    const startDate = startOfDay(new Date(event.start.dateTime));
-    const endDate = endOfDay(new Date(event.end.dateTime));
-    return startDate <= date && date <= endDate;
-  });
-
-  const tasksInRange = tasks.filter((task) => {
-    const dueDate = new Date(task.due);
-    return isSameDay(date, dueDate);
-  });
-
-  return { eventsInRange, tasksInRange };
-};
-
-type EntriesInRange = {
-  eventsInRange: CalendarEvent[];
-  tasksInRange: CalendarTask[];
-};
-
 export default function CalendarView({
   events,
   tasks,
@@ -64,14 +34,6 @@ export default function CalendarView({
 }: CalendarData) {
   const today = format(new Date(), 'yyyy-MM-dd');
   const [clickedDate, setClickedDate] = useState<string>(today);
-
-  const initialEntries = getEntriesInRange(events, tasks, clickedDate);
-  const [entriesInRange, setEntriesInRange] =
-    useState<EntriesInRange>(initialEntries);
-
-  const updateDisplayedEntries = (date: string) => {
-    setEntriesInRange(getEntriesInRange(events, tasks, date));
-  };
 
   const markedDates: MarkedDates = events.reduce((calendarMarks, event) => {
     const startDate = format(new Date(event.start.dateTime), 'yyyy-MM-dd');
@@ -141,7 +103,6 @@ export default function CalendarView({
         markedDates={markedDates}
         onDayPress={(date: DateData) => {
           const pressedDate = date.dateString;
-          updateDisplayedEntries(pressedDate);
           setClickedDate(pressedDate);
         }}
         firstDay={1}
