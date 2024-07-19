@@ -66,6 +66,15 @@ function App() {
     await removeLocalEntry(id, type, setLocalData);
   };
 
+  const handleEntryEdit = async (formData: FormData) => {
+    if (isConnected) {
+      await editRemoteEntry(formData);
+    }
+
+    const editedEntry = toCalendarEntry(formData);
+    await editLocalEntry(editedEntry, setLocalData);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar />
@@ -84,7 +93,7 @@ function App() {
               tasklists={localData.tasklists}
               tasks={localData.tasks}
               onStatusChange={updateRemoteTaskStatus}
-              onEdit={editRemoteEntry}
+              onEdit={handleEntryEdit}
               onRemove={handleEntryRemoval}
             />
           ) : (
@@ -93,7 +102,7 @@ function App() {
               tasklists={localData.tasklists}
               tasks={localData.tasks}
               onStatusChange={updateRemoteTaskStatus}
-              onEdit={editRemoteEntry}
+              onEdit={handleEntryEdit}
               onRemove={handleEntryRemoval}
             />
           )}
