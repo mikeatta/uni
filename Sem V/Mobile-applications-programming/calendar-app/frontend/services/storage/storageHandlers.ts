@@ -159,3 +159,53 @@ export const removeLocalEntry = (
     console.error('Error removing local entry:', error)
   }
 }
+
+export const editLocalEntry = async (
+  submittedEntry: CalendarEvent | CalendarTask,
+  setData: React.Dispatch<React.SetStateAction<ICalendarData>>,
+) => {
+  try {
+    const entryType = await getDataType(submittedEntry)
+
+    const matchEntryById = (
+      entryToMatch: CalendarEvent | CalendarTask,
+      entryToCheck: CalendarEvent | CalendarTask,
+    ) => entryToMatch.id === entryToCheck.id
+
+    if (entryType === 'event') {
+      const updatedEvent = submittedEntry as CalendarEvent
+
+      setData((prevData) => {
+        const outdatedEventIndex = prevData.events.findIndex((event) =>
+          matchEntryById(updatedEvent, event),
+        )
+
+        if (outdatedEventIndex !== -1) {
+          const updatedEvents = [...prevData.events]
+          updatedEvents[outdatedEventIndex] = updatedEvent
+          return { ...prevData, events: updatedEvents }
+        }
+
+        return prevData
+      })
+    } else if (entryType === 'task') {
+      const updatedTask = submittedEntry as CalendarTask
+
+      setData((prevData) => {
+        const outdatedTaskIndex = prevData.tasks.findIndex((task) =>
+          matchEntryById(updatedTask, task),
+        )
+
+        if (outdatedTaskIndex !== -1) {
+          const updatedTasks = [...prevData.tasks]
+          updatedTasks[outdatedTaskIndex] = updatedTask
+          return { ...prevData, tasks: updatedTasks }
+        }
+
+        return prevData
+      })
+    }
+  } catch (error) {
+    console.error('Error modifying local entry:', error)
+  }
+}
