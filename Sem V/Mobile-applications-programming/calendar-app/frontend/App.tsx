@@ -29,6 +29,7 @@ import {
   removeLocalEntry,
 } from './services/storage/storageHandlers';
 import { FormData } from './components/types';
+import { UserTimeInfoProvider } from './contexts/UserTimeInfoProvider';
 
 function App() {
   const [displayMode, setDisplayMode] = useState<string>('list');
@@ -79,34 +80,35 @@ function App() {
     <SafeAreaView style={styles.container}>
       <StatusBar />
       <ScrollView style={styles.scrollView}>
-        <View style={styles.contentContainer}>
-          <Text style={styles.headerText}>Create New Entry</Text>
-          <EntryForm onSubmit={handleFormSubmit} />
-            />
-        </View>
-        <View style={styles.contentContainer}>
-          <Text style={styles.headerText}>Calendar Data</Text>
-          <Slider onValueChange={handleSliderChange} />
-          {displayMode === 'list' ? (
-            <ListView
-              events={localData.events}
-              tasklists={localData.tasklists}
-              tasks={localData.tasks}
-              onStatusChange={updateRemoteTaskStatus}
-              onEdit={handleEntryEdit}
-              onRemove={handleEntryRemoval}
-            />
-          ) : (
-            <CalendarView
-              events={localData.events}
-              tasklists={localData.tasklists}
-              tasks={localData.tasks}
-              onStatusChange={updateRemoteTaskStatus}
-              onEdit={handleEntryEdit}
-              onRemove={handleEntryRemoval}
-            />
-          )}
-        </View>
+        <UserTimeInfoProvider>
+          <View style={styles.contentContainer}>
+            <Text style={styles.headerText}>Create New Entry</Text>
+            <EntryForm onSubmit={handleFormSubmit} />
+          </View>
+          <View style={styles.contentContainer}>
+            <Text style={styles.headerText}>Calendar Data</Text>
+            <Slider onValueChange={handleSliderChange} />
+            {displayMode === 'list' ? (
+              <ListView
+                events={localData.events}
+                tasklists={localData.tasklists}
+                tasks={localData.tasks}
+                onStatusChange={updateRemoteTaskStatus}
+                onEdit={handleEntryEdit}
+                onRemove={handleEntryRemoval}
+              />
+            ) : (
+              <CalendarView
+                events={localData.events}
+                tasklists={localData.tasklists}
+                tasks={localData.tasks}
+                onStatusChange={updateRemoteTaskStatus}
+                onEdit={handleEntryEdit}
+                onRemove={handleEntryRemoval}
+              />
+            )}
+          </View>
+        </UserTimeInfoProvider>
       </ScrollView>
     </SafeAreaView>
   );

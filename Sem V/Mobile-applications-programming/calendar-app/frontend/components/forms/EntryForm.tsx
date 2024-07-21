@@ -2,13 +2,12 @@ import { StyleSheet, TextInput, View, Button } from 'react-native';
 import React, { useState } from 'react';
 import { SelectList } from 'react-native-dropdown-select-list';
 import { EntryFormProps, FormData } from '../types';
-import moment from 'moment-timezone';
 import DateTimePicker from '../common/DateTimePicker';
 import DateOnlyPicker from '../common/DateOnlyPicker';
+import { useUserTimeInfoContext } from '../../hooks/useUserTimeInfoContext';
 
 export default function EntryForm({ onSubmit }: EntryFormProps) {
-  const deviceTimeZone: string = moment.tz.guess(true);
-  const currentDayTime: Date = new Date();
+  const { currentTime, timeZone } = useUserTimeInfoContext();
 
   const selectValidInterval = (timestamp: Date) => {
     const timestampHours = timestamp.getHours();
@@ -86,8 +85,8 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
     return formData;
   };
 
-  const minimumStartingTime = selectValidInterval(currentDayTime);
-  const minimumEndingTime = selectNextInterval(currentDayTime);
+  const minimumStartingTime = selectValidInterval(currentTime);
+  const minimumEndingTime = selectNextInterval(currentTime);
 
   const [formData, setFormData] = useState<FormData>({
     id: '',
@@ -95,11 +94,11 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
     description: '',
     start: {
       dateTime: minimumStartingTime,
-      timeZone: deviceTimeZone,
+      timeZone: timeZone,
     },
     end: {
       dateTime: minimumEndingTime,
-      timeZone: deviceTimeZone,
+      timeZone: timeZone,
     },
     type: 'event', // Default option
   });
@@ -122,11 +121,11 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
         description: '',
         start: {
           dateTime: minimumStartingTime,
-          timeZone: deviceTimeZone,
+          timeZone: timeZone,
         },
         end: {
           dateTime: minimumEndingTime,
-          timeZone: deviceTimeZone,
+          timeZone: timeZone,
         },
         type: 'event',
       });
@@ -168,12 +167,14 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
             title={'Select start time'}
             dateTime={formData.start.dateTime}
             dateTimeType={'start'}
+            minimumDateTime={minimumStartingTime}
             setDateTime={setFormData}
           />
           <DateTimePicker
             title={'Select end time'}
             dateTime={formData.end.dateTime}
             dateTimeType={'end'}
+            minimumDateTime={minimumEndingTime}
             setDateTime={setFormData}
           />
         </View>
@@ -184,6 +185,7 @@ export default function EntryForm({ onSubmit }: EntryFormProps) {
             title={'Select due date'}
             dateTime={formData.start.dateTime}
             dateTimeType={'start'}
+            minimumDateTime={minimumStartingTime}
             setDateTime={setFormData}
           />
         </View>
