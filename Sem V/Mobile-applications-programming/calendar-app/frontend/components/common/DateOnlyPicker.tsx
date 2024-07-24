@@ -3,7 +3,12 @@ import React, { useState } from 'react';
 import DatePicker from 'react-native-date-picker';
 import { DateTimeSelector } from '../types';
 
-function DateOnlyPicker({ title, dateTime, setDateTime }: DateTimeSelector) {
+function DateOnlyPicker({
+  title,
+  dateTime,
+  minimumDateTime,
+  setDateTime,
+}: DateTimeSelector) {
   const [open, setOpen] = useState(false);
   const selectedDate = `⏰ ${dateTime.toLocaleDateString()}`;
 
@@ -16,7 +21,7 @@ function DateOnlyPicker({ title, dateTime, setDateTime }: DateTimeSelector) {
         open={open}
         mode={'date'}
         date={dateTime}
-        minimumDate={dateTime}
+        minimumDate={minimumDateTime}
         onConfirm={(date) => {
           setOpen(false);
           setDateTime((prev) => ({

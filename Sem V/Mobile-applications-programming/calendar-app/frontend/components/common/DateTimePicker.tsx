@@ -7,6 +7,7 @@ function DateTimePicker({
   title,
   dateTime,
   dateTimeType,
+  minimumDateTime,
   setDateTime,
 }: DateTimeSelector) {
   const [open, setOpen] = useState(false);
@@ -38,7 +39,7 @@ function DateTimePicker({
         title={title}
         open={open}
         date={dateTime}
-        minimumDate={dateTime}
+        minimumDate={minimumDateTime}
         minuteInterval={15}
         onConfirm={(date) => {
           setOpen(false);
