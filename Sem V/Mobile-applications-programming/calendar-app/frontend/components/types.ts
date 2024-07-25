@@ -47,6 +47,7 @@ export type CalendarData = {
 export type DateTimeSelector = {
   title: string
   dateTime: Date
+  minimumDateTime: Date
   dateTimeType: 'start' | 'end'
   setDateTime: React.Dispatch<React.SetStateAction<FormData>>
 }
