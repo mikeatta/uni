@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import Events from '../common/Events';
 import Tasks from '../common/Tasks';
@@ -11,18 +11,38 @@ export default function ListView({
   onEdit,
   onRemove,
 }: CalendarData) {
+  const getEntryCounts = () => {
+    const hasEvents = events.length > 0;
+    const hasTasks = tasks.length > 0;
+    return [hasEvents, hasTasks];
+  };
+
+  const [hasEvents, hasTasks] = getEntryCounts();
+
+  if (!hasEvents && !hasTasks) {
+    return (
+      <View style={styles.contentContainer}>
+        <Text>No entries found in the calendar</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.contentContainer}>
-      <Events
-        events={events}
-        styles={entryStyles}
-        functions={{ onEdit, onRemove }}
-      />
-      <Tasks
-        tasks={tasks}
-        styles={entryStyles}
-        functions={{ onStatusChange, onEdit, onRemove }}
-      />
+      {hasEvents && (
+        <Events
+          events={events}
+          styles={entryStyles}
+          functions={{ onEdit, onRemove }}
+        />
+      )}
+      {hasTasks && (
+        <Tasks
+          tasks={tasks}
+          styles={entryStyles}
+          functions={{ onStatusChange, onEdit, onRemove }}
+        />
+      )}
     </View>
   );
 }
