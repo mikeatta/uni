@@ -21,14 +21,14 @@ export default function ListView({
 
   if (!hasEvents && !hasTasks) {
     return (
-      <View style={styles.contentContainer}>
+      <View style={{ ...styles.container, marginTop: 10 }}>
         <Text>No entries found in the calendar</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.contentContainer}>
+    <View style={styles.container}>
       {hasEvents && (
         <Events
           events={events}
@@ -48,7 +48,7 @@ export default function ListView({
 }
 
 const styles = StyleSheet.create({
-  contentContainer: {
+  container: {
     width: '100%',
     alignItems: 'center',
   },
