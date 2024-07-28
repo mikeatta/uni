@@ -4,7 +4,7 @@ import {
   CalendarTask,
   ICalendarData,
 } from '../../components/types'
-import { getDataType } from '../../utils/helpers'
+import { getDataType } from '../../utils/helpers/dataTypeHelpers'
 
 export const addLocalEntry = async (
   submittedEntry: CalendarEvent | CalendarTask,

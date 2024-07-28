@@ -15,7 +15,7 @@ import {
   removeRemoteEntry,
   returnSubmittedEntry,
 } from '../services/api/googleCalendar'
-import { toCalendarEntry, toFormData } from '../utils/helpers'
+import { toCalendarEntry, toFormData } from '../utils/helpers/dataTypeHelpers'
 import { overwriteOfflineEntry } from '../services/storage/storageHandlers'
 
 export const useSyncChanges = async (
