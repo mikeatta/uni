@@ -23,13 +23,15 @@ import { useFetchLocalData } from './hooks/useFetchLocalData';
 import { useSetupDatabase } from './hooks/useSetupDatabase';
 import { useNetworkStatus } from './hooks/useNetworkStatus';
 import { useSyncChanges } from './hooks/useSyncChanges';
-import { fillTempEntryId, toCalendarEntry } from './utils/helpers';
+import { fillTempEntryId } from './utils/helpers/other';
 import {
   addLocalEntry,
+  editLocalEntry,
   removeLocalEntry,
 } from './services/storage/storageHandlers';
 import { FormData } from './components/types';
 import { UserTimeInfoProvider } from './contexts/UserTimeInfoProvider';
+import { toCalendarEntry } from './utils/helpers/dataTypeHelpers';
 
 function App() {
   const [displayMode, setDisplayMode] = useState<string>('list');
