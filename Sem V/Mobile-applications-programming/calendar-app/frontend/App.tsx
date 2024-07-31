@@ -28,8 +28,9 @@ import {
   addLocalEntry,
   editLocalEntry,
   removeLocalEntry,
+  updateLocalTaskStatus,
 } from './services/storage/storageHandlers';
-import { FormData } from './components/types';
+import { CalendarTask, FormData } from './components/types';
 import { UserTimeInfoProvider } from './contexts/UserTimeInfoProvider';
 import { toCalendarEntry } from './utils/helpers/dataTypeHelpers';
 
@@ -78,6 +79,14 @@ function App() {
     await editLocalEntry(editedEntry, setLocalData);
   };
 
+  const handleTaskStatusChange = async (task: CalendarTask) => {
+    if (isConnected) {
+      await updateRemoteTaskStatus(task);
+    }
+
+    await updateLocalTaskStatus(task, setLocalData);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar />
@@ -95,7 +104,7 @@ function App() {
                 events={localData.events}
                 tasklists={localData.tasklists}
                 tasks={localData.tasks}
-                onStatusChange={updateRemoteTaskStatus}
+                onStatusChange={handleTaskStatusChange}
                 onEdit={handleEntryEdit}
                 onRemove={handleEntryRemoval}
               />
@@ -104,7 +113,7 @@ function App() {
                 events={localData.events}
                 tasklists={localData.tasklists}
                 tasks={localData.tasks}
-                onStatusChange={updateRemoteTaskStatus}
+                onStatusChange={handleTaskStatusChange}
                 onEdit={handleEntryEdit}
                 onRemove={handleEntryRemoval}
               />
