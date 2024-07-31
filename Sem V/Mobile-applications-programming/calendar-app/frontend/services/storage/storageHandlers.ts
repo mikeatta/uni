@@ -209,3 +209,38 @@ export const editLocalEntry = async (
     console.error('Error modifying local entry:', error)
   }
 }
+
+export const updateLocalTaskStatus = async (
+  taskToUpdate: CalendarTask,
+  setData: React.Dispatch<React.SetStateAction<ICalendarData>>,
+) => {
+  try {
+    const matchEntryById = (
+      entryToMatch: CalendarTask,
+      entryToCheck: CalendarTask,
+    ) => entryToMatch.id === entryToCheck.id
+
+    const toggleTaskStatus = (taskStatus: 'needsAction' | 'completed') =>
+      taskStatus === 'needsAction' ? 'completed' : 'needsAction'
+
+    setData((prevData) => {
+      const outdatedTaskIndex = prevData.tasks.findIndex((task) =>
+        matchEntryById(taskToUpdate, task),
+      )
+
+      if (outdatedTaskIndex !== -1) {
+        const updatedTasks = prevData.tasks.map((task, index) =>
+          index === outdatedTaskIndex
+            ? { ...task, status: toggleTaskStatus(task.status) }
+            : task,
+        ) as CalendarTask[]
+
+        return { ...prevData, tasks: updatedTasks }
+      }
+
+      return prevData
+    })
+  } catch (error) {
+    console.error('Error updating local task status:', error)
+  }
+}
