@@ -23,6 +23,7 @@ import { useFetchLocalData } from './hooks/useFetchLocalData';
 import { useSetupDatabase } from './hooks/useSetupDatabase';
 import { useNetworkStatus } from './hooks/useNetworkStatus';
 import { useSyncChanges } from './hooks/useSyncChanges';
+import AlertBox from './components/overlays/AlertBox';
 import { fillTempEntryId } from './utils/helpers/other';
 import {
   addLocalEntry,
@@ -121,6 +122,12 @@ function App() {
           </View>
         </UserTimeInfoProvider>
       </ScrollView>
+      {!isConnected && (
+        <AlertBox
+          title={'No internet connection!'}
+          message={'Offline mode enabled.'}
+        />
+      )}
     </SafeAreaView>
   );
 }
