@@ -15,7 +15,11 @@ import {
   removeRemoteEntry,
   returnSubmittedEntry,
 } from '../services/api/googleCalendar'
-import { toCalendarEntry, toFormData } from '../utils/helpers/dataTypeHelpers'
+import {
+  getDataType,
+  toCalendarEntry,
+  toFormData,
+} from '../utils/helpers/dataTypeHelpers'
 import { overwriteOfflineEntry } from '../services/storage/storageHandlers'
 
 export const useSyncChanges = async (
@@ -206,30 +210,40 @@ export const useSyncChanges = async (
   const convertToSubmittableEntries = (
     calendarChanges: DataStatus,
   ): SubmittableEntries => {
-    const eventsToAdd = calendarChanges.eventsToAdd.map((eventToAdd) =>
-      toFormData(eventToAdd),
+    const convertEntries = (
+      entries: (CalendarEvent | CalendarTask)[],
+      operation: 'add' | 'remove' | 'update',
+    ) => {
+      return entries.map((entry) => {
+        if (operation === 'add' || operation === 'update') {
+          return toFormData(entry)
+        } else if (operation === 'remove') {
+          const id = entry.id
+          const type = getDataType(entry)
+          return [id, type]
+        }
+        throw Error('Unidentified type of entry operation')
+      })
+    }
+
+    const eventsToAdd = convertEntries(calendarChanges.eventsToAdd, 'add')
+    const eventsToRemove = convertEntries(
+      calendarChanges.eventsToRemove,
+      'remove',
     )
-    const eventsToRemove = calendarChanges.eventsToRemove.map(
-      (eventToRemove) => {
-        const id = eventToRemove.id
-        const type = 'event'
-        return [id, type]
-      },
-    )
-    const eventsToUpdate = calendarChanges.eventsToUpdate.map((eventToUpdate) =>
-      toFormData(eventToUpdate),
+    const eventsToUpdate = convertEntries(
+      calendarChanges.eventsToUpdate,
+      'update',
     )
 
-    const tasksToAdd = calendarChanges.tasksToAdd.map((taskToAdd) =>
-      toFormData(taskToAdd),
+    const tasksToAdd = convertEntries(calendarChanges.tasksToAdd, 'add')
+    const tasksToRemove = convertEntries(
+      calendarChanges.tasksToRemove,
+      'remove',
     )
-    const tasksToRemove = calendarChanges.tasksToRemove.map((taskToRemove) => {
-      const id = taskToRemove.id
-      const type = 'task'
-      return [id, type]
-    })
-    const tasksToUpdate = calendarChanges.tasksToUpdate.map((taskToUpdate) =>
-      toFormData(taskToUpdate),
+    const tasksToUpdate = convertEntries(
+      calendarChanges.tasksToUpdate,
+      'update',
     )
 
     return {
@@ -239,7 +253,7 @@ export const useSyncChanges = async (
       tasksToAdd,
       tasksToRemove,
       tasksToUpdate,
-    }
+    } as SubmittableEntries
   }
 
   useEffect(() => {
