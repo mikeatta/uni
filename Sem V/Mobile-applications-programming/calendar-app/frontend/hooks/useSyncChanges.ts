@@ -273,6 +273,7 @@ export const useSyncChanges = async (
     syncChangesWithLocalDatabase()
   }, [compareCalendarData])
 
+  // Sync local database with Calendar content on app start
   useEffect(() => {
     const syncLocalDatabaseWithGoogleCalendar = async () => {
       const updatedGoogleData = await fetchGoogleCalendarData()
@@ -293,6 +294,7 @@ export const useSyncChanges = async (
     }
   }, [compareCalendarData])
 
+  // Sync Google Calendar with database content on network reconnect
   useEffect(() => {
     const syncGoogleCalendarWithLocalDatabase = async () => {
       const currentGoogleData = await fetchGoogleCalendarData()
