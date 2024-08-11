@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@react-native-community/netinfo": "^11.3.2",
+    "@react-native-firebase/app": "^20.3.0",
+    "@react-native-firebase/auth": "^20.3.0",
+    "@react-native-google-signin/google-signin": "^12.2.1",
     "axios": "^1.6.7",
     "date-fns": "^3.6.0",
     "moment-timezone": "^0.5.45",
