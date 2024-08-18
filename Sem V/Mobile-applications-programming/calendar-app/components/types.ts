@@ -5,12 +5,10 @@ export type CalendarEvent = {
   summary: string
   description?: string
   start: {
-    date: Date
     dateTime: Date
     timeZone: string
   }
   end: {
-    date: Date
     dateTime: Date
     timeZone: string
   }
@@ -41,7 +39,7 @@ export type CalendarData = {
   tasks: CalendarTask[]
   onStatusChange: (taskData: CalendarTask) => Promise<void>
   onEdit: (formData: FormData) => Promise<void>
-  onRemove: (id: string, type: string) => Promise<void>
+  onRemove: (id: string, type: 'event' | 'task') => Promise<void>
 }
 
 export type DateTimeSelector = {

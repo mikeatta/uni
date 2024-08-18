@@ -49,12 +49,10 @@ export const toCalendarEntry = (
       summary: title,
       description: description,
       start: {
-        date: new Date(start.dateTime),
         dateTime: start.dateTime,
         timeZone: start.timeZone,
       },
       end: {
-        date: new Date(end.dateTime),
         dateTime: end.dateTime,
         timeZone: end.timeZone,
       },
