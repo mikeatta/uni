@@ -13,50 +13,47 @@ type GoogleLoginProps = {
 };
 
 const GoogleLogin = ({ isLoggedIn, setIsLoggedIn }: GoogleLoginProps) => {
-  if (isLoggedIn) {
-    return (
-      <View style={styles.container}>
-        <Button
-          title={'Sign Out'}
-          onPress={async () => {
-            await GoogleSignin.signOut();
-            setIsLoggedIn(false);
-          }}
-        />
-      </View>
-    );
-  }
+  const handleSignOut = async () => {
+    await GoogleSignin.signOut();
+    setIsLoggedIn(false);
+  };
+
+  const handleSignIn = async () => {
+    try {
+      const user = await GoogleSignin.signIn();
+      if (!user) {
+        throw new Error('No user object!');
+      }
+
+      const { idToken, accessToken } = await GoogleSignin.getTokens();
+      if (!idToken || !accessToken) {
+        throw new Error('No access token received!');
+      }
+
+      const googleCredentials = auth.GoogleAuthProvider.credential(idToken);
+      await auth().signInWithCredential(googleCredentials);
+
+      GoogleAuthService.setAccessToken(accessToken);
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.error('Failed to sign into Google Account:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Text>Sign in with Google</Text>
-      <GoogleSigninButton
-        size={GoogleSigninButton.Size.Standard}
-        color={'light'}
-        onPress={async () => {
-          try {
-            const user = await GoogleSignin.signIn();
-            if (!user) {
-              throw Error('No user object!');
-            }
-
-            const { idToken, accessToken } = await GoogleSignin.getTokens();
-            if (!idToken || !accessToken) {
-              throw new Error('No access token received!');
-            }
-
-            const googleCredentials =
-              auth.GoogleAuthProvider.credential(idToken);
-            await auth().signInWithCredential(googleCredentials);
-
-            // Set the access token in the GoogleAuthService singleton
-            GoogleAuthService.setAccessToken(accessToken);
-            setIsLoggedIn(true);
-          } catch (error) {
-            console.error('Failed to sign into Google Account:', error);
-          }
-        }}
-      />
+      {isLoggedIn ? (
+        <Button title={'Sign Out'} onPress={handleSignOut} />
+      ) : (
+        <View style={styles.signInContainer}>
+          <Text>Sign in with Google</Text>
+          <GoogleSigninButton
+            size={GoogleSigninButton.Size.Standard}
+            color={GoogleSigninButton.Color.Light}
+            onPress={handleSignIn}
+          />
+        </View>
+      )}
     </View>
   );
 };
@@ -66,9 +63,11 @@ export default GoogleLogin;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
-    gap: 5,
     marginTop: 10,
+  },
+  signInContainer: {
+    alignItems: 'center',
+    gap: 10,
   },
 });
