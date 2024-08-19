@@ -40,8 +40,7 @@ function isCalendarTask(
 export const toCalendarEntry = (
   formData: FormData,
 ): CalendarEvent | CalendarTask => {
-  const { id, title, description, start, end } = formData
-  const type = formData.type
+  const { id, title, description, start, end, type } = formData
 
   if (type === 'event') {
     return {
