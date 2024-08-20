@@ -31,7 +31,7 @@ import {
   removeLocalEntry,
   updateLocalTaskStatus,
 } from './services/storage/storageHandlers';
-import { CalendarTask, FormData } from './components/types';
+import { CalendarTask, EntryTypes, FormData } from './components/types';
 import { UserTimeInfoProvider } from './contexts/UserTimeInfoProvider';
 import { toCalendarEntry } from './utils/helpers/dataTypeHelpers';
 
@@ -54,7 +54,7 @@ function App() {
     if (isConnected) {
       await addRemoteEntry(formData);
       const updatedData = await fetchGoogleCalendarData();
-      const submittedEntry = await returnSubmittedEntry(formData, updatedData);
+      const submittedEntry = returnSubmittedEntry(formData, updatedData);
       await addLocalEntry(submittedEntry, setLocalData);
     } else {
       let tempOfflineEntry = await toCalendarEntry(formData);
@@ -63,7 +63,7 @@ function App() {
     }
   };
 
-  const handleEntryRemoval = async (id: string, type: string) => {
+  const handleEntryRemoval = async (id: string, type: EntryTypes) => {
     if (isConnected) {
       await removeRemoteEntry(id, type);
     }
@@ -72,7 +72,19 @@ function App() {
   };
 
   const handleEntryEdit = async (formData: FormData) => {
-    if (isConnected) {
+    const { type } = formData;
+
+    if (isConnected && type === 'task') {
+      const editedTaskStatus = localData.tasks.find(
+        (task) => task.id === formData.id,
+      )?.status;
+
+      if (!editedTaskStatus) {
+        throw new Error('Could not find currently edited task status');
+      }
+
+      await editRemoteEntry(formData, editedTaskStatus);
+    } else if (isConnected && type === 'event') {
       await editRemoteEntry(formData);
     }
 
