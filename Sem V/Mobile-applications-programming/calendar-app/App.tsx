@@ -46,8 +46,14 @@ function App() {
   const { localData, setLocalData, refreshLocalEntryList } =
     useFetchLocalData(isDatabaseSetup);
 
-  useSyncChanges(localData, isConnected, setLocalData, refreshLocalEntryList);
 
+  useSyncChanges(
+    localData,
+    isConnected,
+    isLoggedIn,
+    setLocalData,
+    refreshLocalEntryList,
+  );
 
   const handleSliderChange = async (value: 'list' | 'calendar') => {
     setDisplayMode(value);

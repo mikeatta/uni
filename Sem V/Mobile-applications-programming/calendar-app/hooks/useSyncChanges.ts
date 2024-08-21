@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
   CalendarEvent,
   CalendarTask,
+  EntryTypes,
   FormData,
   ICalendarData,
 } from '../components/types'
@@ -25,6 +26,7 @@ import { overwriteOfflineEntry } from '../services/storage/storageHandlers'
 export const useSyncChanges = async (
   localData: ICalendarData,
   isConnected: boolean,
+  isLoggedIn: boolean,
   setLocalData: React.Dispatch<React.SetStateAction<ICalendarData>>,
   refreshLocalEntryList: () => Promise<void>,
 ) => {
@@ -41,6 +43,15 @@ export const useSyncChanges = async (
     tasksToAdd: CalendarTask[]
     tasksToRemove: CalendarTask[]
     tasksToUpdate: CalendarTask[]
+  }
+
+  type SubmittableEntries = {
+    eventsToAdd: FormData[]
+    eventsToRemove: [string, EntryTypes][]
+    eventsToUpdate: FormData[]
+    tasksToAdd: FormData[]
+    tasksToRemove: [string, EntryTypes][]
+    tasksToUpdate: FormData[]
   }
 
   const compareCalendarData = useCallback(
@@ -146,15 +157,6 @@ export const useSyncChanges = async (
     [calendarUpdatesNeeded],
   )
 
-  type SubmittableEntries = {
-    eventsToAdd: FormData[]
-    eventsToRemove: string[][]
-    eventsToUpdate: FormData[]
-    tasksToAdd: FormData[]
-    tasksToRemove: string[][]
-    tasksToUpdate: FormData[]
-  }
-
   const updateSubmittedEntryDetails = async (submittedEntries: FormData[]) => {
     const updatedData = await fetchGoogleCalendarData()
     const entryPairs = []
@@ -202,7 +204,7 @@ export const useSyncChanges = async (
   )
 
   const updateLocalData = useCallback(async () => {
-    if (localDataNeedsUpdates.current === true) {
+    if (localDataNeedsUpdates.current.valueOf() === true) {
       await refreshLocalEntryList()
     }
   }, [calendarUpdatesNeeded])
@@ -265,7 +267,6 @@ export const useSyncChanges = async (
 
       if (calendarUpdatesNeeded(changesToUpdate)) {
         await updateLocalDatabase(changesToUpdate)
-        await updateLocalData()
         await setLastSyncedLocalData(localData)
       }
     }
@@ -289,10 +290,10 @@ export const useSyncChanges = async (
       }
     }
 
-    if (isConnected && isFirstLoad.current.valueOf()) {
+    if (isConnected && isLoggedIn && isFirstLoad.current.valueOf()) {
       syncLocalDatabaseWithGoogleCalendar()
     }
-  }, [compareCalendarData])
+  }, [isLoggedIn])
 
   // Sync Google Calendar with database content on network reconnect
   useEffect(() => {
@@ -310,7 +311,7 @@ export const useSyncChanges = async (
       }
     }
 
-    if (isConnected && !isFirstLoad.current.valueOf()) {
+    if (isConnected && isLoggedIn && !isFirstLoad.current.valueOf()) {
       syncGoogleCalendarWithLocalDatabase()
     } else if (!isConnected) {
       isFirstLoad.current = false
