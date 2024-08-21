@@ -34,12 +34,15 @@ import {
 import { CalendarTask, EntryTypes, FormData } from './components/types';
 import { UserTimeInfoProvider } from './contexts/UserTimeInfoProvider';
 import { toCalendarEntry } from './utils/helpers/dataTypeHelpers';
+import GoogleLogin from './components/forms/GoogleLogin';
+import { useGoogleSignin } from './hooks/useGoogleSignin';
+import GoogleAuthService from './services/auth/GoogleAuthService';
 
 function App() {
   const [displayMode, setDisplayMode] = useState<string>('list');
 
   const isConnected = useNetworkStatus();
-  const isDatabaseSetup = useSetupDatabase();
+  const { isLoggedIn, setIsLoggedIn } = useGoogleSignin();
   const { localData, setLocalData, refreshLocalEntryList } =
     useFetchLocalData(isDatabaseSetup);
 
@@ -109,29 +112,32 @@ function App() {
             <Text style={styles.headerText}>Create New Entry</Text>
             <EntryForm onSubmit={handleFormSubmit} />
           </View>
-          <View style={styles.contentContainer}>
-            <Text style={styles.headerText}>Calendar Data</Text>
-            <Slider onValueChange={handleSliderChange} />
-            {displayMode === 'list' ? (
-              <ListView
-                events={localData.events}
-                tasklists={localData.tasklists}
-                tasks={localData.tasks}
-                onStatusChange={handleTaskStatusChange}
-                onEdit={handleEntryEdit}
-                onRemove={handleEntryRemoval}
-              />
-            ) : (
-              <CalendarView
-                events={localData.events}
-                tasklists={localData.tasklists}
-                tasks={localData.tasks}
-                onStatusChange={handleTaskStatusChange}
-                onEdit={handleEntryEdit}
-                onRemove={handleEntryRemoval}
-              />
-            )}
-          </View>
+          <GoogleLogin isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+          {isLoggedIn && (
+            <View style={styles.contentContainer}>
+              <Text style={styles.headerText}>Calendar Data</Text>
+              <Slider onValueChange={handleSliderChange} />
+              {displayMode === 'list' ? (
+                <ListView
+                  events={localData.events}
+                  tasklists={localData.tasklists}
+                  tasks={localData.tasks}
+                  onStatusChange={handleTaskStatusChange}
+                  onEdit={handleEntryEdit}
+                  onRemove={handleEntryRemoval}
+                />
+              ) : (
+                <CalendarView
+                  events={localData.events}
+                  tasklists={localData.tasklists}
+                  tasks={localData.tasks}
+                  onStatusChange={handleTaskStatusChange}
+                  onEdit={handleEntryEdit}
+                  onRemove={handleEntryRemoval}
+                />
+              )}
+            </View>
+          )}
         </UserTimeInfoProvider>
       </ScrollView>
       {!isConnected && (
