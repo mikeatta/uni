@@ -13,8 +13,8 @@ import {
   fetchGoogleCalendarData,
   removeRemoteEntry,
   returnSubmittedEntry,
-  updateRemoteTaskStatus,
 } from './services/api/googleCalendar';
+import { updateRemoteTaskStatus } from './services/api/entryHandlers';
 import ListView from './components/views/ListView';
 import EntryForm from './components/forms/EntryForm';
 import Slider from './components/controls/Slider';

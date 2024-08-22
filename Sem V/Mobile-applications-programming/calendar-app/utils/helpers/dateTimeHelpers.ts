@@ -1,4 +1,4 @@
-import { FormData } from '../../components/types'
+import { CalendarTask, FormData } from '../../components/types'
 
 export const selectValidInterval = (timestamp: Date) => {
   const timestampHours = timestamp.getHours()
@@ -75,4 +75,13 @@ export const normalizeFormDataTimes = (formData: FormData) => {
   }
 
   return formData
+}
+
+/**
+ * Formats the due date of a task object to a specific format to avoid the 400
+ * status error when submitting entries
+ */
+export const formatDueDateToISO8601UTC = (task: CalendarTask) => {
+  const formattedDueDate = new Date(task.due).toISOString()
+  return { ...task, due: formattedDueDate }
 }
