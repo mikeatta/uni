@@ -31,7 +31,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define UART3_TX_BUF_LEN 50
+#define UART3_RX_BUF_LEN 50
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -44,7 +45,13 @@
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
+uint8_t UART3_Tx_Buf[UART3_TX_BUF_LEN];   // TX buffer for UART3
+uint8_t UART3_Rx_Buf[UART3_RX_BUF_LEN];   // RX buffer for UART3
 
+volatile uint16_t UART3_Tx_Empty = 0;     // TX buffer complete index
+volatile uint16_t UART3_Tx_Busy = 0;      // TX buffer in progress index
+volatile uint16_t UART3_Rx_Empty = 0;     // RX buffer complete index
+volatile uint16_t UART3_Rx_Busy = 0;      // RX buffer in progress index
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -95,26 +102,16 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_UART_Receive_IT(&huart3, &UART3_Rx_Buf[UART3_Rx_Empty], 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint8_t test_message[] = "Hello, world from STM!\n\r";
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin); // Toggle pin PB14
-
-	  // Try sending test message, run error handler, if status is not OK
-	  if (HAL_UART_Transmit(&huart3, test_message, strlen((const char *)test_message), 100) != HAL_OK)
-	  {
-		  Error_Handler();
-	  }
-
-	  HAL_Delay(1000); // 1 second timeout
   }
   /* USER CODE END 3 */
 }
@@ -225,7 +222,35 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if (huart == &huart3)
+	{
+		if (UART3_Tx_Empty != UART3_Rx_Busy)
+		{
+			uint8_t tmp = UART3_Tx_Buf[UART3_Tx_Busy];
+			UART3_Tx_Busy++;
+			if (UART3_Tx_Busy >= UART3_TX_BUF_LEN)
+			{
+				UART3_Tx_Busy = 0;
+			}
+			HAL_UART_Transmit_IT(&huart3, &tmp, 1);
+		}
+	}
+}
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if (huart == &huart3)
+	{
+		UART3_Rx_Empty++;
+		if (UART3_Rx_Empty >= UART3_RX_BUF_LEN)
+		{
+			UART3_Rx_Empty = 0;
+		}
+		HAL_UART_Receive_IT(&huart3, &UART3_Rx_Buf[UART3_Rx_Empty], 1);
+	}
+}
 /* USER CODE END 4 */
 
  /* MPU Configuration */
