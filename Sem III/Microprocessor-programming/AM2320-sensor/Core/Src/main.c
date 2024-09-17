@@ -226,7 +226,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if (huart == &huart3)
 	{
-		if (UART3_Tx_Empty != UART3_Rx_Busy)
+		if (UART3_Tx_Empty != UART3_Tx_Busy)
 		{
 			uint8_t tmp = UART3_Tx_Buf[UART3_Tx_Busy];
 			UART3_Tx_Busy++;
