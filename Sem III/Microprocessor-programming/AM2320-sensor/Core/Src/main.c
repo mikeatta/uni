@@ -31,6 +31,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define MAX_FRAME_LEN 50
 #define UART3_TX_BUF_LEN 50
 #define UART3_RX_BUF_LEN 50
 /* USER CODE END PD */
@@ -65,7 +66,75 @@ static void MX_USART3_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void receive_frame(uint8_t *sender_address, uint8_t *data)
+{
+	static uint8_t tmp[MAX_FRAME_LEN];
+	static uint16_t index = 0;
+	static uint8_t escape = 0; // Marker for the special '\' escape character sequence
 
+	// When there's data to collect from the reception buffer
+	while (UART3_Rx_Empty != UART3_Rx_Busy)
+	{
+		// Store new data in temporary buffer
+		tmp[index] = UART3_Rx_Buf[UART3_Rx_Busy];
+		if (++UART3_Rx_Busy >= UART3_RX_BUF_LEN)
+		{
+			UART3_Rx_Busy = 0;
+		}
+
+		// Collect & decode received frame
+		if (tmp[index] == '[')
+		{
+			tmp[0] = '[';
+			index = 1;
+			escape = 0;
+			continue;
+		}
+
+		// If received character was not the frame starting character ('[')
+		if (!index)
+		{
+			continue;
+		}
+
+		// If the current character is the escape character, encode the following characters
+		if (escape)
+		{
+			if (tmp[index] == '\\')
+			{
+				tmp[index++] = '\\';
+			}
+			else if (tmp[index] == '{')
+			{
+				tmp[index++] = '[';
+			}
+			else if (tmp[index] == '}')
+			{
+				tmp[index++] = ']';
+			}
+			else
+			{
+				// Incorrect character in the escape sequence -- reset the frame
+				index = 0;
+			}
+			// Turn off special character encoding
+			escape = 0;
+		}
+		// If character at index is the escape character
+		else if (tmp[index] == '\\')
+		{
+			escape = 1;
+		}
+		else if (tmp[index] == ']')
+		{
+			// TODO: Store frame data
+		}
+		else if (++index >= MAX_FRAME_LEN)
+		{
+			index = 0;
+		}
+	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -88,7 +157,8 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  uint8_t sender_address[4];
+  uint8_t data[MAX_FRAME_LEN];
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -112,6 +182,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  receive_frame(sender_address, data);
   }
   /* USER CODE END 3 */
 }
