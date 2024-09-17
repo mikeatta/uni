@@ -32,6 +32,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define MAX_FRAME_LEN 50
+#define MIN_FRAME_LEN 11 // Frame length of a valid frame with an empty body
 #define UART3_TX_BUF_LEN 50
 #define UART3_RX_BUF_LEN 50
 /* USER CODE END PD */
@@ -125,9 +126,22 @@ void receive_frame(uint8_t *sender_address, uint8_t *data)
 		{
 			escape = 1;
 		}
+		// Frame ending character found, move to data checks & collection
 		else if (tmp[index] == ']')
 		{
-			// TODO: Store frame data
+			uint16_t frame_length = index + 1; // Add frame end to the length
+			index = 0;
+
+			// Run checks before frame data collection
+			// Skip frame, if the length is too short
+			if (frame_length < MIN_FRAME_LEN)
+			{
+				continue;
+			}
+
+			// DEBUG: Toggle LED on valid frame
+			HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+			index = 0; // Reset -- restart frame collection
 		}
 		else if (++index >= MAX_FRAME_LEN)
 		{
