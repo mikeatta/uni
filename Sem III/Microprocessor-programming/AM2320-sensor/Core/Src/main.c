@@ -54,6 +54,8 @@ volatile uint16_t UART3_Tx_Empty = 0;     // TX buffer complete index
 volatile uint16_t UART3_Tx_Busy = 0;      // TX buffer in progress index
 volatile uint16_t UART3_Rx_Empty = 0;     // RX buffer complete index
 volatile uint16_t UART3_Rx_Busy = 0;      // RX buffer in progress index
+
+const uint8_t DEVICE_ADDRESS[3] = {'S', 'T', 'M'};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -135,6 +137,12 @@ void receive_frame(uint8_t *sender_address, uint8_t *data)
 			// Run checks before frame data collection
 			// Skip frame, if the length is too short
 			if (frame_length < MIN_FRAME_LEN)
+			{
+				continue;
+			}
+
+			// Skip frame if the recipient is NOT this device ('STM')
+			if (tmp[4] != DEVICE_ADDRESS[0] || tmp[5] != DEVICE_ADDRESS[1] || tmp[6] != DEVICE_ADDRESS[2])
 			{
 				continue;
 			}
