@@ -172,6 +172,26 @@
     </div>
   </body>
   <script>
-    function computeCRC() {}
+    function computeCRC(data) {
+      const dataLength = data.length;
+      let CRC = 0xffff; // Initialize the CRC value
+
+      for (let byteIndex = 0; byteIndex < dataLength; byteIndex++) {
+        // Get the ASCII code of the individual character at the specified index of data
+        CRC ^= data.charCodeAt(byteIndex); // XOR the CRC with the data byte value
+
+        // Process each bit of the byte
+        for (i = 0; i < 8; i++) {
+          if (CRC & 0x0001) {
+            CRC >>= 1;
+            CRC ^= 0xa001;
+          } else {
+            CRC >>= 1;
+          }
+        }
+      }
+
+      return CRC;
+    }
   </script>
 </html>
