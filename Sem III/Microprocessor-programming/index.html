@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>STM32 Project Frame Generator</title>
+    <style>
+      :root {
+        --primary-color: #000308;
+        --primary-color-lighter: #0e0e0e;
+        --secondary-color: #1f2535;
+        --btn-bg-color: #16181d;
+        --btn-bg-highlight-color: #1b1e24;
+        --btn-text-color: #ffffff;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--primary-color);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 600px;
+        padding: 1rem;
+        background-color: var(--primary-color);
+        text-align: center;
+      }
+
+      header h1 {
+        margin: 0 0 2rem 0;
+      }
+
+      /* Frame Window Styles */
+      .frame-input {
+        margin: 0 0 1.2rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+      }
+
+      .frame-window {
+        padding: 0.75rem 0.5rem;
+        font-size: 1rem;
+        background-color: var(--primary-color-lighter);
+        color: var(--btn-text-color);
+        border: 4px solid var(--secondary-color);
+        border-radius: 1rem;
+      }
+
+      .frame-window:hover {
+        background-color: var(--btn-bg-highlight-color);
+      }
+
+      .frame-window-control-btns {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+      }
+
+      .frame-window-btn {
+        flex: 1;
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
+        background-color: var(--btn-bg-color);
+        color: var(--btn-text-color);
+        border: 1px solid var(--btn-bg-color);
+        border-radius: 0.35rem;
+      }
+
+      .frame-window-btn:hover {
+        background-color: var(--btn-bg-highlight-color);
+        cursor: pointer;
+      }
+
+      /* Frame Output Styles */
+      .frame-gen-output {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        height: 200px;
+        overflow-y: auto;
+      }
+
+      .frame-gen-output p {
+        margin: 0;
+        padding: 0.125rem;
+        font-size: 1rem;
+        border-radius: 0.25rem;
+      }
+
+      .frame-gen-output p:hover {
+        background-color: var(--primary-color-lighter);
+        cursor: pointer;
+      }
+
+      /* Footer Styles */
+      footer {
+        text-align: center;
+      }
+
+      footer.sticky {
+        position: sticky;
+        bottom: 0;
+        width: 100%;
+      }
+
+      .footer-info {
+        margin: 1.2rem 0 0 0;
+      }
+
+      .footer-info p {
+        margin: auto;
+      }
+
+      .footer-author-link {
+        color: var(--btn-text-color);
+        text-decoration: none;
+      }
+
+      .footer-author-link:hover {
+        color: var(--btn-bg-highlight-color);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Frame generator</h1>
+      </header>
+      <main>
+        <div class="frame-input">
+          <input
+            class="frame-window"
+            type="text"
+            placeholder="Frame data..."
+            title="Frame data input field"
+          />
+          <div class="frame-window-control-btns">
+            <button class="frame-window-btn" type="button" title="Submit">
+              Submit
+            </button>
+            <button class="frame-window-btn" type="reset" title="Reset">
+              Clear input
+            </button>
+          </div>
+          <button
+            class="frame-window-btn"
+            type="reset"
+            title="Remove generated frames"
+          >
+            Clear generated frames
+          </button>
+        </div>
+        <div class="frame-gen-output"></div>
+      </main>
+      <footer class="sticky">
+        <div class="footer-info">
+          <p>Made by Atami</p>
+          <a href="" target="_blank" class="footer-author-link">@mikeatta</a>
+          <span> | </span>
+          <a href="" target="_blank" class="footer-author-link">@mikeatta</a>
+        </div>
+      </footer>
+    </div>
+  </body>
+  <script>
+    function computeCRC() {}
+  </script>
+</html>
