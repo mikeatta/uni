@@ -260,6 +260,18 @@
       if (!e.repeat) captureKeyboard(e.key); // Capture pressed key
     });
 
+    /**
+     * Adds keyboard controls to speed up copying, pasting, and clearing
+     * the generated frames based on user key inputs.
+     *
+     * - 'C' or 'c': Copies the latest generated frame to the clipboard.
+     * - 'D' or 'd': Clears the output of generated frames.
+     * - 'Enter': Submits the input window and auto-copies the new frame.
+     * - 'Escape': Clears the input window if it contains content.
+     *
+     * @param {string} pressedKey - The key pressed by the user to trigger the action.
+     * @returns {void}
+     */
     function captureKeyboard(pressedKey) {
       const inputWindow = document.querySelector('input.frame-window');
       const windowHasContent = inputWindow.value !== '';
