@@ -144,10 +144,21 @@
             title="Frame data input field"
           />
           <div class="frame-window-control-btns">
-            <button class="frame-window-btn" type="button" title="Submit">
+            <button
+              class="frame-window-btn"
+              type="button"
+              title="Submit"
+              onclick="printOutput()"
+            >
               Submit
             </button>
-            <button class="frame-window-btn" type="reset" title="Reset">
+            <button
+              id="clear-input-btn"
+              class="frame-window-btn"
+              type="reset"
+              title="Reset"
+              onclick="clearWindow()"
+            >
               Clear input
             </button>
           </div>
@@ -155,6 +166,7 @@
             class="frame-window-btn"
             type="reset"
             title="Remove generated frames"
+            onclick="clearOutput()"
           >
             Clear generated frames
           </button>
@@ -192,6 +204,39 @@
       }
 
       return CRC;
+    }
+
+    function formatCRC(value) {
+      const formattedValue = value.toString().padStart(5, '0'); // Affix zeros to CRC, if length is less than 5 chars
+      return formattedValue;
+    }
+
+    function generateFrame() {
+      const inputData = document.querySelector('input.frame-window').value;
+      const computedCRC = computeCRC(inputData);
+      const frame = `[PC0STM${inputData}${formatCRC(computedCRC)}]`;
+      clearWindow(); // Clear input field after processing the frame
+      return frame;
+    }
+
+    function clearWindow() {
+      const window = document.querySelector('input.frame-window');
+      const windowHasData = window.value.length > 0;
+      if (windowHasData) window.value = '';
+    }
+
+    function printOutput() {
+      const outputContainer = document.querySelector('div.frame-gen-output');
+      const generatedFrame = generateFrame();
+      const frameNode = document.createElement('p');
+
+      frameNode.textContent = generatedFrame;
+      outputContainer.appendChild(frameNode);
+    }
+
+    function clearOutput() {
+      const outputContainer = document.querySelector('div.frame-gen-output');
+      outputContainer.innerHTML = ''; // Remove the child nodes (output frames)
     }
   </script>
 </html>
