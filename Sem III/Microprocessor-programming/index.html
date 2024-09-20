@@ -231,12 +231,29 @@
       const frameNode = document.createElement('p');
 
       frameNode.textContent = generatedFrame;
+
+      frameNode.setAttribute('onClick', 'copyElementContent(this)');
       outputContainer.appendChild(frameNode);
     }
 
     function clearOutput() {
       const outputContainer = document.querySelector('div.frame-gen-output');
       outputContainer.innerHTML = ''; // Remove the child nodes (output frames)
+    }
+
+    // UI-related functions
+    function copyElementContent(element) {
+      const clickedElementContent = element.innerHTML;
+      console.log('Clicked:', clickedElementContent);
+
+      navigator.clipboard
+        .writeText(clickedElementContent)
+        .then(() => {
+          console.log('Element content copied to clipboard!');
+        })
+        .catch((error) => {
+          console.error(error, 'Failed to copy element content.');
+        });
     }
   </script>
 </html>
