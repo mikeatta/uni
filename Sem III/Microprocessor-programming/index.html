@@ -255,5 +255,35 @@
           console.error(error, 'Failed to copy element content.');
         });
     }
+
+    document.addEventListener('keydown', (e) => {
+      if (!e.repeat) captureKeyboard(e.key); // Capture pressed key
+    });
+
+    function captureKeyboard(pressedKey) {
+      const inputWindow = document.querySelector('input.frame-window');
+      const windowHasContent = inputWindow.value !== '';
+      const output = document.querySelector('div.frame-gen-output');
+      const currentlyFocused = document.activeElement;
+
+      switch (pressedKey) {
+        case 'c':
+        case 'C': // Copy latest frame to clipboard
+          if (inputWindow !== currentlyFocused)
+            copyElementContent(output.lastChild); // Manual copy
+          break;
+        case 'd':
+        case 'D': // Clear output
+          if (inputWindow !== currentlyFocused) clearOutput();
+          break;
+        case 'Enter': // Submit input window
+          printOutput();
+          copyElementContent(output.lastChild); // Redundant auto-copy on frame gen
+          break;
+        case 'Escape': // Clear input window
+          if (windowHasContent) clearWindow();
+          break;
+      }
+    }
   </script>
 </html>
