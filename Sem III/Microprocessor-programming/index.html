@@ -266,9 +266,7 @@
 
       navigator.clipboard
         .writeText(clickedElementContent)
-        .then(() => {
-          console.log('Element content copied to clipboard!');
-        })
+        .then(showCopiedOverlay(element))
         .catch((error) => {
           console.error(error, 'Failed to copy element content.');
         });
