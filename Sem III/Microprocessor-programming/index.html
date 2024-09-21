@@ -128,6 +128,14 @@
       .footer-author-link:hover {
         color: var(--btn-bg-highlight-color);
       }
+
+      /* Copied Frame Overlay Styles */
+      .copied-overlay {
+        position: absolute;
+        z-index: 1000;
+        opacity: 0.987;
+        transition: opacity 0.5s ease;
+      }
     </style>
   </head>
   <body>
@@ -264,6 +272,51 @@
         .catch((error) => {
           console.error(error, 'Failed to copy element content.');
         });
+    }
+
+    /**
+     * Adds an overlay above the copied (clicked) element. There can only
+     * be one overlay at a time, so if a previous overlay is still present,
+     * it will be removed from the DOM.
+     *
+     * @param {Element} element - The currently copied element.
+     * @returns {void}
+     */
+    function showCopiedOverlay(element) {
+      const previousOverlay = document.querySelector('img.copied-overlay');
+      if (previousOverlay) previousOverlay.remove(); // Clear previous overlay
+
+      const overlay = document.createElement('img');
+      const overlayWidth = 100;
+      const overlayHeight = 59;
+
+      // Set attributes for the copied overlay SVG
+      overlay.setAttribute('src', 'copied-overlay.svg');
+      overlay.setAttribute('alt', 'copied-overlay.svg');
+      overlay.setAttribute('class', 'copied-overlay');
+      overlay.setAttribute('width', `${overlayWidth}px`);
+      overlay.setAttribute('height', `${overlayHeight}px`);
+
+      // Get the position and the dimensions of the copied frame
+      const frameRect = element.getBoundingClientRect();
+
+      // Align and center the copied overlay above copied frame
+      overlay.style.left = `${
+        frameRect.left + window.scrollX + frameRect.width / 2 - overlayWidth / 2
+      }px`;
+      overlay.style.top = `${
+        frameRect.top + window.scrollY - overlayHeight + 12
+      }px`;
+
+      document.body.appendChild(overlay);
+
+      // Remove the overlay after a 2sec delay
+      showCopiedOverlayTimeout = setTimeout(() => {
+        overlay.style.opacity = 0;
+        setTimeout(() => overlay.remove(), 500);
+      }, 2000);
+
+      clearTimeout(showCopiedOverlay);
     }
 
     document.addEventListener('keydown', (e) => {
