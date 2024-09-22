@@ -21,6 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+
 #include "string.h"
 /* USER CODE END Includes */
 
@@ -69,7 +71,57 @@ static void MX_USART3_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void receive_frame(uint8_t *sender_address, uint8_t *data)
+/**
+ * Computes the MODBUS CRC-16 value for a given frame data.
+ *
+ * This function calculates a 16-bit CRC checksum for the frame data part
+ * using the MODBUS CRC-16 algorithm with the polynomial 0xA001.
+ *
+ * @param frame_data A pointer to the data to compute the CRC on.
+ * @param data_length The length of the data over which to compute the CRC.
+ * @returns A 16-bit CRC value computed over the input data.
+ */
+uint16_t compute_CRC(uint8_t *frame_data, uint16_t data_length)
+{
+	uint16_t crc = 0xffff;
+	uint16_t byte_index = 0;
+
+	while (byte_index != data_length)
+	{
+		crc ^= *frame_data;
+		for (uint8_t i = 0; i < 8; i++) // For each bit of the byte
+		{
+			if (crc & 0x0001)
+			{
+				crc >>= 1;
+				crc ^= 0xA001;
+			}
+			else
+			{
+				crc >>= 1;
+			}
+		}
+		frame_data++; // Move to next byte
+		byte_index++;
+	}
+
+	return crc;
+}
+
+/**
+ * Receives and validates a communication frame from the UART buffer.
+ *
+ * This function processes the incoming UART data, checks for valid frame format,
+ * applies escape character sequences, verifies if the frame is meant for this
+ * device based on the address, and validates the CRC checksum. If the frame is
+ * valid, it extracts the sender's address and the data payload into the provided
+ * arrays. Invalid frames are skipped.
+ *
+ * @param sender_address A pointer to a buffer for storing the sender's address from the frame.
+ * @param data A pointer to a buffer for storing the extracted data payload from the frame.
+ * @returns 1 if the frame is valid and processed successfully, 0 otherwise.
+ */
+uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
 {
 	static uint8_t tmp[MAX_FRAME_LEN];
 	static uint16_t index = 0;
@@ -147,15 +199,41 @@ void receive_frame(uint8_t *sender_address, uint8_t *data)
 				continue;
 			}
 
+			// Skip the frame on invalid CRC value
+			uint8_t *crc_value_ptr = &tmp[frame_length - 6]; // CRC value length (5) + frame end character (1)
+
+			// Compute the CRC value based on received frame's data
+			uint8_t *data_value_ptr = &tmp[7];
+			uint16_t data_part_length = frame_length - 13;
+			uint16_t computed_crc = compute_CRC(data_value_ptr, data_part_length);
+
+			// Convert computed CRC to char array for value comparison
+			uint8_t crc_string[6];
+			sprintf((char *)crc_string, "%05d", computed_crc);
+
+			for (uint8_t i = 0; i < 5; i++)
+			{
+				if (*crc_value_ptr < '0' || *crc_value_ptr > '9')
+				{
+					continue; // Skip the frame if CRC character is not a number
+				}
+				else if (*crc_value_ptr != crc_string[i])
+				{
+					continue; // Skip the frame if the CRC doesn't match
+				}
+				crc_value_ptr++;
+			}
+
 			// DEBUG: Toggle LED on valid frame
 			HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
-			index = 0; // Reset -- restart frame collection
+			return 1;
 		}
 		else if (++index >= MAX_FRAME_LEN)
 		{
 			index = 0;
 		}
 	}
+	return 0;
 }
 /* USER CODE END 0 */
 
