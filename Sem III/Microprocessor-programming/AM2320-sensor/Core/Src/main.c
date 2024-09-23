@@ -224,6 +224,14 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
 				crc_value_ptr++;
 			}
 
+			// Copy the frame data part to the data array
+			for (uint16_t i = 0; i < data_part_length; i++)
+			{
+				data[i] = *data_value_ptr; // Assign value at the memory address to the data array
+				data_value_ptr++; // Move to the next memory address
+			}
+			data[data_part_length] = '\0'; // Null-terminate the char array at the last index of the data
+
 			// DEBUG: Toggle LED on valid frame
 			HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
 			return 1;
