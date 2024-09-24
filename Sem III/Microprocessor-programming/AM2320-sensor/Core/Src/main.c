@@ -57,7 +57,7 @@ volatile uint16_t UART3_Tx_Busy = 0;      // TX buffer in progress index
 volatile uint16_t UART3_Rx_Empty = 0;     // RX buffer complete index
 volatile uint16_t UART3_Rx_Busy = 0;      // RX buffer in progress index
 
-const uint8_t DEVICE_ADDRESS[3] = {'S', 'T', 'M'};
+const uint8_t DEVICE_ADDRESS[4] = "STM";
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
