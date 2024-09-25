@@ -34,7 +34,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define MAX_FRAME_LEN 50
-#define MIN_FRAME_LEN 11 // Frame length of a valid frame with an empty body
+#define MIN_FRAME_LEN 13 // Frame length of a valid frame with an empty body
 #define UART3_TX_BUF_LEN 50
 #define UART3_RX_BUF_LEN 50
 /* USER CODE END PD */
