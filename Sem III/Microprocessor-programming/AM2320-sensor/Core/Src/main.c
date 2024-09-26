@@ -247,6 +247,79 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
 	}
 	return 0;
 }
++void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
+{
+	uint16_t frame_length = strlen((char *)data) + MIN_FRAME_LEN; // Data length + other frame characters (13)
+	uint8_t frame[frame_length + 3]; // Add (3) indexes for the special characters at the end of the frame
+	uint16_t index = 0;
+
+	// Cast the uint16_t CRC value to a uint8_t array
+	uint8_t crc_string[6];
+	sprintf((char *)crc_string, "%05d", crc_value);
+
+	// Define pointers for easier data assignment in arrays
+	const uint8_t *device_address_ptr = DEVICE_ADDRESS;
+	uint8_t *crc_string_ptr = crc_string;
+
+	// Create the communication frame
+	frame[index++] = '['; // Add frame start character
+	while (index < frame_length - 1) // Subtract (1) to omit copying the '\0' from the CRC string
+	{
+		if (index < 4) // Fill the sender address (STM)
+		{
+			frame[index++] = *device_address_ptr;
+			device_address_ptr++;
+		}
+		else if (index < 7) // Fill the recipient address
+		{
+			frame[index++] = *recipient_address;
+			recipient_address++;
+		}
+		else if (index < (frame_length - 6)) // Fill the data part
+		{
+			frame[index++] = *data;
+			data++;
+		}
+		else // Fill the CRC value
+		{
+			frame[index++] = *crc_string_ptr;
+			crc_string_ptr++;
+		}
+	}
+	frame[index++] = ']'; // Add frame end character
+	frame[index++] = '\r'; // Add the carriage return character
+	frame[index++] = '\n'; // Add the newline character
+	frame[index++] = '\0'; // Null-terminate the frame
+
+	// Push the frame to the UART TX buffer
+	volatile uint16_t copy_index = UART3_Tx_Empty;
+	for (uint16_t i = 0; i < index; i++)
+	{
+		UART3_Tx_Buf[copy_index] = frame[i];
+		if (++copy_index >= UART3_TX_BUF_LEN)
+		{
+			copy_index= 0;
+		}
+	}
+	__disable_irq();
+
+	// Transmit the frame from the TX buffer
+	if (UART3_Tx_Empty == UART3_Tx_Busy && __HAL_UART_GET_FLAG(&huart3, UART_FLAG_TXE == SET))
+	{
+		UART3_Tx_Empty = copy_index;
+		uint8_t tmp = UART3_Tx_Buf[UART3_Tx_Busy];
+		if (++UART3_Tx_Busy >= UART3_TX_BUF_LEN)
+		{
+			UART3_Tx_Busy = 0;
+		}
+		HAL_UART_Transmit_IT(&huart3, &tmp, 1);
+	}
+	else
+	{
+		UART3_Tx_Empty = copy_index;
+	}
+	__enable_irq();
+}
 /* USER CODE END 0 */
 
 /**
