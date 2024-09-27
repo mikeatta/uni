@@ -247,7 +247,22 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
 	}
 	return 0;
 }
-+void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
+
+/**
+ * Sends a formatted communication frame over UART from the STM32 device.
+ *
+ * This function creates a communication frame that includes the sender address,
+ * recipient address, data payload, and CRC value, encapsulated within start ('[')
+ * and end (']') characters. It also appends the carriage return and newline characters
+ * at the end of the frame for line termination. The frame is then transferred to the
+ * UART TX buffer, and the UART transmission is initiated using interrupt communication.
+ *
+ * @param recipient_address A pointer to the buffer containing the recipient address.
+ * @param data A pointer to the buffer containing the data payload to be sent.
+ * @param crc_value The CRC value (checksum) to be included in the frame.
+ * @returns void Currently, the function does not return the transmission status.
+ */
+void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
 {
 	uint16_t frame_length = strlen((char *)data) + MIN_FRAME_LEN; // Data length + other frame characters (13)
 	uint8_t frame[frame_length + 3]; // Add (3) indexes for the special characters at the end of the frame
