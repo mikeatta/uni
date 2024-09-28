@@ -382,7 +382,13 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  receive_frame(sender_address, data);
+	  uint8_t frame_received = receive_frame(sender_address, data);
+	  if (frame_received)
+	  {
+		  // Get CRC value from the data
+		  uint16_t crc_value = compute_CRC(data, strlen((char *)data));
+		  send_frame(sender_address, data, crc_value);
+	  }
   }
   /* USER CODE END 3 */
 }
