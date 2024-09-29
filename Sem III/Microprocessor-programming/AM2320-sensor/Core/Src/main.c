@@ -83,7 +83,7 @@ static void MX_USART3_UART_Init(void);
  */
 uint16_t compute_CRC(uint8_t *frame_data, uint16_t data_length)
 {
-	uint16_t crc = 0xffff;
+	uint16_t crc = 0xFFFF;
 	uint16_t byte_index = 0;
 
 	while (byte_index != data_length)
