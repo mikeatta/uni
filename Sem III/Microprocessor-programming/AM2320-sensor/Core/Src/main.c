@@ -338,6 +338,41 @@ void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
 	}
 	__enable_irq();
 }
+
+HAL_StatusTypeDef AM2320_ReadSensorData(uint8_t sensor_address, uint8_t *sensor_data)
+{
+	HAL_StatusTypeDef ret; // Value returned from HAL_I2C status checks
+	uint8_t registers[3] = { 0x03, 0x00, 0x04 }; // Function code + 1st register address + number of registers to read
+
+	// Send empty frame to wake up the sensor
+	ret = HAL_I2C_Master_Transmit(&hi2c1, sensor_address, 0x00, 0, 50);
+	if (ret != HAL_OK) return ret;
+
+	HAL_Delay(1); // >= 800µs wait before further communication, as per the AM2320 datasheet
+
+	// Verify if the sensor has waken up
+	ret = HAL_I2C_IsDeviceReady(&hi2c1, sensor_address, 1, 50);
+	if (ret != HAL_OK) return ret;
+
+	// Host sends a request for the data
+	ret = HAL_I2C_Master_Transmit(&hi2c1, sensor_address, registers, 3, 50);
+	if (ret != HAL_OK) return ret;
+
+	HAL_Delay(2);
+
+	// Host reads the requested data
+	ret = HAL_I2C_Master_Receive(&hi2c1, sensor_address, sensor_data, 8, 100);
+	if (ret != HAL_OK) return ret;
+
+	// Verify the data was passed to the STM's sensor data array
+	if (sensor_data[0] != 0x03 || sensor_data[1] != 0x04)
+	{
+		// Sensor should've returned the [0] function code and the [1] data length
+		return HAL_ERROR;
+	}
+
+	return ret;
+}
 /* USER CODE END 0 */
 
 /**
