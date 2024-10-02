@@ -373,6 +373,38 @@ HAL_StatusTypeDef AM2320_ReadSensorData(uint8_t sensor_address, uint8_t *sensor_
 
 	return ret;
 }
+
+void AM2320_ProcessSensorData(uint8_t *sensor_data, float temperature, float humidity)
+{
+	uint16_t rcrc = sensor_data[7] << 8 | sensor_data[6];
+	uint16_t sensor_data_crc = compute_CRC(sensor_data, 6); // Compute the CRC based on the first 6 bytes of data
+
+	// Verify the received data is correct
+	if (sensor_data_crc != rcrc)
+	{
+		send_frame((uint8_t *)"PC1", (uint8_t *)"SENSOR_CRC_ERR", compute_CRC((uint8_t *)"SENSOR_CRC_ERR", strlen("SENSOR_CRC_ERR")));
+		return;
+	}
+
+	// Begin processing the data
+	uint16_t tmp_temp = sensor_data[5] | sensor_data[4] << 8;
+	uint16_t tmp_hum = sensor_data[3] | sensor_data[2] << 8;
+
+	// For negative temperature reads
+	if (tmp_temp & 0x8000)
+	{
+		// MSB set means that the temperature is negative -- convert the value
+		tmp_temp = -(int16_t)tmp_temp & 0x7FFF;
+	}
+	else
+	{
+		tmp_temp = (int16_t)tmp_temp;
+	}
+
+	// Pass the sensor data to the function parameters
+	temperature = (float)tmp_temp / 10.0f;
+	humidity = (float)tmp_hum / 10.0f;
+}
 /* USER CODE END 0 */
 
 /**
