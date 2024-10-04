@@ -429,6 +429,11 @@ int main(void)
   /* USER CODE BEGIN Init */
   uint8_t sender_address[4];
   uint8_t data[MAX_FRAME_LEN];
+
+  uint8_t am2320_address = 0xB8;
+  uint8_t sensor_data[8];
+  float temperature = 0.0;
+  float humidity = 0.0;
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -459,6 +464,49 @@ int main(void)
 		  // Get CRC value from the data
 		  uint16_t crc_value = compute_CRC(data, strlen((char *)data));
 		  send_frame(sender_address, data, crc_value);
+	  }
+
+	  if (AM2320_ReadSensorData(am2320_address, sensor_data) == HAL_OK)
+	  {
+		  // Process the sensor data and get float values
+		  AM2320_ProcessSensorData(sensor_data, &temperature, &humidity);
+
+		  // Descriptions for the sensor data
+		  uint8_t tmp_temp_desc[7] = "TEMP: ";
+		  uint8_t tmp_hum_desc[6] = "HUM: ";
+
+		  // Sensor output buffers for the 'X.XX' format
+		  uint8_t tmp_char_temp[5];
+		  uint8_t tmp_char_hum[5];
+
+		  sprintf((char *)tmp_char_temp, "%.1f", temperature);
+		  sprintf((char *)tmp_char_hum, "%.1f", humidity);
+
+		  uint8_t sensor_read_output[21]; // Total size of tmp arrays - x3 skipped '\0's + final '\0' at the end of the array
+		  uint8_t index = 0;
+
+		  // Construct the final output array by concatenating the string arrays
+		  memcpy(&sensor_read_output[index], tmp_temp_desc, sizeof(tmp_temp_desc) - 1); // Skip the null terminator
+		  index += sizeof(tmp_temp_desc) - 1;
+
+		  memcpy(&sensor_read_output[index], tmp_char_temp, sizeof(tmp_char_temp) - 1); // Skip the null terminator
+		  index += sizeof(tmp_char_temp) - 1;
+
+		  sensor_read_output[index++] = ' '; // Add a space separator
+
+		  memcpy(&sensor_read_output[index], tmp_hum_desc, sizeof(tmp_hum_desc) - 1); // Skip the null terminator
+		  index += sizeof(tmp_hum_desc) - 1;
+
+		  memcpy(&sensor_read_output[index], tmp_char_hum, sizeof(tmp_char_hum)); // Copy the null terminator
+		  index += sizeof(tmp_char_hum);
+
+		  uint16_t crc_value = compute_CRC(sensor_read_output, index);
+		  send_frame((uint8_t *)"PC1", sensor_read_output, crc_value);
+	  }
+	  else
+	  {
+		  uint16_t crc_value = compute_CRC((uint8_t *)"AM2320_READ_ERROR", strlen("AM2320_READ_ERROR"));
+		  send_frame((uint8_t *)"PC1", (uint8_t *)"AM2320_READ_ERROR", crc_value);
 	  }
   }
   /* USER CODE END 3 */
