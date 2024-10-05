@@ -405,6 +405,42 @@ void AM2320_ProcessSensorData(uint8_t *sensor_data, float *temperature, float *h
 	*temperature = (float)tmp_temp / 10.0f;
 	*humidity = (float)tmp_hum / 10.0f;
 }
+
+void AM2320_SendSensorDataFrame(uint8_t *recipient, float temperature, float humidity)
+{
+	  // Descriptions for the sensor data
+	  uint8_t tmp_temp_desc[7] = "TEMP: ";
+	  uint8_t tmp_hum_desc[6] = "HUM: ";
+
+	  // Sensor output buffers for the 'X.XX' format
+	  uint8_t tmp_char_temp[5];
+	  uint8_t tmp_char_hum[5];
+
+	  // TODO: Replace 'sprintf' [float --> char] formatting with a more optimized method
+	  sprintf((char *)tmp_char_temp, "%.1f", temperature);
+	  sprintf((char *)tmp_char_hum, "%.1f", humidity);
+
+	  uint8_t sensor_read_output[21]; // Total size of tmp arrays - x3 skipped '\0's + final '\0' at the end of the array
+	  uint8_t index = 0;
+
+	  // Construct the final output array by concatenating the string arrays
+	  memcpy(&sensor_read_output[index], tmp_temp_desc, sizeof(tmp_temp_desc) - 1); // Skip the null terminator
+	  index += sizeof(tmp_temp_desc) - 1;
+
+	  memcpy(&sensor_read_output[index], tmp_char_temp, sizeof(tmp_char_temp) - 1); // Skip the null terminator
+	  index += sizeof(tmp_char_temp) - 1;
+
+	  sensor_read_output[index++] = ' '; // Add a space separator
+
+	  memcpy(&sensor_read_output[index], tmp_hum_desc, sizeof(tmp_hum_desc) - 1); // Skip the null terminator
+	  index += sizeof(tmp_hum_desc) - 1;
+
+	  memcpy(&sensor_read_output[index], tmp_char_hum, sizeof(tmp_char_hum)); // Copy the null terminator
+	  index += sizeof(tmp_char_hum);
+
+	  uint16_t crc_value = compute_CRC(sensor_read_output, index);
+	  send_frame(recipient, sensor_read_output, crc_value);
+}
 /* USER CODE END 0 */
 
 /**
@@ -471,37 +507,8 @@ int main(void)
 		  // Process the sensor data and get float values
 		  AM2320_ProcessSensorData(sensor_data, &temperature, &humidity);
 
-		  // Descriptions for the sensor data
-		  uint8_t tmp_temp_desc[7] = "TEMP: ";
-		  uint8_t tmp_hum_desc[6] = "HUM: ";
-
-		  // Sensor output buffers for the 'X.XX' format
-		  uint8_t tmp_char_temp[5];
-		  uint8_t tmp_char_hum[5];
-
-		  sprintf((char *)tmp_char_temp, "%.1f", temperature);
-		  sprintf((char *)tmp_char_hum, "%.1f", humidity);
-
-		  uint8_t sensor_read_output[21]; // Total size of tmp arrays - x3 skipped '\0's + final '\0' at the end of the array
-		  uint8_t index = 0;
-
-		  // Construct the final output array by concatenating the string arrays
-		  memcpy(&sensor_read_output[index], tmp_temp_desc, sizeof(tmp_temp_desc) - 1); // Skip the null terminator
-		  index += sizeof(tmp_temp_desc) - 1;
-
-		  memcpy(&sensor_read_output[index], tmp_char_temp, sizeof(tmp_char_temp) - 1); // Skip the null terminator
-		  index += sizeof(tmp_char_temp) - 1;
-
-		  sensor_read_output[index++] = ' '; // Add a space separator
-
-		  memcpy(&sensor_read_output[index], tmp_hum_desc, sizeof(tmp_hum_desc) - 1); // Skip the null terminator
-		  index += sizeof(tmp_hum_desc) - 1;
-
-		  memcpy(&sensor_read_output[index], tmp_char_hum, sizeof(tmp_char_hum)); // Copy the null terminator
-		  index += sizeof(tmp_char_hum);
-
-		  uint16_t crc_value = compute_CRC(sensor_read_output, index);
-		  send_frame((uint8_t *)"PC1", sensor_read_output, crc_value);
+		  // Return sensor data via an STM32 frame
+		  AM2320_SendSensorDataFrame((uint8_t *)"PC1", temperature, humidity);
 	  }
 	  else
 	  {
