@@ -24,6 +24,7 @@
 #include <stdio.h>
 
 #include "string.h"
+#include "math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -416,9 +417,22 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, float temperature, float hum
 	  uint8_t tmp_char_temp[5];
 	  uint8_t tmp_char_hum[5];
 
-	  // TODO: Replace 'sprintf' [float --> char] formatting with a more optimized method
-	  sprintf((char *)tmp_char_temp, "%.1f", temperature);
-	  sprintf((char *)tmp_char_hum, "%.1f", humidity);
+	  // Manually convert the float values to integers
+	  int16_t int_temp = (int16_t)floor(temperature);
+	  int16_t frac_temp = (int16_t)((temperature - int_temp) * 10);
+
+	  int16_t int_hum = (int16_t)floor(humidity);
+	  int16_t frac_hum = (int16_t)((humidity - int_hum) * 10);
+
+	  // Check if 'snprintf()' returned encoding errors or had written an invalid amount of characters
+	  uint8_t char_array_length = 5;
+	  uint8_t ret;
+
+	  ret = snprintf((char *)tmp_char_temp, char_array_length, "%d.%d", int_temp, frac_temp);
+	  if (ret < 0 || ret >= char_array_length) return;
+
+	  ret = snprintf((char *)tmp_char_hum, char_array_length, "%d.%d", int_hum, frac_hum);
+	  if (ret < 0 || ret >= char_array_length) return;
 
 	  uint8_t sensor_read_output[21]; // Total size of tmp arrays - x3 skipped '\0's + final '\0' at the end of the array
 	  uint8_t index = 0;
