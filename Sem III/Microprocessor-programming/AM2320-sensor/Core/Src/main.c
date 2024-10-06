@@ -346,20 +346,19 @@ HAL_StatusTypeDef AM2320_ReadSensorData(uint8_t sensor_address, uint8_t *sensor_
 	uint8_t registers[3] = { 0x03, 0x00, 0x04 }; // Function code + 1st register address + number of registers to read
 
 	// Send empty frame to wake up the sensor
-	ret = HAL_I2C_Master_Transmit(&hi2c1, sensor_address, 0x00, 0, 50);
-	if (ret != HAL_OK) return ret;
+	HAL_I2C_Master_Transmit(&hi2c1, sensor_address, 0x00, 0, 50);
 
 	HAL_Delay(1); // >= 800µs wait before further communication, as per the AM2320 datasheet
 
 	// Verify if the sensor has waken up
-	ret = HAL_I2C_IsDeviceReady(&hi2c1, sensor_address, 1, 50);
+	ret = HAL_I2C_IsDeviceReady(&hi2c1, sensor_address, 3, 50);
 	if (ret != HAL_OK) return ret;
 
 	// Host sends a request for the data
 	ret = HAL_I2C_Master_Transmit(&hi2c1, sensor_address, registers, 3, 50);
 	if (ret != HAL_OK) return ret;
 
-	HAL_Delay(2);
+	HAL_Delay(2); // >= 1.5ms wait to let the sensor sample the data
 
 	// Host reads the requested data
 	ret = HAL_I2C_Master_Receive(&hi2c1, sensor_address, sensor_data, 8, 100);
