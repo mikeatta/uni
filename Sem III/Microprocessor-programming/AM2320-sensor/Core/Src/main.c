@@ -502,6 +502,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  static uint32_t systick_delay_counter = 0;
+
   while (1)
   {
     /* USER CODE END WHILE */
@@ -515,18 +517,24 @@ int main(void)
 		  send_frame(sender_address, data, crc_value);
 	  }
 
-	  if (AM2320_ReadSensorData(am2320_address, sensor_data) == HAL_OK)
+	  if ((HAL_GetTick() - systick_delay_counter) >= 500)
 	  {
-		  // Process the sensor data and get float values
-		  AM2320_ProcessSensorData(sensor_data, &temperature, &humidity);
+		  // Update the counter
+		  systick_delay_counter = HAL_GetTick();
 
-		  // Return sensor data via an STM32 frame
-		  AM2320_SendSensorDataFrame((uint8_t *)"PC1", temperature, humidity);
-	  }
-	  else
-	  {
-		  uint16_t crc_value = compute_CRC((uint8_t *)"AM2320_READ_ERROR", strlen("AM2320_READ_ERROR"));
-		  send_frame((uint8_t *)"PC1", (uint8_t *)"AM2320_READ_ERROR", crc_value);
+		  if (AM2320_ReadSensorData(am2320_address, sensor_data) == HAL_OK)
+		  {
+			  // Process the sensor data and get float values
+			  AM2320_ProcessSensorData(sensor_data, &temperature, &humidity);
+
+			  // Return sensor data via an STM32 frame
+			  AM2320_SendSensorDataFrame((uint8_t *)"PC1", temperature, humidity);
+		  }
+		  else if (AM2320_ReadSensorData(am2320_address, sensor_data) == HAL_ERROR)
+		  {
+			  uint16_t crc_value = compute_CRC((uint8_t *)"AM2320_READ_ERROR", strlen("AM2320_READ_ERROR"));
+			  send_frame((uint8_t *)"PC1", (uint8_t *)"AM2320_READ_ERROR", crc_value);
+		  }
 	  }
   }
   /* USER CODE END 3 */
