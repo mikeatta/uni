@@ -29,7 +29,15 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef enum {
+	AM2320_STATE_WAKE_SENSOR,
+	AM2320_STATE_WAIT_WAKE,
+	AM2320_STATE_SEND_REQUEST,
+	AM2320_STATE_WAIT_SAMPLE,
+	AM2320_STATE_READ_DATA,
+	AM2320_STATE_DONE,
+	AM2320_STATE_ERROR
+} AM2320_State;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -343,35 +351,70 @@ void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
 HAL_StatusTypeDef AM2320_ReadSensorData(uint8_t sensor_address, uint8_t *sensor_data)
 {
 	HAL_StatusTypeDef ret; // Value returned from HAL_I2C status checks
-	uint8_t registers[3] = { 0x03, 0x00, 0x04 }; // Function code + 1st register address + number of registers to read
+	static AM2320_State am2320_state = AM2320_STATE_WAKE_SENSOR;
+	static uint32_t am2320_delay_timer; // Non-blocking delay tick counter
 
-	// Send empty frame to wake up the sensor
-	HAL_I2C_Master_Transmit(&hi2c1, sensor_address, 0x00, 0, 50);
-
-	HAL_Delay(1); // >= 800µs wait before further communication, as per the AM2320 datasheet
-
-	// Verify if the sensor has waken up
-	ret = HAL_I2C_IsDeviceReady(&hi2c1, sensor_address, 3, 50);
-	if (ret != HAL_OK) return ret;
-
-	// Host sends a request for the data
-	ret = HAL_I2C_Master_Transmit(&hi2c1, sensor_address, registers, 3, 50);
-	if (ret != HAL_OK) return ret;
-
-	HAL_Delay(2); // >= 1.5ms wait to let the sensor sample the data
-
-	// Host reads the requested data
-	ret = HAL_I2C_Master_Receive(&hi2c1, sensor_address, sensor_data, 8, 100);
-	if (ret != HAL_OK) return ret;
-
-	// Verify the data was passed to the STM's sensor data array
-	if (sensor_data[0] != 0x03 || sensor_data[1] != 0x04)
+	switch (am2320_state)
 	{
-		// Sensor should've returned the [0] function code and the [1] data length
+	case AM2320_STATE_WAKE_SENSOR:
+		HAL_I2C_Master_Transmit(&hi2c1, sensor_address, 0x00, 0, 50); // Send empty frame to wake up the sensor
+		am2320_delay_timer = HAL_GetTick(); // Store current tick value
+		am2320_state = AM2320_STATE_WAIT_WAKE; // Move to the next state
+		break;
+	case AM2320_STATE_WAIT_WAKE:
+		if ((HAL_GetTick() - am2320_delay_timer) >= 1) // >= 800µs wait before further communication, as per the AM2320 datasheet
+		{
+			ret = HAL_I2C_IsDeviceReady(&hi2c1, sensor_address, 3, 50); // Verify if the sensor has waken up
+			if (ret != HAL_OK)
+			{
+				am2320_state = AM2320_STATE_ERROR; // Set error state if sensor does not respond
+			}
+			else
+			{
+				am2320_state = AM2320_STATE_SEND_REQUEST; // Move to the next state
+			}
+		}
+		break;
+	case AM2320_STATE_SEND_REQUEST:
+		uint8_t registers[3] = { 0x03, 0x00, 0x04 }; // Function code + 1st register address + number of registers to read
+		ret = HAL_I2C_Master_Transmit(&hi2c1, sensor_address, registers, 3, 50); // Host sends a request for the data
+		if (ret != HAL_OK)
+		{
+			am2320_state = AM2320_STATE_ERROR;
+		}
+		else
+		{
+			am2320_state = AM2320_STATE_WAIT_SAMPLE; // Move to the next state
+		}
+		break;
+	case AM2320_STATE_WAIT_SAMPLE:
+		if ((HAL_GetTick() - am2320_delay_timer) >= 2) // >= 1.5ms wait to let the sensor sample the data
+		{
+			am2320_state = AM2320_STATE_READ_DATA; // Move to the next state
+		}
+		break;
+	case AM2320_STATE_READ_DATA:
+		ret = HAL_I2C_Master_Receive(&hi2c1, sensor_address, sensor_data, 8, 100); // Host reads the requested data
+		if (ret != HAL_OK || sensor_data[0] != 0x03 || sensor_data[1] != 0x04) // Verify the data was passed to the STM's sensor data array
+		{
+			am2320_state = AM2320_STATE_ERROR;
+		}
+		else
+		{
+			am2320_state = AM2320_STATE_DONE;
+		}
+		break;
+	case AM2320_STATE_DONE:
+		am2320_state = AM2320_STATE_WAKE_SENSOR;
+		return HAL_OK;
+		break;
+	case AM2320_STATE_ERROR:
+		am2320_state = AM2320_STATE_WAKE_SENSOR;
 		return HAL_ERROR;
+		break;
 	}
 
-	return ret;
+	return HAL_BUSY;
 }
 
 void AM2320_ProcessSensorData(uint8_t *sensor_data, float *temperature, float *humidity)
