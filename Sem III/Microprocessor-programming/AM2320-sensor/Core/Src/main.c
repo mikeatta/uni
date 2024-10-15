@@ -69,6 +69,11 @@ volatile uint16_t UART3_Rx_Empty = 0;     // RX buffer complete index
 volatile uint16_t UART3_Rx_Busy = 0;      // RX buffer in progress index
 
 const uint8_t DEVICE_ADDRESS[4] = "STM";
+
+uint8_t sensor_address = 0xB8;
+uint8_t sensor_data[8];
+
+AM2320_State am2320_state = AM2320_STATE_IDLE;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -348,73 +353,16 @@ void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
 	__enable_irq();
 }
 
-HAL_StatusTypeDef AM2320_ReadSensorData(uint8_t sensor_address, uint8_t *sensor_data)
+void AM2320_InitSensorRead(void)
 {
-	HAL_StatusTypeDef ret; // Value returned from HAL_I2C status checks
-	static AM2320_State am2320_state = AM2320_STATE_WAKE_SENSOR;
-	static uint32_t am2320_delay_timer; // Non-blocking delay tick counter
-
-	switch (am2320_state)
+	if (am2320_state == AM2320_STATE_IDLE)
 	{
-	case AM2320_STATE_WAKE_SENSOR:
-		HAL_I2C_Master_Transmit(&hi2c1, sensor_address, 0x00, 0, 50); // Send empty frame to wake up the sensor
-		am2320_delay_timer = HAL_GetTick(); // Store current tick value
-		am2320_state = AM2320_STATE_WAIT_WAKE; // Move to the next state
-		break;
-	case AM2320_STATE_WAIT_WAKE:
-		if ((HAL_GetTick() - am2320_delay_timer) >= 1) // >= 800µs wait before further communication, as per the AM2320 datasheet
-		{
-			ret = HAL_I2C_IsDeviceReady(&hi2c1, sensor_address, 3, 50); // Verify if the sensor has waken up
-			if (ret != HAL_OK)
-			{
-				am2320_state = AM2320_STATE_ERROR; // Set error state if sensor does not respond
-			}
-			else
-			{
-				am2320_state = AM2320_STATE_SEND_REQUEST; // Move to the next state
-			}
-		}
-		break;
-	case AM2320_STATE_SEND_REQUEST:
-		uint8_t registers[3] = { 0x03, 0x00, 0x04 }; // Function code + 1st register address + number of registers to read
-		ret = HAL_I2C_Master_Transmit(&hi2c1, sensor_address, registers, 3, 50); // Host sends a request for the data
-		if (ret != HAL_OK)
-		{
-			am2320_state = AM2320_STATE_ERROR;
-		}
-		else
-		{
-			am2320_state = AM2320_STATE_WAIT_SAMPLE; // Move to the next state
-		}
-		break;
-	case AM2320_STATE_WAIT_SAMPLE:
-		if ((HAL_GetTick() - am2320_delay_timer) >= 2) // >= 1.5ms wait to let the sensor sample the data
-		{
-			am2320_state = AM2320_STATE_READ_DATA; // Move to the next state
-		}
-		break;
-	case AM2320_STATE_READ_DATA:
-		ret = HAL_I2C_Master_Receive(&hi2c1, sensor_address, sensor_data, 8, 100); // Host reads the requested data
-		if (ret != HAL_OK || sensor_data[0] != 0x03 || sensor_data[1] != 0x04) // Verify the data was passed to the STM's sensor data array
-		{
-			am2320_state = AM2320_STATE_ERROR;
-		}
-		else
-		{
-			am2320_state = AM2320_STATE_DONE;
-		}
-		break;
-	case AM2320_STATE_DONE:
-		am2320_state = AM2320_STATE_WAKE_SENSOR;
-		return HAL_OK;
-		break;
-	case AM2320_STATE_ERROR:
-		am2320_state = AM2320_STATE_WAKE_SENSOR;
-		return HAL_ERROR;
-		break;
+		HAL_I2C_Master_Transmit_IT(&hi2c1, sensor_address, 0x00, 0); // Send empty frame to wake the sensor
+		am2320_state = AM2320_STATE_AWAIT_WAKEUP;
+		return;
 	}
 
-	return HAL_BUSY;
+	am2320_state = AM2320_STATE_IDLE;
 }
 
 void AM2320_ProcessSensorData(uint8_t *sensor_data, float *temperature, float *humidity)
@@ -522,8 +470,6 @@ int main(void)
   uint8_t sender_address[4];
   uint8_t data[MAX_FRAME_LEN];
 
-  uint8_t am2320_address = 0xB8;
-  uint8_t sensor_data[8];
   float temperature = 0.0;
   float humidity = 0.0;
   /* USER CODE END Init */
@@ -560,25 +506,8 @@ int main(void)
 		  send_frame(sender_address, data, crc_value);
 	  }
 
-	  if ((HAL_GetTick() - systick_delay_counter) >= 500)
-	  {
-		  // Update the counter
-		  systick_delay_counter = HAL_GetTick();
-
-		  if (AM2320_ReadSensorData(am2320_address, sensor_data) == HAL_OK)
-		  {
-			  // Process the sensor data and get float values
-			  AM2320_ProcessSensorData(sensor_data, &temperature, &humidity);
-
-			  // Return sensor data via an STM32 frame
-			  AM2320_SendSensorDataFrame((uint8_t *)"PC1", temperature, humidity);
-		  }
-		  else if (AM2320_ReadSensorData(am2320_address, sensor_data) == HAL_ERROR)
-		  {
-			  uint16_t crc_value = compute_CRC((uint8_t *)"AM2320_READ_ERROR", strlen("AM2320_READ_ERROR"));
-			  send_frame((uint8_t *)"PC1", (uint8_t *)"AM2320_READ_ERROR", crc_value);
-		  }
-	  }
+	  // Debug: Sensor interrupt mode
+	  AM2320_InitSensorRead();
   }
   /* USER CODE END 3 */
 }
@@ -595,7 +524,7 @@ void SystemClock_Config(void)
   /** Configure the main internal regulator output voltage
   */
   __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -603,8 +532,21 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 216;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 2;
+  RCC_OscInitStruct.PLL.PLLR = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Activate the Over-Drive mode
+  */
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
@@ -613,12 +555,12 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV8;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7) != HAL_OK)
   {
     Error_Handler();
   }
@@ -640,7 +582,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x00303D5B;
+  hi2c1.Init.Timing = 0x00606A9B;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -720,6 +662,7 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
@@ -764,6 +707,14 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			UART3_Rx_Empty = 0;
 		}
 		HAL_UART_Receive_IT(&huart3, &UART3_Rx_Buf[UART3_Rx_Empty], 1);
+	}
+}
+
+void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+	if (hi2c == &hi2c1)
+	{
+		HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
 	}
 }
 /* USER CODE END 4 */
