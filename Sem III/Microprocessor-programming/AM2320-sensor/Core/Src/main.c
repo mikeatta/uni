@@ -72,8 +72,11 @@ const uint8_t DEVICE_ADDRESS[4] = "STM";
 
 uint8_t sensor_address = 0xB8;
 uint8_t sensor_data[8];
+uint8_t data_ready = 0;
 
 AM2320_State am2320_state = AM2320_STATE_IDLE;
+volatile HAL_StatusTypeDef ret;
+volatile uint32_t tick_delay = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -357,14 +360,42 @@ void AM2320_InitSensorRead(void)
 {
 	if (am2320_state == AM2320_STATE_IDLE)
 	{
-		HAL_I2C_Master_Transmit_IT(&hi2c1, sensor_address, 0x00, 0); // Send empty frame to wake the sensor
-		am2320_state = AM2320_STATE_AWAIT_WAKEUP;
+		ret = HAL_I2C_Master_Transmit_IT(&hi2c1, sensor_address, 0x00, 0); // Send empty frame to wake the sensor
+		if (ret != HAL_OK)
+		{
+			HAL_I2C_Master_Abort_IT(&hi2c1, sensor_address);
+			am2320_state = AM2320_STATE_IDLE;
+			return;
+		}
+		tick_delay = HAL_GetTick() + 2;
+		am2320_state = AM2320_STATE_SEND_COMMAND;
 		return;
 	}
-
-	am2320_state = AM2320_STATE_IDLE;
 }
 
+void AM2320_ReadSensorData(void)
+{
+	if (am2320_state == AM2320_STATE_SEND_COMMAND && (HAL_GetTick() >= tick_delay))
+	{
+		uint8_t registers[3] = { 0x03, 0x00, 0x04 };
+		ret = HAL_I2C_Master_Transmit_IT(&hi2c1, sensor_address, registers, 3);
+		if (ret != HAL_OK)
+		{
+			HAL_I2C_Master_Abort_IT(&hi2c1, sensor_address);
+			am2320_state = AM2320_STATE_IDLE;
+			return;
+		}
+		tick_delay = HAL_GetTick() + 3;
+		return;
+	}
+	else if (am2320_state == AM2320_STATE_READ_DATA && (HAL_GetTick() >= tick_delay))
+	{
+		tick_delay = HAL_GetTick() + 3000;
+		am2320_state = AM2320_STATE_IDLE;
+		return;
+	}
+}
+^M
 void AM2320_ProcessSensorData(uint8_t *sensor_data, float *temperature, float *humidity)
 {
 	uint16_t rcrc = sensor_data[7] << 8 | sensor_data[6];
@@ -491,8 +522,6 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  static uint32_t systick_delay_counter = 0;
-
   while (1)
   {
     /* USER CODE END WHILE */
@@ -507,7 +536,27 @@ int main(void)
 	  }
 
 	  // Debug: Sensor interrupt mode
+	  if (HAL_GetTick() <= tick_delay)
+	  {
+		  continue;
+	  }
+
 	  AM2320_InitSensorRead();
+
+	  AM2320_ReadSensorData();
+
+	  if (data_ready == 1)
+      {
+          // Sensor data successfully read, process the data
+          AM2320_ProcessSensorData(sensor_data, &temperature, &humidity);
+
+          // Send the sensor data back
+          AM2320_SendSensorDataFrame((uint8_t *)"PC1", temperature, humidity);
+
+          data_ready = 0;
+          am2320_state = AM2320_STATE_IDLE;
+          tick_delay = HAL_GetTick() + 3000;
+      }
   }
   /* USER CODE END 3 */
 }
@@ -714,7 +763,35 @@ void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 	if (hi2c == &hi2c1)
 	{
-		HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+		if (am2320_state == AM2320_STATE_SEND_COMMAND)
+		{
+			HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+			am2320_state = AM2320_STATE_READ_DATA;
+		}
+		else
+		{
+			am2320_state = AM2320_STATE_IDLE;
+		}
+	}
+}
+
+void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+    if (hi2c == &hi2c1)
+    {
+	static uint8_t read_retries = 0;
+^M
+		if (sensor_data[0] == 0x03 && sensor_data[1] == 0x04)
+		{
+			data_ready = 1;
+		}
+		else if (read_retries <= 3)
+		{
+			read_retries++; // Retry 3 times
+			return;
+		}
+		read_retries = 0;
+		am2320_state = AM2320_STATE_IDLE;
 	}
 }
 /* USER CODE END 4 */
