@@ -390,8 +390,14 @@ void AM2320_ReadSensorData(void)
 	}
 	else if (am2320_state == AM2320_STATE_READ_DATA && (HAL_GetTick() >= tick_delay))
 	{
-		tick_delay = HAL_GetTick() + 3000;
-		am2320_state = AM2320_STATE_IDLE;
+		ret = HAL_I2C_Master_Receive_IT(&hi2c1, sensor_address, sensor_data, 8);
+		if (ret != HAL_OK)
+		{
+			HAL_I2C_Master_Abort_IT(&hi2c1, sensor_address);
+			am2320_state = AM2320_STATE_IDLE;
+			return;
+		}
+		tick_delay = HAL_GetTick() + 3;
 		return;
 	}
 }
@@ -765,7 +771,6 @@ void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 	{
 		if (am2320_state == AM2320_STATE_SEND_COMMAND)
 		{
-			HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
 			am2320_state = AM2320_STATE_READ_DATA;
 		}
 		else
@@ -779,9 +784,9 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     if (hi2c == &hi2c1)
     {
-	static uint8_t read_retries = 0;
-^M
-		if (sensor_data[0] == 0x03 && sensor_data[1] == 0x04)
+		static uint8_t read_retries = 0;
+
+		if (am2320_state == AM2320_STATE_READ_DATA && (sensor_data[0] == 0x03 && sensor_data[1] == 0x04))
 		{
 			data_ready = 1;
 		}
