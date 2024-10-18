@@ -25,19 +25,12 @@
 
 #include "string.h"
 #include "math.h"
+#include "am2320_it.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef enum {
-	AM2320_STATE_WAKE_SENSOR,
-	AM2320_STATE_WAIT_WAKE,
-	AM2320_STATE_SEND_REQUEST,
-	AM2320_STATE_WAIT_SAMPLE,
-	AM2320_STATE_READ_DATA,
-	AM2320_STATE_DONE,
-	AM2320_STATE_ERROR
-} AM2320_State;
+AM2320_HandleTypeDef am2320;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -70,13 +63,10 @@ volatile uint16_t UART3_Rx_Busy = 0;      // RX buffer in progress index
 
 const uint8_t DEVICE_ADDRESS[4] = "STM";
 
-uint8_t sensor_address = 0xB8;
-uint8_t sensor_data[8];
-uint8_t data_ready = 0;
-
 AM2320_State am2320_state = AM2320_STATE_IDLE;
-volatile HAL_StatusTypeDef ret;
-volatile uint32_t tick_delay = 0;
+HAL_StatusTypeDef ret;
+uint32_t tick_delay;
+uint8_t data_ready = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -92,44 +82,7 @@ static void MX_I2C1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 /**
- * Computes the MODBUS CRC-16 value for a given frame data.
- *
- * This function calculates a 16-bit CRC checksum for the frame data part
- * using the MODBUS CRC-16 algorithm with the polynomial 0xA001.
- *
- * @param frame_data A pointer to the data to compute the CRC on.
- * @param data_length The length of the data over which to compute the CRC.
- * @returns A 16-bit CRC value computed over the input data.
- */
-uint16_t compute_CRC(uint8_t *frame_data, uint16_t data_length)
-{
-	uint16_t crc = 0xFFFF;
-	uint16_t byte_index = 0;
-
-	while (byte_index != data_length)
-	{
-		crc ^= *frame_data;
-		for (uint8_t i = 0; i < 8; i++) // For each bit of the byte
-		{
-			if (crc & 0x0001)
-			{
-				crc >>= 1;
-				crc ^= 0xA001;
-			}
-			else
-			{
-				crc >>= 1;
-			}
-		}
-		frame_data++; // Move to next byte
-		byte_index++;
-	}
-
-	return crc;
-}
-
-/**
- * Receives and validates a communication frame from the UART buffer.
+ * @brief Receives and validates a communication frame from the UART buffer.
  *
  * This function processes the incoming UART data, checks for valid frame format,
  * applies escape character sequences, verifies if the frame is meant for this
@@ -269,7 +222,7 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
 }
 
 /**
- * Sends a formatted communication frame over UART from the STM32 device.
+ * @brief Sends a formatted communication frame over UART from the STM32 device.
  *
  * This function creates a communication frame that includes the sender address,
  * recipient address, data payload, and CRC value, encapsulated within start ('[')
@@ -354,84 +307,6 @@ void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
 		UART3_Tx_Empty = copy_index;
 	}
 	__enable_irq();
-}
-
-void AM2320_InitSensorRead(void)
-{
-	if (am2320_state == AM2320_STATE_IDLE)
-	{
-		ret = HAL_I2C_Master_Transmit_IT(&hi2c1, sensor_address, 0x00, 0); // Send empty frame to wake the sensor
-		if (ret != HAL_OK)
-		{
-			HAL_I2C_Master_Abort_IT(&hi2c1, sensor_address);
-			am2320_state = AM2320_STATE_IDLE;
-			return;
-		}
-		tick_delay = HAL_GetTick() + 2;
-		am2320_state = AM2320_STATE_SEND_COMMAND;
-		return;
-	}
-}
-
-void AM2320_ReadSensorData(void)
-{
-	if (am2320_state == AM2320_STATE_SEND_COMMAND && (HAL_GetTick() >= tick_delay))
-	{
-		uint8_t registers[3] = { 0x03, 0x00, 0x04 };
-		ret = HAL_I2C_Master_Transmit_IT(&hi2c1, sensor_address, registers, 3);
-		if (ret != HAL_OK)
-		{
-			HAL_I2C_Master_Abort_IT(&hi2c1, sensor_address);
-			am2320_state = AM2320_STATE_IDLE;
-			return;
-		}
-		tick_delay = HAL_GetTick() + 3;
-		return;
-	}
-	else if (am2320_state == AM2320_STATE_READ_DATA && (HAL_GetTick() >= tick_delay))
-	{
-		ret = HAL_I2C_Master_Receive_IT(&hi2c1, sensor_address, sensor_data, 8);
-		if (ret != HAL_OK)
-		{
-			HAL_I2C_Master_Abort_IT(&hi2c1, sensor_address);
-			am2320_state = AM2320_STATE_IDLE;
-			return;
-		}
-		tick_delay = HAL_GetTick() + 3;
-		return;
-	}
-}
-^M
-void AM2320_ProcessSensorData(uint8_t *sensor_data, float *temperature, float *humidity)
-{
-	uint16_t rcrc = sensor_data[7] << 8 | sensor_data[6];
-	uint16_t sensor_data_crc = compute_CRC(sensor_data, 6); // Compute the CRC based on the first 6 bytes of data
-
-	// Verify the received data is correct
-	if (sensor_data_crc != rcrc)
-	{
-		send_frame((uint8_t *)"PC1", (uint8_t *)"SENSOR_CRC_ERR", compute_CRC((uint8_t *)"SENSOR_CRC_ERR", strlen("SENSOR_CRC_ERR")));
-		return;
-	}
-
-	// Begin processing the data
-	uint16_t tmp_temp = sensor_data[5] | sensor_data[4] << 8;
-	uint16_t tmp_hum = sensor_data[3] | sensor_data[2] << 8;
-
-	// For negative temperature reads
-	if (tmp_temp & 0x8000)
-	{
-		// MSB set means that the temperature is negative -- convert the value
-		tmp_temp = -(int16_t)tmp_temp & 0x7FFF;
-	}
-	else
-	{
-		tmp_temp = (int16_t)tmp_temp;
-	}
-
-	// Pass the sensor data to the function parameters
-	*temperature = (float)tmp_temp / 10.0f;
-	*humidity = (float)tmp_hum / 10.0f;
 }
 
 void AM2320_SendSensorDataFrame(uint8_t *recipient, float temperature, float humidity)
@@ -524,6 +399,7 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart3, &UART3_Rx_Buf[UART3_Rx_Empty], 1);
+  am2320 = AM2320_Init(&hi2c1, AM2320_ADDRESS);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -547,14 +423,14 @@ int main(void)
 		  continue;
 	  }
 
-	  AM2320_InitSensorRead();
+	  AM2320_InitSensorRead(&am2320);
 
-	  AM2320_ReadSensorData();
+	  AM2320_ReadSensorData(&am2320);
 
 	  if (data_ready == 1)
       {
           // Sensor data successfully read, process the data
-          AM2320_ProcessSensorData(sensor_data, &temperature, &humidity);
+          AM2320_ProcessSensorData(&am2320, &temperature, &humidity);
 
           // Send the sensor data back
           AM2320_SendSensorDataFrame((uint8_t *)"PC1", temperature, humidity);
@@ -786,7 +662,7 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
     {
 		static uint8_t read_retries = 0;
 
-		if (am2320_state == AM2320_STATE_READ_DATA && (sensor_data[0] == 0x03 && sensor_data[1] == 0x04))
+		if (am2320_state == AM2320_STATE_READ_DATA && (am2320.sensor_data[0] == 0x03 && am2320.sensor_data[1] == 0x04))
 		{
 			data_ready = 1;
 		}
