@@ -15,12 +15,10 @@
  * @param  sensor_address A uint8_t value representing the sensor's address.
  * @retval AM2320_HandleTypeDef handle
  */
-AM2320_HandleTypeDef AM2320_Init(I2C_HandleTypeDef *hi2c, uint8_t sensor_address)
+void AM2320_Init(AM2320_HandleTypeDef *am2320, I2C_HandleTypeDef *hi2c, uint8_t sensor_address)
 {
-	AM2320_HandleTypeDef am2320;
-	am2320.hi2c = hi2c;
-	am2320.sensor_address = sensor_address;
-	return am2320;
+	am2320->hi2c = hi2c;
+	am2320->sensor_address = sensor_address;
 }
 
 /**

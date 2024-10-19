@@ -34,7 +34,7 @@ extern HAL_StatusTypeDef ret;
 extern uint32_t tick_delay;
 
 // Function declarations
-AM2320_HandleTypeDef AM2320_Init(I2C_HandleTypeDef *hi2c, uint8_t sensor_address);
+void AM2320_Init(AM2320_HandleTypeDef *am2320, I2C_HandleTypeDef *hi2c, uint8_t sensor_address);
 void AM2320_InitSensorRead(AM2320_HandleTypeDef *am2320);
 void AM2320_ReadSensorData(AM2320_HandleTypeDef *am2320);
 void AM2320_ProcessSensorData(AM2320_HandleTypeDef *am2320, float *temperature, float *humidity);
