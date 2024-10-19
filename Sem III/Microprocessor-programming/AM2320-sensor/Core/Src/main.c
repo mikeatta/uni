@@ -399,7 +399,7 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart3, &UART3_Rx_Buf[UART3_Rx_Empty], 1);
-  am2320 = AM2320_Init(&hi2c1, AM2320_ADDRESS);
+  AM2320_Init(&am2320, &hi2c1, AM2320_ADDRESS);
   /* USER CODE END 2 */
 
   /* Infinite loop */
