@@ -82,7 +82,7 @@ static void MX_I2C1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 /**
- * @brief Receives and validates a communication frame from the UART buffer.
+ * @brief  Receives and validates a communication frame from the UART buffer.
  *
  * This function processes the incoming UART data, checks for valid frame format,
  * applies escape character sequences, verifies if the frame is meant for this
@@ -90,9 +90,9 @@ static void MX_I2C1_Init(void);
  * valid, it extracts the sender's address and the data payload into the provided
  * arrays. Invalid frames are skipped.
  *
- * @param sender_address A pointer to a buffer for storing the sender's address from the frame.
- * @param data A pointer to a buffer for storing the extracted data payload from the frame.
- * @returns 1 if the frame is valid and processed successfully, 0 otherwise.
+ * @param  sender_address Pointer to a buffer for storing the sender's address from the frame.
+ * @param  data Pointer to a buffer for storing the extracted data payload from the frame.
+ * @retval 1 if the frame is valid and processed successfully, 0 otherwise
  */
 uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
 {
@@ -222,7 +222,7 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
 }
 
 /**
- * @brief Sends a formatted communication frame over UART from the STM32 device.
+ * @brief  Sends a formatted communication frame over UART from the STM32 device.
  *
  * This function creates a communication frame that includes the sender address,
  * recipient address, data payload, and CRC value, encapsulated within start ('[')
@@ -230,10 +230,10 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
  * at the end of the frame for line termination. The frame is then transferred to the
  * UART TX buffer, and the UART transmission is initiated using interrupt communication.
  *
- * @param recipient_address A pointer to the buffer containing the recipient address.
- * @param data A pointer to the buffer containing the data payload to be sent.
- * @param crc_value The CRC value (checksum) to be included in the frame.
- * @returns void Currently, the function does not return the transmission status.
+ * @param  recipient_address Pointer to the buffer containing the recipient address.
+ * @param  data Pointer to the buffer containing the data payload to be sent.
+ * @param  crc_value The 16-bit CRC value.
+ * @retval None
  */
 void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
 {
