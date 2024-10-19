@@ -40,9 +40,10 @@ void AM2320_InitSensorRead(AM2320_HandleTypeDef *am2320)
 		{
 			HAL_I2C_Master_Abort_IT(am2320->hi2c, am2320->sensor_address);
 			am2320_state = AM2320_STATE_IDLE;
+			tick_delay = HAL_GetTick() + 1;
 			return;
 		}
-		tick_delay = HAL_GetTick() + 2;
+		tick_delay = HAL_GetTick() + 1;
 		am2320_state = AM2320_STATE_SEND_COMMAND;
 		return;
 	}
