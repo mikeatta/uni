@@ -418,7 +418,7 @@ int main(void)
 	  }
 
 	  // Debug: Sensor interrupt mode
-	  if (HAL_GetTick() <= tick_delay)
+	  if (tick_delay != 0 && HAL_GetTick() <= tick_delay)
 	  {
 		  continue;
 	  }
@@ -660,13 +660,13 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     if (hi2c == &hi2c1)
     {
-		static uint8_t read_retries = 0;
+    	static uint8_t read_retries = 0;
 
 		if (am2320_state == AM2320_STATE_READ_DATA && (am2320.sensor_data[0] == 0x03 && am2320.sensor_data[1] == 0x04))
 		{
 			data_ready = 1;
 		}
-		else if (read_retries <= 3)
+		else if (read_retries < 3)
 		{
 			read_retries++; // Retry 3 times
 			return;
