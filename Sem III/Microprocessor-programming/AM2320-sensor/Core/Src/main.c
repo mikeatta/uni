@@ -142,11 +142,9 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
 			}
 			else
 			{
-				// Incorrect character in the escape sequence -- reset the frame
-				index = 0;
+				index = 0; // Incorrect character in the escape sequence -- reset the frame
 			}
-			// Turn off special character encoding
-			escape = 0;
+			escape = 0; // Turn off special character encoding
 		}
 		// If character at index is the escape character
 		else if (tmp[index] == '\\')
