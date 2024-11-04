@@ -38,7 +38,7 @@ void AM2320_InitSensorRead(AM2320_HandleTypeDef *am2320)
 		ret = HAL_I2C_Master_Transmit_IT(am2320->hi2c, am2320->sensor_address, 0x00, 0); // Send empty frame to wake the sensor
 		if (ret != HAL_OK)
 		{
-			HAL_I2C_Master_Abort_IT(am2320->hi2c, am2320->sensor_address);
+			ret = HAL_I2C_Master_Abort_IT(am2320->hi2c, am2320->sensor_address);
 			am2320_state = AM2320_STATE_IDLE;
 			tick_delay = HAL_GetTick() + 1;
 			return;
@@ -66,7 +66,7 @@ void AM2320_ReadSensorData(AM2320_HandleTypeDef *am2320)
 		ret = HAL_I2C_Master_Transmit_IT(am2320->hi2c, am2320->sensor_address, registers, 3);
 		if (ret != HAL_OK)
 		{
-			HAL_I2C_Master_Abort_IT(am2320->hi2c, am2320->sensor_address);
+			ret = HAL_I2C_Master_Abort_IT(am2320->hi2c, am2320->sensor_address);
 			am2320_state = AM2320_STATE_IDLE;
 			return;
 		}
@@ -78,7 +78,7 @@ void AM2320_ReadSensorData(AM2320_HandleTypeDef *am2320)
 		ret = HAL_I2C_Master_Receive_IT(am2320->hi2c, am2320->sensor_address, am2320->sensor_data, 8);
 		if (ret != HAL_OK)
 		{
-			HAL_I2C_Master_Abort_IT(am2320->hi2c, am2320->sensor_address);
+			ret = HAL_I2C_Master_Abort_IT(am2320->hi2c, am2320->sensor_address);
 			am2320_state = AM2320_STATE_IDLE;
 			return;
 		}
