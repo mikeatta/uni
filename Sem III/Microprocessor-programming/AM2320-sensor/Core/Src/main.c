@@ -35,10 +35,10 @@ AM2320_HandleTypeDef am2320;
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MAX_FRAME_LEN 50
+#define MAX_FRAME_LEN 513
 #define MIN_FRAME_LEN 13 // Frame length of a valid frame with an empty body
-#define UART3_TX_BUF_LEN 50
-#define UART3_RX_BUF_LEN 50
+#define UART3_TX_BUF_LEN 2052
+#define UART3_RX_BUF_LEN 2052
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -65,7 +65,7 @@ const uint8_t DEVICE_ADDRESS[4] = "STM";
 
 AM2320_State am2320_state = AM2320_STATE_IDLE;
 HAL_StatusTypeDef ret;
-uint32_t tick_delay;
+uint32_t tick_delay = 0;
 uint8_t data_ready = 0;
 /* USER CODE END PV */
 
@@ -410,33 +410,43 @@ int main(void)
 	  uint8_t frame_received = receive_frame(sender_address, data);
 	  if (frame_received)
 	  {
+		  // TODO: Add sensor functions
+		  // Debug: Toggle LED via command
+		  if (data[0] == 'T')
+		  {
+			  HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+		  }
+
 		  // Get CRC value from the data
 		  uint16_t crc_value = compute_CRC(data, strlen((char *)data));
 		  send_frame(sender_address, data, crc_value);
 	  }
 
 	  // Debug: Sensor interrupt mode
-	  if (tick_delay != 0 && HAL_GetTick() <= tick_delay)
+	  uint32_t current_tick = HAL_GetTick();
+	  if (current_tick <= tick_delay)
 	  {
 		  continue;
 	  }
+	  else
+	  {
+		  AM2320_InitSensorRead(&am2320);
 
-	  AM2320_InitSensorRead(&am2320);
+		  AM2320_ReadSensorData(&am2320);
 
-	  AM2320_ReadSensorData(&am2320);
+		  if (data_ready == 1)
+		  {
+			  // Sensor data successfully read, process the data
+			  AM2320_ProcessSensorData(&am2320, &temperature, &humidity);
 
-	  if (data_ready == 1)
-      {
-          // Sensor data successfully read, process the data
-          AM2320_ProcessSensorData(&am2320, &temperature, &humidity);
+			  // Send the sensor data back
+			  AM2320_SendSensorDataFrame((uint8_t *)"PC1", temperature, humidity);
 
-          // Send the sensor data back
-          AM2320_SendSensorDataFrame((uint8_t *)"PC1", temperature, humidity);
-
-          data_ready = 0;
-          am2320_state = AM2320_STATE_IDLE;
-          tick_delay = HAL_GetTick() + 3000;
-      }
+			  data_ready = 0;
+			  am2320_state = AM2320_STATE_IDLE;
+			  tick_delay = HAL_GetTick() + 3000;
+		  }
+	  }
   }
   /* USER CODE END 3 */
 }
