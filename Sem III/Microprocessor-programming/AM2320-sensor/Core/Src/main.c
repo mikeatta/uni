@@ -312,6 +312,18 @@ void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
 	__enable_irq();
 }
 
+/**
+ * @brief  Prepares and sends the formatted sensor reads.
+ *
+ * The function formats the read temperature and humidity values, constructs
+ * and sends the frame with the formatted AM2320 sensor read values to the original
+ * frame sender.
+ *
+ * @param  recipient A pointer to the original frame sender.
+ * @param  temperature A float storing the temperature read value.
+ * @param  humidity A float storing the humidity read value.
+ * @retval None
+ */
 void AM2320_SendSensorDataFrame(uint8_t *recipient, float temperature, float humidity)
 {
 	  // Descriptions for the sensor data
