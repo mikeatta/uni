@@ -31,7 +31,8 @@ typedef enum {
 // External declarations for variables
 extern AM2320_State am2320_state;
 extern HAL_StatusTypeDef ret;
-extern uint32_t tick_delay;
+extern volatile uint8_t delay_elapsed;
+extern TIM_HandleTypeDef htim6;
 
 // Function declarations
 void AM2320_Init(AM2320_HandleTypeDef *am2320, I2C_HandleTypeDef *hi2c, uint8_t sensor_address);
@@ -39,5 +40,6 @@ void AM2320_InitSensorRead(AM2320_HandleTypeDef *am2320);
 void AM2320_ReadSensorData(AM2320_HandleTypeDef *am2320);
 void AM2320_ProcessSensorData(AM2320_HandleTypeDef *am2320, float *temperature, float *humidity);
 uint16_t compute_CRC(uint8_t *frame_data, uint16_t data_length);
+void TIM_StartDelay(uint16_t milliseconds);
 
 #endif /* INC_AM2320_IT_H_ */

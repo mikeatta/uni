@@ -50,6 +50,8 @@ AM2320_HandleTypeDef am2320;
 
 I2C_HandleTypeDef hi2c1;
 
+TIM_HandleTypeDef htim6;
+
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
@@ -67,6 +69,8 @@ AM2320_State am2320_state = AM2320_STATE_IDLE;
 HAL_StatusTypeDef ret;
 uint32_t tick_delay = 0;
 uint8_t data_ready = 0;
+
+volatile uint8_t delay_elapsed = 1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -75,6 +79,7 @@ static void MPU_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_I2C1_Init(void);
+static void MX_TIM6_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -395,6 +400,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   MX_I2C1_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart3, &UART3_Rx_Buf[UART3_Rx_Empty], 1);
   AM2320_Init(&am2320, &hi2c1, AM2320_ADDRESS);
@@ -423,12 +429,7 @@ int main(void)
 	  }
 
 	  // Debug: Sensor interrupt mode
-	  uint32_t current_tick = HAL_GetTick();
-	  if (current_tick <= tick_delay)
-	  {
-		  continue;
-	  }
-	  else
+	  if (delay_elapsed == 1)
 	  {
 		  AM2320_InitSensorRead(&am2320);
 
@@ -444,7 +445,11 @@ int main(void)
 
 			  data_ready = 0;
 			  am2320_state = AM2320_STATE_IDLE;
-			  tick_delay = HAL_GetTick() + 3000;
+
+			  if (htim6.State == HAL_TIM_STATE_READY)
+			  {
+				  TIM_StartDelay(2000);
+			  }
 		  }
 	  }
   }
@@ -554,6 +559,44 @@ static void MX_I2C1_Init(void)
 }
 
 /**
+  * @brief TIM6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM6_Init(void)
+{
+
+  /* USER CODE BEGIN TIM6_Init 0 */
+
+  /* USER CODE END TIM6_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM6_Init 1 */
+
+  /* USER CODE END TIM6_Init 1 */
+  htim6.Instance = TIM6;
+  htim6.Init.Prescaler = 54000-1;
+  htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim6.Init.Period = 1000-1;
+  htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM6_Init 2 */
+
+  /* USER CODE END TIM6_Init 2 */
+
+}
+
+/**
   * @brief USART3 Initialization Function
   * @param None
   * @retval None
@@ -646,6 +689,16 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			UART3_Rx_Empty = 0;
 		}
 		HAL_UART_Receive_IT(&huart3, &UART3_Rx_Buf[UART3_Rx_Empty], 1);
+	}
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if (htim == &htim6)
+	{
+		HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+		delay_elapsed = 1;
+		HAL_TIM_Base_Stop_IT(htim);
 	}
 }
 

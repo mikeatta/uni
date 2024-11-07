@@ -39,14 +39,14 @@ void AM2320_InitSensorRead(AM2320_HandleTypeDef *am2320)
 		if (ret == HAL_OK)
 		{
 			am2320_state = AM2320_STATE_SEND_COMMAND;
-			tick_delay = HAL_GetTick() + 1;
+			TIM_StartDelay(1);
 			return;
 		}
 		else
 		{
 			ret = HAL_I2C_Master_Abort_IT(am2320->hi2c, am2320->sensor_address);
 			am2320_state = AM2320_STATE_IDLE;
-			tick_delay = HAL_GetTick() + 1;
+			TIM_StartDelay(1);
 			return;
 		}
 	}
@@ -63,7 +63,7 @@ void AM2320_InitSensorRead(AM2320_HandleTypeDef *am2320)
  */
 void AM2320_ReadSensorData(AM2320_HandleTypeDef *am2320)
 {
-	if (am2320_state == AM2320_STATE_SEND_COMMAND && (HAL_GetTick() >= tick_delay))
+	if (am2320_state == AM2320_STATE_SEND_COMMAND && (delay_elapsed == 1))
 	{
 		uint8_t registers[3] = { 0x03, 0x00, 0x04 };
 		ret = HAL_I2C_Master_Transmit_IT(am2320->hi2c, am2320->sensor_address, registers, 3);
@@ -71,23 +71,23 @@ void AM2320_ReadSensorData(AM2320_HandleTypeDef *am2320)
 		{
 			ret = HAL_I2C_Master_Abort_IT(am2320->hi2c, am2320->sensor_address);
 			am2320_state = AM2320_STATE_IDLE;
-			tick_delay = HAL_GetTick() + 1;
+			TIM_StartDelay(2);
 			return;
 		}
-		tick_delay = HAL_GetTick() + 1;
+		TIM_StartDelay(1);
 		return;
 	}
-	else if (am2320_state == AM2320_STATE_READ_DATA && (HAL_GetTick() >= tick_delay))
+	else if (am2320_state == AM2320_STATE_READ_DATA && (delay_elapsed == 1))
 	{
 		ret = HAL_I2C_Master_Receive_IT(am2320->hi2c, am2320->sensor_address, am2320->sensor_data, 8);
 		if (ret != HAL_OK)
 		{
 			ret = HAL_I2C_Master_Abort_IT(am2320->hi2c, am2320->sensor_address);
 			am2320_state = AM2320_STATE_IDLE;
-			tick_delay = HAL_GetTick() + 1;
+			TIM_StartDelay(1);
 			return;
 		}
-		tick_delay = HAL_GetTick() + 1;
+		TIM_StartDelay(1);
 		return;
 	}
 }
@@ -170,4 +170,22 @@ uint16_t compute_CRC(uint8_t *frame_data, uint16_t data_length)
 	}
 
 	return crc;
+}
+
+/**
+ * @brief  Sets a new timer timeout.
+ *
+ * The function starts a new interrupt delay with the value provided in the function
+ * parameters. It resets the current clock counter, and sets the timer auto-reload
+ * value to the provided value.
+ *
+ * @param  milliseconds Delay timeout in milliseconds.
+ * @retval None
+ */
+void TIM_StartDelay(uint16_t milliseconds)
+{
+	__HAL_TIM_SET_COUNTER(&htim6, 0); // Reset current timer count
+	__HAL_TIM_SET_AUTORELOAD(&htim6, milliseconds); // Set new 'count up-to' value
+	delay_elapsed = 0; // Reset 'time elapsed' flag
+	HAL_TIM_Base_Start_IT(&htim6); // Start the timer
 }
