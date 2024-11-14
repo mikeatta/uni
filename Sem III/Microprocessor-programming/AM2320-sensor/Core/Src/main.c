@@ -71,6 +71,7 @@ uint32_t tick_delay = 0;
 uint8_t data_ready = 0;
 
 volatile uint8_t delay_elapsed = 1;
+volatile uint8_t sensor_active = 1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -432,12 +433,19 @@ int main(void)
 		  // Debug: Toggle LED via command
 		  if (data[0] == 'T')
 		  {
-			  HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+			  HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+			  sensor_active = !sensor_active;
 		  }
 
 		  // Get CRC value from the data
 		  uint16_t crc_value = compute_CRC(data, strlen((char *)data));
 		  send_frame(sender_address, data, crc_value);
+	  }
+
+	  // Return to the beginning of the loop if the sensor is idle
+	  if (sensor_active == 0)
+	  {
+		  continue;
 	  }
 
 	  // Debug: Sensor interrupt mode
@@ -458,10 +466,11 @@ int main(void)
 			  data_ready = 0;
 			  am2320_state = AM2320_STATE_IDLE;
 
-			  if (htim6.State == HAL_TIM_STATE_READY)
+			  if (htim6.State != HAL_TIM_STATE_READY)
 			  {
-				  TIM_StartDelay(2000);
+				  HAL_TIM_Base_Stop_IT(&htim6); // Manually stop the timer
 			  }
+			  TIM_StartDelay(2000); // Start a 2sec read delay
 		  }
 	  }
   }
@@ -655,19 +664,19 @@ static void MX_GPIO_Init(void)
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, LED_RED_Pin|LED_BLUE_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : LED_BLUE_Pin */
-  GPIO_InitStruct.Pin = LED_BLUE_Pin;
+  /*Configure GPIO pins : LED_RED_Pin LED_BLUE_Pin */
+  GPIO_InitStruct.Pin = LED_RED_Pin|LED_BLUE_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED_BLUE_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
