@@ -373,6 +373,55 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, float temperature, float hum
 	  uint16_t crc_value = compute_CRC(sensor_read_output, index);
 	  send_frame(recipient, sensor_read_output, crc_value);
 }
+
+/**
+ * @brief  Reads and executes the command sent in the data part of the frame.
+ *
+ * This function searches for available command substrings within the passed data array.
+ * If a command is found it is immediately executed within the loop. After command execution,
+ * the function continues to look for the next command until it reaches the end of data array.
+ *
+ * @param  frame_data A pointer to the array containing the commands.
+ * @param  data_length Amount of characters to read from the data array.
+ * @retval None
+ */
+void process_command(uint8_t *frame_data, uint16_t data_length)
+{
+	// Define available commands in char array format for later comparison
+	const char *available_commands[] = { "START", "STOP" };
+	uint8_t command_count = sizeof(available_commands) / sizeof(available_commands[0]);
+	uint8_t command_found = 0;
+
+	const char *index = (const char *)frame_data;
+	const char *frame_data_end = (const char *)frame_data + data_length;
+
+	while (index != frame_data_end)
+	{
+		for (uint8_t i = 0; i < command_count; i++)
+		{
+			const char *match = strstr(index, available_commands[i]);
+			if (match && *(match + strlen((const char *)available_commands[i])) == ';')
+			{
+				index = match + strlen((const char *)available_commands[i]) + 1;
+				command_found = 1;
+				if (strncmp(available_commands[i], "START", strlen("START")) == 0)
+				{
+					HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, 0); // Debug: Turn OFF RED LED
+					sensor_active = 1;
+				}
+				else if (strncmp(available_commands[i], "STOP", strlen("STOP")) == 0)
+				{
+					HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, 1); // Debug: Turn ON RED LED
+					sensor_active = 0;
+				}
+			}
+		}
+		if (command_found == 0)
+		{
+			return; // None of the available commands were a substring of the frame_data array
+		}
+	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -430,6 +479,8 @@ int main(void)
 	  if (frame_received)
 	  {
 		  // TODO: Add sensor functions
+		  process_command(data, strlen((const char *)data));
+
 		  // Debug: Toggle LED via command
 		  if (data[0] == 'T')
 		  {
