@@ -385,7 +385,7 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, float temperature, float hum
  * @param  data_length Amount of characters to read from the data array.
  * @retval None
  */
-void process_command(uint8_t *frame_data, uint16_t data_length)
+void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t data_length)
 {
 	// Define available commands in char array format for later comparison
 	const char *available_commands[] = { "START", "STOP" };
@@ -408,17 +408,25 @@ void process_command(uint8_t *frame_data, uint16_t data_length)
 				{
 					HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, 0); // Debug: Turn OFF RED LED
 					sensor_active = 1;
+					uint16_t crc_value = compute_CRC((uint8_t *)"SENSOR: STARTED", strlen("SENSOR: STARTED"));
+					send_frame(recipient_address, (uint8_t *)"SENSOR: STARTED", crc_value);
 				}
 				else if (strncmp(available_commands[i], "STOP", strlen("STOP")) == 0)
 				{
 					HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, 1); // Debug: Turn ON RED LED
 					sensor_active = 0;
+					uint16_t crc_value = compute_CRC((uint8_t *)"SENSOR: STOPPED", strlen("SENSOR: STOPPED"));
+					send_frame(recipient_address, (uint8_t *)"SENSOR: STOPPED", crc_value);
 				}
 			}
 		}
 		if (command_found == 0)
 		{
 			return; // None of the available commands were a substring of the frame_data array
+		}
+		else
+		{
+			command_found = 0; // Reset command found flag -- prevents from getting stuck in an infinite loop
 		}
 	}
 }
@@ -479,18 +487,7 @@ int main(void)
 	  if (frame_received)
 	  {
 		  // TODO: Add sensor functions
-		  process_command(data, strlen((const char *)data));
-
-		  // Debug: Toggle LED via command
-		  if (data[0] == 'T')
-		  {
-			  HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
-			  sensor_active = !sensor_active;
-		  }
-
-		  // Get CRC value from the data
-		  uint16_t crc_value = compute_CRC(data, strlen((char *)data));
-		  send_frame(sender_address, data, crc_value);
+		  process_command(sender_address, data, strlen((const char *)data));
 	  }
 
 	  // Return to the beginning of the loop if the sensor is idle
