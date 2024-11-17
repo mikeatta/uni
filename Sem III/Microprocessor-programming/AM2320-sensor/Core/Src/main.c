@@ -381,6 +381,7 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, float temperature, float hum
  * If a command is found it is immediately executed within the loop. After command execution,
  * the function continues to look for the next command until it reaches the end of data array.
  *
+ * @param  recipient_address A pointer to the array containing the frame sender's address.
  * @param  frame_data A pointer to the array containing the commands.
  * @param  data_length Amount of characters to read from the data array.
  * @retval None
