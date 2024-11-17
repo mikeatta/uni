@@ -71,7 +71,8 @@ uint32_t tick_delay = 0;
 uint8_t data_ready = 0;
 
 volatile uint8_t delay_elapsed = 1;
-volatile uint8_t sensor_active = 1;
+volatile uint8_t sensor_active = 0;
+volatile uint8_t sensor_read_data = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -516,7 +517,10 @@ int main(void)
 			  AM2320_ProcessSensorData(&am2320, &temperature, &humidity);
 
 			  // Send the sensor data back
-			  AM2320_SendSensorDataFrame((uint8_t *)"PC1", temperature, humidity);
+			  if (sensor_read_data == 1)
+			  {
+				  AM2320_SendSensorDataFrame((uint8_t *)"PC1", temperature, humidity);
+			  }
 
 			  data_ready = 0;
 			  am2320_state = AM2320_STATE_IDLE;
