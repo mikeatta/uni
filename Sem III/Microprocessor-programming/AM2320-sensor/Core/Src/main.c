@@ -388,23 +388,36 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, float temperature, float hum
  */
 void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t data_length)
 {
-	// Define available commands in char array format for later comparison
+	// Define available commands in char array format for string value comparison
 	const char *available_commands[] = { "START", "STOP" };
 	uint8_t command_count = sizeof(available_commands) / sizeof(available_commands[0]);
-	uint8_t command_found = 0;
 
-	const char *index = (const char *)frame_data;
-	const char *frame_data_end = (const char *)frame_data + data_length;
+	uint8_t tmp_command[data_length]; // Temporary array for processing commands in FIFO order
+	uint16_t tmp_command_idx = 0;
 
-	while (index != frame_data_end)
+	const char *index = (const char *)&tmp_command; // Checkpoint index for command processing
+
+	// Exit early without processing data
+	if (data_length < 5)
 	{
+		return; // Shortest valid command needs at least 5 characters
+	}
+	else if (!strstr((const char *)frame_data, (const char *)";"))
+	{
+		return; // No command end character found -- no valid command in data array
+	}
+
+	while (tmp_command_idx <= data_length)
+	{
+		// Compare every available command with the current content of tmp_command array
 		for (uint8_t i = 0; i < command_count; i++)
 		{
+			// Look for a matching command string from the previous index, onwards
 			const char *match = strstr(index, available_commands[i]);
 			if (match && *(match + strlen((const char *)available_commands[i])) == ';')
 			{
-				index = match + strlen((const char *)available_commands[i]) + 1;
-				command_found = 1;
+				// Save the index of the last found command -- prevents from 'finding' the same command twice
+				index = match + strlen((const char *)available_commands[i]) + 1; // Shift the index past the ';' char
 				if (strncmp(available_commands[i], "START", strlen("START")) == 0)
 				{
 					HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, 0); // Debug: Turn OFF RED LED
@@ -421,14 +434,7 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 				}
 			}
 		}
-		if (command_found == 0)
-		{
-			return; // None of the available commands were a substring of the frame_data array
-		}
-		else
-		{
-			command_found = 0; // Reset command found flag -- prevents from getting stuck in an infinite loop
-		}
+		tmp_command[tmp_command_idx++] = *(frame_data++); // Copy next character to the temporary array
 	}
 }
 /* USER CODE END 0 */
@@ -497,7 +503,7 @@ int main(void)
 		  continue;
 	  }
 
-	  // Debug: Sensor interrupt mode
+	  // AM2320 sensor reads
 	  if (delay_elapsed == 1)
 	  {
 		  AM2320_InitSensorRead(&am2320);
