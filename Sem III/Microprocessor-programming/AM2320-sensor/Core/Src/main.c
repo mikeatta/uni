@@ -390,7 +390,7 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, float temperature, float hum
 void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t data_length)
 {
 	// Define available commands in char array format for string value comparison
-	const char *available_commands[] = { "START", "STOP" };
+	const char *available_commands[] = { "START", "STOP", "READ" };
 	uint8_t command_count = sizeof(available_commands) / sizeof(available_commands[0]);
 
 	uint8_t tmp_command[data_length]; // Temporary array for processing commands in FIFO order
@@ -432,6 +432,11 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					sensor_active = 0;
 					uint16_t crc_value = compute_CRC((uint8_t *)"SENSOR: STOPPED", strlen("SENSOR: STOPPED"));
 					send_frame(recipient_address, (uint8_t *)"SENSOR: STOPPED", crc_value);
+				}
+				else if (strncmp(available_commands[i], "READ", strlen("READ")) == 0)
+				{
+					HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin); // Debug: Toggle GREEN LED
+					sensor_read_data = !sensor_read_data; // Toggle displaying the data
 				}
 			}
 		}
@@ -728,10 +733,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LED_RED_Pin|LED_BLUE_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, LED_GREEN_Pin|LED_RED_Pin|LED_BLUE_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : LED_RED_Pin LED_BLUE_Pin */
-  GPIO_InitStruct.Pin = LED_RED_Pin|LED_BLUE_Pin;
+  /*Configure GPIO pins : LED_GREEN_Pin LED_RED_Pin LED_BLUE_Pin */
+  GPIO_InitStruct.Pin = LED_GREEN_Pin|LED_RED_Pin|LED_BLUE_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
