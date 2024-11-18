@@ -135,15 +135,15 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
 		// If the current character is the escape character, encode the following characters
 		if (escape)
 		{
-			if (tmp[index] == '\\')
+			if (tmp[index] == '\\' && index < MAX_FRAME_LEN)
 			{
 				tmp[index++] = '\\';
 			}
-			else if (tmp[index] == '{')
+			else if (tmp[index] == '{' && index < MAX_FRAME_LEN)
 			{
 				tmp[index++] = '[';
 			}
-			else if (tmp[index] == '}')
+			else if (tmp[index] == '}' && index < MAX_FRAME_LEN)
 			{
 				tmp[index++] = ']';
 			}
