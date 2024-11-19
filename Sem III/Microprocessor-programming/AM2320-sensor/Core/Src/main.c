@@ -31,6 +31,11 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 AM2320_HandleTypeDef am2320;
+
+typedef struct {
+	float temperature;
+	float humidity;
+} AM2320_Data;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -73,6 +78,9 @@ uint8_t data_ready = 0;
 volatile uint8_t delay_elapsed = 1;
 volatile uint8_t sensor_active = 0;
 volatile uint8_t sensor_read_data = 0;
+
+AM2320_Data AM2320_Data_Buf[300];
+volatile uint16_t AM2320_Buf_Idx = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -326,53 +334,95 @@ void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
  * @param  humidity A float storing the humidity read value.
  * @retval None
  */
-void AM2320_SendSensorDataFrame(uint8_t *recipient, float temperature, float humidity)
+void AM2320_SendSensorDataFrame(uint8_t *recipient, uint16_t *read_idx, float temperature, float humidity)
 {
-	  // Descriptions for the sensor data
-	  uint8_t tmp_temp_desc[7] = "TEMP: ";
-	  uint8_t tmp_hum_desc[6] = "HUM: ";
+	// Descriptions for the sensor data
+	uint8_t tmp_temp_desc[7] = "TEMP: ";
+	uint8_t tmp_hum_desc[6] = "HUM: ";
 
-	  // Sensor output buffers for the 'X.XX' format
-	  uint8_t tmp_char_temp[5];
-	  uint8_t tmp_char_hum[5];
+	// Sensor output buffers for the 'X.XX' format
+	uint8_t tmp_char_temp[5];
+	uint8_t tmp_char_hum[5];
 
-	  // Manually convert the float values to integers
-	  int16_t int_temp = (int16_t)floor(temperature);
-	  int16_t frac_temp = (int16_t)((temperature - int_temp) * 10);
+	// Manually convert the float values to integers
+	int16_t int_temp = (int16_t)floor(temperature);
+	int16_t frac_temp = (int16_t)((temperature - int_temp) * 10);
 
-	  int16_t int_hum = (int16_t)floor(humidity);
-	  int16_t frac_hum = (int16_t)((humidity - int_hum) * 10);
+	int16_t int_hum = (int16_t)floor(humidity);
+	int16_t frac_hum = (int16_t)((humidity - int_hum) * 10);
 
-	  // Check if 'snprintf()' returned encoding errors or had written an invalid amount of characters
-	  uint8_t char_array_length = 5;
-	  uint8_t ret;
+	// Check if 'snprintf()' returned encoding errors or had written an invalid amount of characters
+	uint8_t char_array_length = 5;
+	uint8_t ret;
 
-	  ret = snprintf((char *)tmp_char_temp, char_array_length, "%d.%d", int_temp, frac_temp);
-	  if (ret < 0 || ret >= char_array_length) return;
+	ret = snprintf((char *)tmp_char_temp, char_array_length, "%d.%d", int_temp, frac_temp);
+	if (ret < 0 || ret >= char_array_length) return;
 
-	  ret = snprintf((char *)tmp_char_hum, char_array_length, "%d.%d", int_hum, frac_hum);
-	  if (ret < 0 || ret >= char_array_length) return;
+	ret = snprintf((char *)tmp_char_hum, char_array_length, "%d.%d", int_hum, frac_hum);
+	if (ret < 0 || ret >= char_array_length) return;
 
-	  uint8_t sensor_read_output[21]; // Total size of tmp arrays - x3 skipped '\0's + final '\0' at the end of the array
-	  uint8_t index = 0;
+	uint8_t sensor_read_output[30]; // Total size of tmp arrays - x4 skipped '\0's + final '\0' at the end of the array
+	uint8_t index = 0;
 
-	  // Construct the final output array by concatenating the string arrays
-	  memcpy(&sensor_read_output[index], tmp_temp_desc, sizeof(tmp_temp_desc) - 1); // Skip the null terminator
-	  index += sizeof(tmp_temp_desc) - 1;
+	// TODO: Validate passed indexes -- 000 would return false, but is a valid index
+	// FIX: Processing stops at 'TEMP: 0.0' for empty data buffers
+	// If requested, prepare the 'IDX' output string
+	if (read_idx != NULL)
+	{
+		uint8_t tmp_idx_desc[6] = "IDX: ";
+		uint8_t tmp_char_idx[4];
+		uint8_t idx_array_length = 4;
 
-	  memcpy(&sensor_read_output[index], tmp_char_temp, sizeof(tmp_char_temp) - 1); // Skip the null terminator
-	  index += sizeof(tmp_char_temp) - 1;
+		ret = snprintf((char *)tmp_char_idx, idx_array_length, "%03d", *read_idx);
+		if (ret < 0 || ret >= idx_array_length) return;
 
-	  sensor_read_output[index++] = ' '; // Add a space separator
+		// Construct the final output array by concatenating the string arrays
+		memcpy(&sensor_read_output[index], tmp_idx_desc, sizeof(tmp_idx_desc) - 1); // Skip the null terminator
+		index += sizeof(tmp_idx_desc) - 1;
 
-	  memcpy(&sensor_read_output[index], tmp_hum_desc, sizeof(tmp_hum_desc) - 1); // Skip the null terminator
-	  index += sizeof(tmp_hum_desc) - 1;
+		memcpy(&sensor_read_output[index], tmp_char_idx, sizeof(tmp_char_idx) - 1); // Skip the null terminator
+		index += sizeof(tmp_char_idx) - 1;
 
-	  memcpy(&sensor_read_output[index], tmp_char_hum, sizeof(tmp_char_hum)); // Copy the null terminator
-	  index += sizeof(tmp_char_hum);
+		sensor_read_output[index++] = ' '; // Add a space separator
+	}
 
-	  uint16_t crc_value = compute_CRC(sensor_read_output, index);
-	  send_frame(recipient, sensor_read_output, crc_value);
+	// Construct the final output array by concatenating the string arrays
+	memcpy(&sensor_read_output[index], tmp_temp_desc, sizeof(tmp_temp_desc) - 1); // Skip the null terminator
+	index += sizeof(tmp_temp_desc) - 1;
+
+	memcpy(&sensor_read_output[index], tmp_char_temp, sizeof(tmp_char_temp) - 1); // Skip the null terminator
+	index += sizeof(tmp_char_temp) - 1;
+
+	sensor_read_output[index++] = ' '; // Add a space separator
+
+	memcpy(&sensor_read_output[index], tmp_hum_desc, sizeof(tmp_hum_desc) - 1); // Skip the null terminator
+	index += sizeof(tmp_hum_desc) - 1;
+
+	memcpy(&sensor_read_output[index], tmp_char_hum, sizeof(tmp_char_hum)); // Copy the null terminator
+	index += sizeof(tmp_char_hum);
+
+	uint16_t crc_value = compute_CRC(sensor_read_output, index);
+	send_frame(recipient, sensor_read_output, crc_value);
+}
+
+uint16_t convert_char_string_to_uint16(uint8_t *string_array, uint16_t string_length)
+{
+	uint16_t decimal_multiplier = 1;
+	uint8_t decimal_point = 0;
+	uint16_t result = 0;
+
+	while (++decimal_point != string_length)
+	{
+		decimal_multiplier *= 10;
+	}
+
+	while (decimal_multiplier != 0)
+	{
+		result += (*string_array++ - '0') * decimal_multiplier;
+		decimal_multiplier /= 10;
+	}
+
+	return result;
 }
 
 /**
@@ -415,7 +465,8 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 		{
 			// Look for a matching command string from the previous index, onwards
 			const char *match = strstr(index, available_commands[i]);
-			if (match && *(match + strlen((const char *)available_commands[i])) == ';')
+			const char *char_after_command_string = match + strlen((const char *)available_commands[i]);
+			if (match && *char_after_command_string == ';')
 			{
 				// Save the index of the last found command -- prevents from 'finding' the same command twice
 				index = match + strlen((const char *)available_commands[i]) + 1; // Shift the index past the ';' char
@@ -437,6 +488,33 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 				{
 					HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin); // Debug: Toggle GREEN LED
 					sensor_read_data = !sensor_read_data; // Toggle displaying the data
+				}
+			else if (match && *char_after_command_string == '|')
+			{
+				if (strncmp(available_commands[i], "READ", strlen("READ")) == 0 && *(char_after_command_string + 4) == ';')
+				{
+					uint8_t tmp_read_param[4];
+					for (uint8_t i = 0; i <= 3; i++)
+					{
+						if ((*(char_after_command_string + 1 - i) > '9') || (*(char_after_command_string + 1 - i) < '0'))
+						{
+							index = char_after_command_string + 6; // Shift the index to move the next command
+							tmp_command_idx += 6;
+							frame_data += 6;
+							break;
+						}
+						tmp_read_param[i] = *(char_after_command_string++ + 1);
+						if (i == 3)
+						{
+							tmp_read_param[i] = '\0'; // Null-terminate the array
+						}
+					}
+
+					// Get data from AM2320 buffer
+					uint16_t buffer_index = convert_char_string_to_uint16(tmp_read_param, strlen((const char *)tmp_read_param));
+					AM2320_Data archived_data = AM2320_Data_Buf[buffer_index];
+
+					AM2320_SendSensorDataFrame(recipient_address, &buffer_index, archived_data.temperature, archived_data.humidity);
 				}
 			}
 		}
@@ -470,6 +548,8 @@ int main(void)
 
   float temperature = 0.0;
   float humidity = 0.0;
+
+  AM2320_Data read_data;
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -521,10 +601,22 @@ int main(void)
 			  // Sensor data successfully read, process the data
 			  AM2320_ProcessSensorData(&am2320, &temperature, &humidity);
 
+			  // Assign read data to a temporary data storage variable
+			  read_data.temperature = temperature;
+			  read_data.humidity = humidity;
+
+			  // Place processed data in the AM2320 data buffer
+			  AM2320_Data_Buf[AM2320_Buf_Idx] = read_data;
+
+			  if (++AM2320_Buf_Idx >= 300)
+			  {
+				  AM2320_Buf_Idx = 0;
+			  }
+
 			  // Send the sensor data back
 			  if (sensor_read_data == 1)
 			  {
-				  AM2320_SendSensorDataFrame((uint8_t *)"PC1", temperature, humidity);
+				  AM2320_SendSensorDataFrame(sender_address, NULL, temperature, humidity);
 			  }
 
 			  data_ready = 0;
