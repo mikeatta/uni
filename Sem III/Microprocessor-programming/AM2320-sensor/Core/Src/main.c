@@ -415,7 +415,7 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, uint16_t *read_idx, float te
  */
 uint16_t convert_char_string_to_uint16(uint8_t *string_array, uint8_t string_length)
 {
-	uint16_t decimal_multiplier = 1 * (10 ** (string_length - 1));
+	uint16_t decimal_multiplier = 1 * pow(10, (string_length - 1));
 	uint16_t result = 0;
 
 	while (decimal_multiplier != 0)
