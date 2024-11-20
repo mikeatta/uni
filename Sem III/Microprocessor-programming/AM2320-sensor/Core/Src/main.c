@@ -406,16 +406,17 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, uint16_t *read_idx, float te
 	send_frame(recipient, sensor_read_output, crc_value);
 }
 
-uint16_t convert_char_string_to_uint16(uint8_t *string_array, uint16_t string_length)
+/**
+ * @brief  Converts the string representation of a digit into an unsigned 16-bit integer.
+ *
+ * @param  string_array A pointer to the string-digit array.
+ * @param  string_length An unsigned int representing the amount of characters to convert.
+ * @retval A 16-bit unsigned integer.
+ */
+uint16_t convert_char_string_to_uint16(uint8_t *string_array, uint8_t string_length)
 {
-	uint16_t decimal_multiplier = 1;
-	uint8_t decimal_point = 0;
+	uint16_t decimal_multiplier = 1 * (10 ** (string_length - 1));
 	uint16_t result = 0;
-
-	while (++decimal_point != string_length)
-	{
-		decimal_multiplier *= 10;
-	}
 
 	while (decimal_multiplier != 0)
 	{
