@@ -78,6 +78,7 @@ uint8_t data_ready = 0;
 volatile uint8_t delay_elapsed = 1;
 volatile uint8_t sensor_active = 0;
 volatile uint8_t sensor_read_data = 0;
+volatile uint16_t sensor_read_interval = 2000;
 
 AM2320_Data AM2320_Data_Buf[300];
 volatile uint16_t AM2320_Buf_Idx = 0;
@@ -440,7 +441,7 @@ uint16_t convert_char_string_to_uint16(uint8_t *string_array, uint16_t string_le
 void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t data_length)
 {
 	// Define available commands in char array format for string value comparison
-	const char *available_commands[] = { "START", "STOP", "READ" };
+	const char *available_commands[] = { "START", "STOP", "READ", "INTV" };
 	uint8_t command_count = sizeof(available_commands) / sizeof(available_commands[0]);
 
 	uint8_t tmp_command[data_length]; // Temporary array for processing commands in FIFO order
@@ -489,6 +490,23 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin); // Debug: Toggle GREEN LED
 					sensor_read_data = !sensor_read_data; // Toggle displaying the data
 				}
+				else if (strncmp(available_commands[i], "INTV", strlen("INTV")) == 0)
+				{
+					// TODO: Implement reading set interval
+					uint8_t interval_ret_message[16] = "INTERVAL: ";
+					uint8_t tmp_interval_value_array[6];
+					sprintf((char *)tmp_interval_value_array, "%05d", sensor_read_interval);
+
+					// Concatenate the arrays to form the message
+					size_t interval_array_size = sizeof(interval_ret_message) + sizeof(interval_ret_message[0]);
+					size_t concat_char_limit = interval_array_size - strlen((const char *)tmp_interval_value_array) - 1;
+					strncat((char *)interval_ret_message, (const char *)tmp_interval_value_array, concat_char_limit);
+
+					// Send return message
+					uint16_t crc_value = compute_CRC(interval_ret_message, interval_array_size);
+					send_frame(recipient_address, interval_ret_message, crc_value);
+				}
+			}
 			else if (match && *char_after_command_string == '|')
 			{
 				if (strncmp(available_commands[i], "READ", strlen("READ")) == 0 && *(char_after_command_string + 4) == ';')
@@ -515,6 +533,45 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					AM2320_Data archived_data = AM2320_Data_Buf[buffer_index];
 
 					AM2320_SendSensorDataFrame(recipient_address, &buffer_index, archived_data.temperature, archived_data.humidity);
+				}
+				else if (strncmp(available_commands[i], "INTV", strlen("INTV")) == 0 && *(char_after_command_string + 6) == ';')
+				{
+					uint8_t tmp_intv_param[6];
+					for (uint8_t i = 0; i <= 5; i++)
+					{
+						// TODO: Validate the function shifts indexes properly
+						// If any character in parameters' part is not a digit
+						if ((*(char_after_command_string + 1 - i) > '9') || (*(char_after_command_string + 1 - i) < '0'))
+						{
+							index = char_after_command_string + 6; // Shift the index to move the next command
+							tmp_command_idx += 6;
+							frame_data += 6;
+							break;
+						}
+						tmp_intv_param[i] = *(char_after_command_string++ + 1);
+						if (i == 5)
+						{
+							tmp_intv_param[i] = '\0'; // Null-terminate the array
+						}
+					}
+
+					// TODO: Validate new interval values (2000- 65535)
+					// Assign new interval value
+					sensor_read_interval = convert_char_string_to_uint16(tmp_intv_param, strlen((const char *)tmp_intv_param));
+
+					// Prepare the return command message
+					uint8_t tmp_interval_array[20] = "NEW INTERVAL: ";
+					uint8_t tmp_interval_value_array[6];
+					sprintf((char *)tmp_interval_value_array, "%05d", sensor_read_interval);
+
+					// Concatenate the arrays to form the message
+					size_t interval_array_size = sizeof(tmp_interval_array) / sizeof(tmp_interval_array[0]);
+					size_t concat_char_limit = interval_array_size - strlen((const char *)tmp_interval_value_array) - 1;
+					strncat((char *)tmp_interval_array, (const char *)tmp_interval_value_array, concat_char_limit);
+
+					// Send return message
+					uint16_t crc_value = compute_CRC(frame_data, interval_array_size);
+					send_frame(recipient_address, tmp_interval_array, crc_value);
 				}
 			}
 		}
@@ -626,7 +683,7 @@ int main(void)
 			  {
 				  HAL_TIM_Base_Stop_IT(&htim6); // Manually stop the timer
 			  }
-			  TIM_StartDelay(2000); // Start a 2sec read delay
+			  TIM_StartDelay(sensor_read_interval); // Start the delay between sensor reads
 		  }
 	  }
   }
