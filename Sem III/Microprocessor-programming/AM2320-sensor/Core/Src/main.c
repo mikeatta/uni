@@ -511,6 +511,7 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 			{
 				if (strncmp(available_commands[i], "READ", strlen("READ")) == 0 && *(char_after_command_string + 4) == ';')
 				{
+					index = match + strlen((const char *)available_commands[i]) + 5; // Shift the index past the ';' char
 					uint8_t tmp_read_param[4];
 					for (uint8_t i = 0; i <= 3; i++)
 					{
@@ -536,6 +537,7 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 				}
 				else if (strncmp(available_commands[i], "READ", strlen("READ")) == 0 && *(char_after_command_string + 4) == '-' && *(char_after_command_string + 8) == ';')
 				{
+					index = match + strlen((const char *)available_commands[i]) + 9; // Shift the index past the ';' char
 					uint8_t tmp_read_param_start[4];
 					uint8_t tmp_read_param_stop[4];
 					for (uint8_t i = 0; i <= 3; i++)
@@ -590,6 +592,7 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 				}
 				else if (strncmp(available_commands[i], "INTV", strlen("INTV")) == 0 && *(char_after_command_string + 6) == ';')
 				{
+					index = match + strlen((const char *)available_commands[i]) + 7; // Shift the index past the ';' char
 					uint8_t tmp_intv_param[6];
 					for (uint8_t i = 0; i <= 5; i++)
 					{
