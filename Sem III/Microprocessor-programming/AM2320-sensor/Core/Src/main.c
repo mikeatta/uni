@@ -493,7 +493,6 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 				}
 				else if (strncmp(available_commands[i], "INTV", strlen("INTV")) == 0)
 				{
-					// TODO: Implement reading set interval
 					uint8_t interval_ret_message[16] = "INTERVAL: ";
 					uint8_t tmp_interval_value_array[6];
 					sprintf((char *)tmp_interval_value_array, "%05d", sensor_read_interval);
@@ -534,6 +533,60 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					AM2320_Data archived_data = AM2320_Data_Buf[buffer_index];
 
 					AM2320_SendSensorDataFrame(recipient_address, &buffer_index, archived_data.temperature, archived_data.humidity);
+				}
+				else if (strncmp(available_commands[i], "READ", strlen("READ")) == 0 && *(char_after_command_string + 4) == '-' && *(char_after_command_string + 8) == ';')
+				{
+					uint8_t tmp_read_param_start[4];
+					uint8_t tmp_read_param_stop[4];
+					for (uint8_t i = 0; i <= 3; i++)
+					{
+						if ((*(char_after_command_string + 1 - i) > '9') || (*(char_after_command_string + 1 - i) < '0'))
+						{
+							index = char_after_command_string + 6; // Shift the index to move the next command
+							tmp_command_idx += 6;
+							frame_data += 6;
+							break;
+						}
+						else if ((*(char_after_command_string + 5 - i) > '9') || (*(char_after_command_string + 5 - i) < '0'))
+						{
+							index = char_after_command_string + 6; // Shift the index to move the next command
+							tmp_command_idx += 6;
+							frame_data += 6;
+							break;
+						}
+						tmp_read_param_start[i] = *(char_after_command_string + 1);
+						tmp_read_param_stop[i] = *(char_after_command_string + 5);
+						char_after_command_string++;
+						if (i == 3)
+						{
+							// Null-terminate the arrays
+							tmp_read_param_start[i] = '\0';
+							tmp_read_param_stop[i] = '\0';
+						}
+					}
+
+					// Get data from AM2320 buffer
+					uint16_t buffer_start_index = convert_char_string_to_uint16(tmp_read_param_start, strlen((const char*)tmp_read_param_start));
+					uint16_t buffer_stop_index = convert_char_string_to_uint16(tmp_read_param_stop, strlen((const char*)tmp_read_param_stop));
+
+					// Validate the index start and stop values
+					if (buffer_start_index > buffer_stop_index)
+					{
+						index = char_after_command_string + 6; // Shift the index to move the next command
+						tmp_command_idx += 6;
+						frame_data += 6;
+						uint16_t crc_value = compute_CRC((uint8_t *)"IDX_ERROR", strlen((const char *)"IDX_ERROR"));
+						send_frame(recipient_address, (uint8_t *)"IDX_ERROR", crc_value);
+						continue;
+					}
+
+					AM2320_Data archived_data;
+					while (buffer_start_index <= buffer_stop_index)
+					{
+						archived_data = AM2320_Data_Buf[buffer_start_index];
+						AM2320_SendSensorDataFrame(recipient_address, &buffer_start_index, archived_data.temperature, archived_data.humidity);
+						buffer_start_index++;
+					}
 				}
 				else if (strncmp(available_commands[i], "INTV", strlen("INTV")) == 0 && *(char_after_command_string + 6) == ';')
 				{
@@ -578,6 +631,9 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 		}
 		tmp_command[tmp_command_idx++] = *(frame_data++); // Copy next character to the temporary array
 	}
+
+	// Reset the temporary array -- ensures no data is left over from the last read
+	memset(tmp_command, 0, sizeof(tmp_command));
 }
 /* USER CODE END 0 */
 
