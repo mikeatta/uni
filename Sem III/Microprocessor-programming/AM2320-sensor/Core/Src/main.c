@@ -407,6 +407,25 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, uint16_t *read_idx, float te
 }
 
 /**
+ * @brief  Checks if the given string contains only decimal numeric values.
+ *
+ * @param  str A pointer to the array containing the string.
+ * @param  length The length of the given string.
+ * @retval Returns 1 when the string is numeric, 0 otherwise.
+ */
+uint8_t is_numeric(const char *str, uint8_t length)
+{
+	for (uint8_t i = 0; i < length; i++)
+	{
+		if (str[i] > '9' || str[i] < '0')
+		{
+			return 0;
+		}
+	}
+	return 1; // All chars are decimal numbers
+}
+
+/**
  * @brief  Converts the string representation of a digit into an unsigned 16-bit integer.
  *
  * @param  string_array A pointer to the string-digit array.
@@ -512,27 +531,32 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 				if (strncmp(available_commands[i], "READ", strlen("READ")) == 0 && *(char_after_command_string + 4) == ';')
 				{
 					index = match + strlen((const char *)available_commands[i]) + 5; // Shift the index past the ';' char
+					// Fill the read param's numerical values
 					uint8_t tmp_read_param[4];
-					for (uint8_t i = 0; i <= 3; i++)
+					for (uint8_t i = 0; i < 3; i++)
 					{
-						if ((*(char_after_command_string + 1 - i) > '9') || (*(char_after_command_string + 1 - i) < '0'))
-						{
-							index = char_after_command_string + 6; // Shift the index to move the next command
-							tmp_command_idx += 6;
-							frame_data += 6;
-							break;
-						}
 						tmp_read_param[i] = *(char_after_command_string++ + 1);
-						if (i == 3)
-						{
-							tmp_read_param[i] = '\0'; // Null-terminate the array
-						}
+					}
+					tmp_read_param[3] = '\0'; // Null-terminate the array
+
+					// Validate the numerical values in the array
+					if (!is_numeric((const char *)tmp_read_param, strlen((const char *)tmp_read_param)))
+					{
+						continue;
 					}
 
 					// Get data from AM2320 buffer
 					uint16_t buffer_index = convert_char_string_to_uint16(tmp_read_param, strlen((const char *)tmp_read_param));
-					AM2320_Data archived_data = AM2320_Data_Buf[buffer_index];
 
+					// Validate the index is within range of the AM2320 data buffer
+					if (buffer_index < 0 || buffer_index > 299)
+					{
+						uint16_t crc_value = compute_CRC((uint8_t *)"IDX_ERROR", strlen((const char *)"IDX_ERROR"));
+						send_frame(recipient_address, (uint8_t *)"IDX_ERROR", crc_value);
+						continue;
+					}
+
+					AM2320_Data archived_data = AM2320_Data_Buf[buffer_index];
 					AM2320_SendSensorDataFrame(recipient_address, &buffer_index, archived_data.temperature, archived_data.humidity);
 				}
 				else if (strncmp(available_commands[i], "READ", strlen("READ")) == 0 && *(char_after_command_string + 4) == '-' && *(char_after_command_string + 8) == ';')
@@ -540,31 +564,23 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					index = match + strlen((const char *)available_commands[i]) + 9; // Shift the index past the ';' char
 					uint8_t tmp_read_param_start[4];
 					uint8_t tmp_read_param_stop[4];
-					for (uint8_t i = 0; i <= 3; i++)
+
+					// Fill the numerical string parameter arrays
+					for (uint8_t i = 0; i < 3; i++)
 					{
-						if ((*(char_after_command_string + 1 - i) > '9') || (*(char_after_command_string + 1 - i) < '0'))
-						{
-							index = char_after_command_string + 6; // Shift the index to move the next command
-							tmp_command_idx += 6;
-							frame_data += 6;
-							break;
-						}
-						else if ((*(char_after_command_string + 5 - i) > '9') || (*(char_after_command_string + 5 - i) < '0'))
-						{
-							index = char_after_command_string + 6; // Shift the index to move the next command
-							tmp_command_idx += 6;
-							frame_data += 6;
-							break;
-						}
 						tmp_read_param_start[i] = *(char_after_command_string + 1);
 						tmp_read_param_stop[i] = *(char_after_command_string + 5);
 						char_after_command_string++;
-						if (i == 3)
-						{
-							// Null-terminate the arrays
-							tmp_read_param_start[i] = '\0';
-							tmp_read_param_stop[i] = '\0';
-						}
+					}
+					// Null-terminate the arrays
+					tmp_read_param_start[3] = '\0';
+					tmp_read_param_stop[3] = '\0';
+
+					// Validate the numerical values in the arrays
+					if (!is_numeric((const char *)tmp_read_param_start, strlen((const char *)tmp_read_param_start)) ||
+						!is_numeric((const char *)tmp_read_param_stop, strlen((const char *)tmp_read_param_stop)))
+					{
+						continue;
 					}
 
 					// Get data from AM2320 buffer
@@ -572,11 +588,10 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					uint16_t buffer_stop_index = convert_char_string_to_uint16(tmp_read_param_stop, strlen((const char*)tmp_read_param_stop));
 
 					// Validate the index start and stop values
-					if (buffer_start_index > buffer_stop_index)
+					if (buffer_start_index > buffer_stop_index ||
+						(buffer_start_index < 0 || buffer_start_index > 299) ||
+						(buffer_stop_index < 0 || buffer_stop_index > 299))
 					{
-						index = char_after_command_string + 6; // Shift the index to move the next command
-						tmp_command_idx += 6;
-						frame_data += 6;
 						uint16_t crc_value = compute_CRC((uint8_t *)"IDX_ERROR", strlen((const char *)"IDX_ERROR"));
 						send_frame(recipient_address, (uint8_t *)"IDX_ERROR", crc_value);
 						continue;
@@ -594,27 +609,31 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 				{
 					index = match + strlen((const char *)available_commands[i]) + 7; // Shift the index past the ';' char
 					uint8_t tmp_intv_param[6];
-					for (uint8_t i = 0; i <= 5; i++)
+
+					// Fill the param's numerical values
+					for (uint8_t i = 0; i < 5; i++)
 					{
-						// TODO: Validate the function shifts indexes properly
-						// If any character in parameters' part is not a digit
-						if ((*(char_after_command_string + 1 - i) > '9') || (*(char_after_command_string + 1 - i) < '0'))
-						{
-							index = char_after_command_string + 6; // Shift the index to move the next command
-							tmp_command_idx += 6;
-							frame_data += 6;
-							break;
-						}
 						tmp_intv_param[i] = *(char_after_command_string++ + 1);
-						if (i == 5)
-						{
-							tmp_intv_param[i] = '\0'; // Null-terminate the array
-						}
+					}
+					tmp_intv_param[5] = '\0'; // Null-terminate the array
+
+					// Validate the numerical values in the array
+					if (!is_numeric((const char *)tmp_intv_param, strlen((const char *)tmp_intv_param)))
+					{
+						continue;
 					}
 
-					// TODO: Validate new interval values (2000- 65535)
 					// Assign new interval value
 					sensor_read_interval = convert_char_string_to_uint16(tmp_intv_param, strlen((const char *)tmp_intv_param));
+
+					// TODO: Improve range check logic
+					// Only check for values under 2000ms -- values over 65535 will overflow
+					if (sensor_read_interval < 2000)
+					{
+						uint16_t crc_value = compute_CRC((uint8_t *)"IDX_ERROR", strlen((const char *)"IDX_ERROR"));
+						send_frame(recipient_address, (uint8_t *)"IDX_ERROR", crc_value);
+						continue;
+					}
 
 					// Prepare the return command message
 					uint8_t tmp_interval_array[20] = "NEW INTERVAL: ";
