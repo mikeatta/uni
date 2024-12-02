@@ -650,6 +650,10 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					send_frame(recipient_address, tmp_interval_array, crc_value);
 				}
 			}
+			else if (match && (*frame_data != '|' && *frame_data != ';'))
+			{
+				index = (const char *)(tmp_command + tmp_command_idx); // Reset index -- prevents from 'indexing' old commands
+			}
 		}
 		tmp_command[tmp_command_idx++] = *(frame_data++); // Copy next character to the temporary array
 	}
