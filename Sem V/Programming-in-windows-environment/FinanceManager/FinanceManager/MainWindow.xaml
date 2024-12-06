@@ -3,35 +3,53 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:FinanceManager.ViewModels"
         xmlns:local="clr-namespace:FinanceManager"
+        xmlns:views="clr-namespace:FinanceManager.Views"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        
-        <Rectangle Grid.Row="1" Fill="#FFFFFF"/>
-        
-        <!-- Application Navbar -->
-        <Grid Grid.Row="0" VerticalAlignment="Top" Height="30">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:SummaryViewModel}">
+            <views:SummaryView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TransactionsViewModel}">
+            <views:TransactionsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:CalendarViewModel}">
+            <views:CalendarView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ReportsViewModel}">
+            <views:ReportsView />
+        </DataTemplate>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+
+    <DockPanel>
+        <!-- Navbar -->
+        <Grid DockPanel.Dock="Top" Height="30">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            
-            <Rectangle Grid.Column="0" Fill="#2C78FC"/>
-            <Rectangle Grid.Column="1" Fill="#12C058"/>
-            <Rectangle Grid.Column="2" Fill="#FF9239"/>
-            <Rectangle Grid.Column="3" Fill="#2FB6F5"/>
-            
-            <TextBlock Grid.Column="0" Foreground="#FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center" TextDecorations="underline">Summary</TextBlock>
-            <TextBlock Grid.Column="1" Foreground="#FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center">Transactions</TextBlock>
-            <TextBlock Grid.Column="2" Foreground="#FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center">Calendar</TextBlock>
-            <TextBlock Grid.Column="3" Foreground="#FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center">Reports</TextBlock>
+
+            <!-- Navbar buttons -->
+            <Button Content="Summary" Command="{Binding NavigateCommand}" CommandParameter="Summary"
+                    Background="#2C78FC" Foreground="white" Grid.Column="0" />
+            <Button Content="Transactions" Command="{Binding NavigateCommand}" CommandParameter="Transactions"
+                    Background="#12C058" Foreground="white" Grid.Column="1" />
+            <Button Content="Calendar" Command="{Binding NavigateCommand}" CommandParameter="Calendar"
+                    Background="#FF9239"
+                    Foreground="white" Grid.Column="2" />
+            <Button Content="Reports" Command="{Binding NavigateCommand}" CommandParameter="Reports"
+                    Background="#2FB6F5" Foreground="white" Grid.Column="3" />
         </Grid>
-    </Grid>
+
+        <!-- Content Area -->
+        <ContentControl Content="{Binding CurrentView}" />
+    </DockPanel>
 </Window>

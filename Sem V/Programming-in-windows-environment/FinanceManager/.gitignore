@@ -1,0 +1,9 @@
+# IDE-specific config
+.idea/
+
+# Local settings for the project
+FinanceManager.sln.DotSettings.user
+
+# Auto-generated project files
+FinanceManager/bin/
+FinanceManager/obj/
