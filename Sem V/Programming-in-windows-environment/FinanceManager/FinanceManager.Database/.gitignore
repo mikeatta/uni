@@ -1,0 +1,6 @@
+# Ignore .env files
+/Config/.env
+
+# Ignore database volumes
+/Config/postgres_data/
+/Config/pgadmin_data/

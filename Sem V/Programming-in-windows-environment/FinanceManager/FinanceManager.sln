@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManager", "FinanceManager\FinanceManager.csproj", "{57835961-CB3F-4CC1-8299-0FDC03F9D310}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManager.Database", "FinanceManager.Database\FinanceManager.Database.csproj", "{99CF93C6-429F-4B04-958D-E00E197ECCDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{57835961-CB3F-4CC1-8299-0FDC03F9D310}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57835961-CB3F-4CC1-8299-0FDC03F9D310}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57835961-CB3F-4CC1-8299-0FDC03F9D310}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99CF93C6-429F-4B04-958D-E00E197ECCDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99CF93C6-429F-4B04-958D-E00E197ECCDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99CF93C6-429F-4B04-958D-E00E197ECCDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99CF93C6-429F-4B04-958D-E00E197ECCDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
