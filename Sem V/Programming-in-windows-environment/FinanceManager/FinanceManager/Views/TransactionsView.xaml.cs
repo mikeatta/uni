@@ -1,12 +1,11 @@
 using System.Windows.Controls;
 
-namespace FinanceManager.Views
+namespace FinanceManager.Views;
+
+public partial class TransactionsView : UserControl
 {
-    public partial class TransactionsView : UserControl
+    public TransactionsView()
     {
-        public TransactionsView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

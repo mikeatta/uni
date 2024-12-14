@@ -1,4 +1,3 @@
-using System;
 using System.Windows.Input;
 
 namespace FinanceManager.Commands;
@@ -23,7 +22,7 @@ public class RelayCommand : ICommand
     {
         _execute(parameter);
     }
-    
+
     public event EventHandler CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;

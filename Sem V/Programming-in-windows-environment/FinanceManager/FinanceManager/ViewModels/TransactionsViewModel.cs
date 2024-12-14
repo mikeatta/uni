@@ -1,7 +1,6 @@
-namespace FinanceManager.ViewModels
+namespace FinanceManager.ViewModels;
+
+public class TransactionsViewModel
 {
-    public class TransactionsViewModel
-    {
-        
-    }
+    
 }

@@ -1,12 +1,11 @@
 using System.Windows.Controls;
 
-namespace FinanceManager.Views
+namespace FinanceManager.Views;
+
+public partial class SummaryView : UserControl
 {
-    public partial class SummaryView : UserControl
+    public SummaryView()
     {
-        public SummaryView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }
