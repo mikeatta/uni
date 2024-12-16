@@ -15,7 +15,7 @@ public class FinancialGoal
     public User User { get; set; } // Navigation property
 
     [Required]
-    [Column(TypeName = "varchar(255")]
+    [Column(TypeName = "varchar(255)")]
     [StringLength(255)]
     public string? Description { get; set; }
 
