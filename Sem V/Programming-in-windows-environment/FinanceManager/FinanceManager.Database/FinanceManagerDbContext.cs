@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FinanceManager.Database.EntityModels;
 
-public class ApplicationDbContext : DbContext
+public class FinanceManagerDbContext : DbContext
 {
     public DbSet<User> Users { get; set; }
     public DbSet<TransactionCategory> TransactionCategories { get; set; }
@@ -18,7 +18,7 @@ public class ApplicationDbContext : DbContext
         var user = Environment.GetEnvironmentVariable("PG_USER") ?? "user";
         var password = Environment.GetEnvironmentVariable("PG_PASSWORD") ?? "password";
 
-        var connectionString = $"Host=localhost;Port=5432;Database={database};Username={user};Password={password};";
+        var connectionString = $"Host=localhost;Port=5432;Database=finance_manager;Username=user;Password=password;";
         optionsBuilder.UseNpgsql(connectionString);
         optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
     }
