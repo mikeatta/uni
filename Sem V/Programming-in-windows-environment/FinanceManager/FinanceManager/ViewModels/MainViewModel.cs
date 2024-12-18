@@ -1,12 +1,38 @@
 using System.ComponentModel;
 using System.Windows.Input;
 using FinanceManager.Commands;
+using FinanceManager.Database;
+using FinanceManager.Database.Repositories;
 
 namespace FinanceManager.ViewModels;
 
 public class MainViewModel : INotifyPropertyChanged
 {
+    private readonly static FinanceManagerDbContext FinanceManagerDbContext = new();
+    private readonly UserRepository _userRepository = new(FinanceManagerDbContext);
     private object _currentView;
+
+    // View models
+    private SummaryViewModel _summaryViewModel;
+    private TransactionsViewModel _transactionsViewModel;
+    private CalendarViewModel _calendarViewModel;
+    private ReportsViewModel _reportsViewModel;
+
+    public MainViewModel()
+    {
+        InitializeViewModels();
+    }
+
+    private void InitializeViewModels()
+    {
+        _summaryViewModel = new SummaryViewModel(_userRepository);
+        _transactionsViewModel = new TransactionsViewModel();
+        _calendarViewModel = new CalendarViewModel();
+        _reportsViewModel = new ReportsViewModel();
+
+        CurrentView = _summaryViewModel;
+        NavigateCommand = new RelayCommand(Navigate);
+    }
 
     public object CurrentView
     {
@@ -18,19 +44,7 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public ICommand NavigateCommand { get; }
-
-    // View models
-    private readonly SummaryViewModel _summaryViewModel = new();
-    private readonly TransactionsViewModel _transactionsViewModel = new();
-    private readonly CalendarViewModel _calendarViewModel = new();
-    private readonly ReportsViewModel _reportsViewModel = new();
-
-    public MainViewModel()
-    {
-        CurrentView = _summaryViewModel;
-        NavigateCommand = new RelayCommand(Navigate);
-    }
+    public ICommand NavigateCommand { get; set; }
 
     private void Navigate(object parameter)
     {
@@ -51,7 +65,7 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged(string propertyName)
     {
