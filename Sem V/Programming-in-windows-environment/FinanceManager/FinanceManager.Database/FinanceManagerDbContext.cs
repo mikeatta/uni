@@ -1,7 +1,14 @@
+using dotenv.net;
+using FinanceManager.Database.EntityModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Alert = FinanceManager.Database.EntityModels.Alert;
+using FinancialGoal = FinanceManager.Database.EntityModels.FinancialGoal;
+using Report = FinanceManager.Database.EntityModels.Report;
+using Transaction = FinanceManager.Database.EntityModels.Transaction;
+using TransactionCategory = FinanceManager.Database.EntityModels.TransactionCategory;
 
-namespace FinanceManager.Database.EntityModels;
+namespace FinanceManager.Database;
 
 public class FinanceManagerDbContext : DbContext
 {
@@ -14,11 +21,21 @@ public class FinanceManagerDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var database = Environment.GetEnvironmentVariable("PG_DATABASE") ?? "database";
-        var user = Environment.GetEnvironmentVariable("PG_USER") ?? "user";
-        var password = Environment.GetEnvironmentVariable("PG_PASSWORD") ?? "password";
+        // Calculate the path to the .env file relative to the base directory
+        string envPath = Path.Combine(AppContext.BaseDirectory, @"..\..\..\..\FinanceManager.Database\.env");
 
-        var connectionString = $"Host=localhost;Port=5432;Database=finance_manager;Username=user;Password=password;";
+        var databaseEnv = DotEnv.Read(new DotEnvOptions(envFilePaths: new[] { envPath }, ignoreExceptions: false));
+
+        // Build the connection string using the environment variables
+        var host = databaseEnv["HOST"];
+        int port = Int32.Parse(databaseEnv["PORT"]);
+        var database = databaseEnv["DATABASE"];
+        var username = databaseEnv["USERNAME"];
+        var password = databaseEnv["PASSWORD"];
+
+        var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};";
+
+        // Configure the DbContext
         optionsBuilder.UseNpgsql(connectionString);
         optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
     }
@@ -93,7 +110,7 @@ public class FinanceManagerDbContext : DbContext
             entity.Property(t => t.Type).HasConversion<string>().HasColumnType("varchar(10)");
             entity.Property(t => t.Date).HasColumnType("timestamp");
             entity.Property(t => t.Amount).HasColumnType("decimal(12,2)");
-            
+
             entity.HasIndex(t => t.UserId).HasDatabaseName("idx_transactions_userid");
         });
 
@@ -135,8 +152,8 @@ public class FinanceManagerDbContext : DbContext
                 .WithOne(a => a.User)
                 .HasForeignKey(a => a.UserId);
 
-            entity.Property(u => u.Balance)
-                .HasColumnType("decimal(12, 2)");
+            entity.Property(u => u.Id).HasColumnType("uuid");
+            entity.Property(u => u.Balance).HasColumnType("decimal(12, 2)");
         });
 
         base.OnModelCreating(modelBuilder);
