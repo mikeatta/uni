@@ -1,9 +1,15 @@
 # Ignore IDE configurations
 .idea/
+*DotSettings.user
 
 # Ignore build artifacts
 FinanceManager*/bin/
 FinanceManager*/obj/
 
+# Ignore database files
+FinanceManager.Database/Config/pgadmin_data
+FinanceManager.Database/Config/postgres_data
+
 # Ignore environment files
 FinanceManager.Database/Config/.env
+*/.env
