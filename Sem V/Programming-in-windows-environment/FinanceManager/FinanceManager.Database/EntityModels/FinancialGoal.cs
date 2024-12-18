@@ -3,27 +3,29 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FinanceManager.Database.EntityModels;
 
+[Table("financialgoals")]
 public class FinancialGoal
 {
     [Key]
+    [Column("id")]
     public int Id { get; set; }
 
     [ForeignKey("User")]
-    [Column(TypeName = "uuid")]
+    [Column("userid", TypeName = "uuid")]
     public Guid UserId { get; set; }
 
     public User User { get; set; } // Navigation property
 
     [Required]
-    [Column(TypeName = "varchar(255)")]
+    [Column("description", TypeName = "varchar(255)")]
     [StringLength(255)]
     public string? Description { get; set; }
 
     [Required]
-    [Column(TypeName = "decimal(12,2")]
+    [Column("currentamount", TypeName = "numeric(12,2")]
     public decimal CurrentAmount { get; set; }
 
     [Required]
-    [Column(TypeName = "decimal(12,2")]
+    [Column("goalamount", TypeName = "numeric(12,2")]
     public decimal TargetAmount { get; set; }
 }

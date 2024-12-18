@@ -3,23 +3,25 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FinanceManager.Database.EntityModels;
 
+[Table("reports")]
 public class Report
 {
     [Key]
+    [Column("id")]
     public Guid Id { get; set; }
 
     [ForeignKey("User")]
-    [Column(TypeName = "uuid")]
+    [Column("userid", TypeName = "uuid")]
     public Guid UserId { get; set; }
 
     public User User { get; set; } // Navigation property
 
     [Required]
-    [Column(TypeName = "timestamp")]
+    [Column("datecreated", TypeName = "timestamp")]
     public DateTime DateCreated { get; set; }
 
     [Required]
-    [Column(TypeName = "varchar(255)")]
+    [Column("criteria", TypeName = "varchar(255)")]
     [StringLength(255)]
-    public required string Criteria  { get; set; }
+    public required string Criteria { get; set; }
 }
