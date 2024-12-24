@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using FinanceManager.Database.EntityModels;
@@ -8,12 +9,15 @@ namespace FinanceManager.ViewModels;
 public class SummaryViewModel : INotifyPropertyChanged
 {
     private readonly UserRepository _userRepository;
-
+    private readonly TransactionRepository _transactionRepository;
+    private ObservableCollection<Transaction> _recentTransactions;
     private User _currentUser;
 
-    public SummaryViewModel(UserRepository userRepository)
+    public SummaryViewModel(UserRepository userRepository, TransactionRepository transactionRepository)
     {
         _userRepository = userRepository;
+        _transactionRepository = transactionRepository;
+        _recentTransactions = new ObservableCollection<Transaction>();
         InitializeAsync();
     }
 
@@ -25,10 +29,21 @@ public class SummaryViewModel : INotifyPropertyChanged
 
             var users = await _userRepository.GetAllUsersAsync();
             CurrentUser = users.FirstOrDefault() ?? throw new InvalidOperationException();
+            await LoadRecentTransactions();
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Initialization error: ", ex.Message);
+        }
+    }
+
+    private async Task LoadRecentTransactions()
+    {
+        var transactions = await _transactionRepository.GetRecentTransactionsAsync(3);
+        RecentTransactions.Clear();
+        foreach (var transaction in transactions)
+        {
+            RecentTransactions.Add(transaction);
         }
     }
 
@@ -59,6 +74,16 @@ public class SummaryViewModel : INotifyPropertyChanged
             _currentUser = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(UserBalance));
+        }
+    }
+
+    public ObservableCollection<Transaction> RecentTransactions
+    {
+        get => _recentTransactions;
+        private set
+        {
+            _recentTransactions = value;
+            OnPropertyChanged();
         }
     }
 

@@ -10,6 +10,7 @@ public class MainViewModel : INotifyPropertyChanged
 {
     private readonly static FinanceManagerDbContext FinanceManagerDbContext = new();
     private readonly UserRepository _userRepository = new(FinanceManagerDbContext);
+    private readonly TransactionRepository _transactionRepository = new(FinanceManagerDbContext);
     private object _currentView;
 
     // View models
@@ -25,7 +26,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     private void InitializeViewModels()
     {
-        _summaryViewModel = new SummaryViewModel(_userRepository);
+        _summaryViewModel = new SummaryViewModel(_userRepository, _transactionRepository);
         _transactionsViewModel = new TransactionsViewModel();
         _calendarViewModel = new CalendarViewModel();
         _reportsViewModel = new ReportsViewModel();
