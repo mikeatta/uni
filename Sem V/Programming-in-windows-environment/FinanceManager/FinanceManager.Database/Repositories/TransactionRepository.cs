@@ -5,26 +5,30 @@ namespace FinanceManager.Database.Repositories;
 
 public class TransactionRepository
 {
-    private readonly FinanceManagerDbContext _context;
+    private readonly IDbContextFactory<FinanceManagerDbContext> _dbContextFactory;
 
-    public TransactionRepository(FinanceManagerDbContext context)
+    public TransactionRepository(IDbContextFactory<FinanceManagerDbContext> dbContextFactory)
     {
-        _context = context;
+        _dbContextFactory = dbContextFactory;
     }
 
     public async Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
     {
-        return await _context.Transactions.ToListAsync();
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        return await context.Transactions.ToListAsync();
     }
 
     public async Task<Transaction> GetTransactionByIdAsync(int id)
     {
-        return await _context.Transactions.FindAsync(id);
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        return await context.Transactions.FindAsync(id);
     }
 
     public async Task<IEnumerable<Transaction>> GetRecentTransactionsAsync(int count = 10)
     {
-        return await _context.Transactions
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+
+        return await context.Transactions
             .Include(t => t.User)
             .OrderByDescending(t => t.Date)
             .Take(count)
@@ -33,24 +37,27 @@ public class TransactionRepository
 
     public async Task AddTransactionAsync(Transaction transaction)
     {
-        await _context.Transactions.AddAsync(transaction);
-        await _context.SaveChangesAsync();
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        await context.Transactions.AddAsync(transaction);
+        await context.SaveChangesAsync();
     }
 
     public async Task RemoveTransactionAsync(Transaction transactionId)
     {
-        var transaction = await _context.Transactions.FindAsync(transactionId);
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        var transaction = await context.Transactions.FindAsync(transactionId);
 
         if (transaction != null)
         {
-            _context.Transactions.Remove(transaction);
-            await _context.SaveChangesAsync();
+            context.Transactions.Remove(transaction);
+            await context.SaveChangesAsync();
         }
     }
 
     public async Task EditTransactionAsync(Transaction transaction)
     {
-        _context.Transactions.Update(transaction);
-        await _context.SaveChangesAsync();
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        context.Transactions.Update(transaction);
+        await context.SaveChangesAsync();
     }
 }

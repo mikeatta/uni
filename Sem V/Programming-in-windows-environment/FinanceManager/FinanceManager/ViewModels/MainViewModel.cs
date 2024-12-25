@@ -1,16 +1,23 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using FinanceManager.Commands;
 using FinanceManager.Database;
+using FinanceManager.Database.EntityModels;
 using FinanceManager.Database.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace FinanceManager.ViewModels;
 
 public class MainViewModel : INotifyPropertyChanged
 {
-    private readonly static FinanceManagerDbContext FinanceManagerDbContext = new();
-    private readonly UserRepository _userRepository = new(FinanceManagerDbContext);
-    private readonly TransactionRepository _transactionRepository = new(FinanceManagerDbContext);
+    private readonly IDbContextFactory<FinanceManagerDbContext> _contextFactory;
+
+    private UserRepository _userRepository;
+    private TransactionRepository _transactionRepository;
+
+    private ObservableCollection<Transaction> _transactions = new();
     private object _currentView;
 
     // View models
@@ -19,21 +26,6 @@ public class MainViewModel : INotifyPropertyChanged
     private CalendarViewModel _calendarViewModel;
     private ReportsViewModel _reportsViewModel;
 
-    public MainViewModel()
-    {
-        InitializeViewModels();
-    }
-
-    private void InitializeViewModels()
-    {
-        _summaryViewModel = new SummaryViewModel(_userRepository, _transactionRepository);
-        _transactionsViewModel = new TransactionsViewModel();
-        _calendarViewModel = new CalendarViewModel();
-        _reportsViewModel = new ReportsViewModel();
-
-        CurrentView = _summaryViewModel;
-        NavigateCommand = new RelayCommand(Navigate);
-    }
 
     public object CurrentView
     {
@@ -43,6 +35,51 @@ public class MainViewModel : INotifyPropertyChanged
             _currentView = value;
             OnPropertyChanged(nameof(CurrentView));
         }
+    }
+
+    public ObservableCollection<Transaction> Transactions
+    {
+        get => _transactions;
+        private set
+        {
+            _transactions = value;
+            OnPropertyChanged(nameof(Transactions));
+        }
+    }
+
+    public MainViewModel(DbContextOptions<FinanceManagerDbContext> options)
+    {
+        _contextFactory = new PooledDbContextFactory<FinanceManagerDbContext>(options);
+        InitializeRepositories();
+        LoadTransactions();
+        InitializeViewModels();
+    }
+
+    private void InitializeRepositories()
+    {
+        _userRepository = new UserRepository(_contextFactory);
+        _transactionRepository = new TransactionRepository(_contextFactory);
+    }
+
+    private async Task LoadTransactions()
+    {
+        var transactions = await _transactionRepository.GetAllTransactionsAsync();
+
+        foreach (var transaction in transactions)
+        {
+            Transactions.Add(transaction);
+        }
+    }
+
+    private void InitializeViewModels()
+    {
+        _summaryViewModel = new SummaryViewModel(_userRepository, _transactions);
+        _transactionsViewModel = new TransactionsViewModel(_transactions);
+        _calendarViewModel = new CalendarViewModel();
+        _reportsViewModel = new ReportsViewModel();
+
+        CurrentView = _summaryViewModel;
+        NavigateCommand = new RelayCommand(Navigate);
     }
 
     public ICommand NavigateCommand { get; set; }

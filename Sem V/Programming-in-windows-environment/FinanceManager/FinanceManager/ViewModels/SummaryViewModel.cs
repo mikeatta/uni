@@ -9,16 +9,37 @@ namespace FinanceManager.ViewModels;
 public class SummaryViewModel : INotifyPropertyChanged
 {
     private readonly UserRepository _userRepository;
-    private readonly TransactionRepository _transactionRepository;
-    private ObservableCollection<Transaction> _recentTransactions;
+    private ObservableCollection<Transaction> _recentTransactions = new();
     private User _currentUser;
 
-    public SummaryViewModel(UserRepository userRepository, TransactionRepository transactionRepository)
+    public User CurrentUser
+    {
+        get => _currentUser;
+        private set
+        {
+            _currentUser = value;
+            OnPropertyChanged(nameof(UserBalance));
+        }
+    }
+
+    public ObservableCollection<Transaction> RecentTransactions
+    {
+        get => _recentTransactions;
+        private set
+        {
+            _recentTransactions = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public SummaryViewModel(UserRepository userRepository, ObservableCollection<Transaction> allTransactions)
     {
         _userRepository = userRepository;
-        _transactionRepository = transactionRepository;
-        _recentTransactions = new ObservableCollection<Transaction>();
+        allTransactions.CollectionChanged += (s, e) => UpdateRecentTransactions(allTransactions);
         InitializeAsync();
+
+        // Populate ObservableConnection on app init
+        UpdateRecentTransactions(allTransactions);
     }
 
     private async void InitializeAsync()
@@ -29,21 +50,10 @@ public class SummaryViewModel : INotifyPropertyChanged
 
             var users = await _userRepository.GetAllUsersAsync();
             CurrentUser = users.FirstOrDefault() ?? throw new InvalidOperationException();
-            await LoadRecentTransactions();
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Initialization error: ", ex.Message);
-        }
-    }
-
-    private async Task LoadRecentTransactions()
-    {
-        var transactions = await _transactionRepository.GetRecentTransactionsAsync(3);
-        RecentTransactions.Clear();
-        foreach (var transaction in transactions)
-        {
-            RecentTransactions.Add(transaction);
         }
     }
 
@@ -66,28 +76,22 @@ public class SummaryViewModel : INotifyPropertyChanged
         return users.First();
     }
 
-    public User CurrentUser
+    private void UpdateRecentTransactions(ObservableCollection<Transaction> allTransactions)
     {
-        get => _currentUser;
-        private set
+        var recentTransactions = allTransactions
+            .OrderByDescending(t => t.Date)
+            .Take(5)
+            .ToList();
+
+        RecentTransactions.Clear();
+
+        foreach (var transaction in recentTransactions)
         {
-            _currentUser = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(UserBalance));
+            RecentTransactions.Add(transaction);
         }
     }
 
-    public ObservableCollection<Transaction> RecentTransactions
-    {
-        get => _recentTransactions;
-        private set
-        {
-            _recentTransactions = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public string UserBalance => CurrentUser?.Balance.ToString("C2") ?? "N/A";
+    public string UserBalance => CurrentUser.Balance.ToString("C2");
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

@@ -5,38 +5,42 @@ namespace FinanceManager.Database.Repositories;
 
 public class UserRepository
 {
-    private readonly FinanceManagerDbContext _context;
+    private readonly IDbContextFactory<FinanceManagerDbContext> _dbContextFactory;
 
-    public UserRepository(FinanceManagerDbContext context)
+    public UserRepository(IDbContextFactory<FinanceManagerDbContext> dbContextFactory)
     {
-        _context = context;
+        _dbContextFactory = dbContextFactory;
     }
 
     public async Task<List<User>> GetAllUsersAsync()
     {
-        return await _context.Users.ToListAsync();
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        return await context.Users.ToListAsync();
     }
 
     public async Task AddUserAsync(User user)
     {
-        await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync();
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        await context.Users.AddAsync(user);
+        await context.SaveChangesAsync();
     }
 
     public async Task RemoveUserAsync(User userId)
     {
-        var user = await _context.Users.FindAsync(userId);
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        var user = await context.Users.FindAsync(userId);
 
         if (user != null)
         {
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            context.Users.Remove(user);
+            await context.SaveChangesAsync();
         }
     }
 
     public async Task EditUserAsync(User user)
     {
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync();
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        context.Users.Update(user);
+        await context.SaveChangesAsync();
     }
 }
