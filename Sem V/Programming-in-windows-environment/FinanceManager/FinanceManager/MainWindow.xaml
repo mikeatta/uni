@@ -22,10 +22,6 @@
         </DataTemplate>
     </Window.Resources>
 
-    <Window.DataContext>
-        <vm:MainViewModel />
-    </Window.DataContext>
-
     <Grid>
         <DockPanel>
             <!-- Navbar -->
