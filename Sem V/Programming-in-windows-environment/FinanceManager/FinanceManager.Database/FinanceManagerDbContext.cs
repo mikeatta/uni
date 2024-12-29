@@ -24,6 +24,8 @@ public class FinanceManagerDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasPostgresEnum<TransactionType>("public", "transactiontype");
+
         // Alert model mapping
         modelBuilder.Entity<Alert>(entity =>
         {
@@ -89,7 +91,11 @@ public class FinanceManagerDbContext : DbContext
                 .WithMany(tc => tc.Transactions)
                 .HasForeignKey(t => t.CategoryId);
 
-            entity.Property(t => t.Type).HasConversion<string>().HasColumnType("varchar(10)");
+            entity.Property(t => t.Type)
+                .HasColumnName("type")
+                .HasColumnType("transactiontype")
+                .HasConversion<TransactionType>();
+
             entity.Property(t => t.Date).HasColumnType("timestamp");
             entity.Property(t => t.Amount).HasColumnType("decimal(12,2)");
 

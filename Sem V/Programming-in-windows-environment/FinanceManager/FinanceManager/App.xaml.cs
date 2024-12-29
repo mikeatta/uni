@@ -2,6 +2,7 @@
 using System.Windows;
 using dotenv.net;
 using FinanceManager.Database;
+using FinanceManager.Database.EntityModels;
 using FinanceManager.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -33,7 +34,9 @@ public partial class App : Application
             $"Host={host};Port={port};Database={database};Username={username};Password={password};";
 
         // Configure the DbContext
-        optionsBuilder.UseNpgsql(connectionString);
+        optionsBuilder.UseNpgsql(connectionString, o =>
+            o.MapEnum<TransactionType>("transactiontype"));
+
         optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
 
         MainWindow = new MainWindow()

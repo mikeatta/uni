@@ -1,4 +1,4 @@
-CREATE TYPE TransactionType as ENUM ('Income', 'Expense');
+CREATE TYPE TransactionType as ENUM ('income', 'expense');
 
 CREATE TABLE Users (
     ID uuid PRIMARY KEY NOT NULL,
