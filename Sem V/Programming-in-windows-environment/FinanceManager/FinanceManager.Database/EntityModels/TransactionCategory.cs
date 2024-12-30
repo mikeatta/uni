@@ -11,7 +11,7 @@ public class TransactionCategory
     public int Id { get; set; }
 
     [Required]
-    [Column("name", TypeName = "varchar(50)")]
+    [Column("name", TypeName = "varchar(50)"), MinLength(1), MaxLength(50)]
     [StringLength(50)]
     public required string Name { get; set; }
 

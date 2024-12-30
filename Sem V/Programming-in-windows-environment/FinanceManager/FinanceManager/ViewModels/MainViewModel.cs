@@ -16,8 +16,10 @@ public class MainViewModel : INotifyPropertyChanged
 
     private UserRepository _userRepository;
     private TransactionRepository _transactionRepository;
+    private TransactionCategoryRepository _transactionCategoryRepository;
 
     private ObservableCollection<Transaction> _transactions = new();
+    private ObservableCollection<TransactionCategory> _transactionCategories = new();
     private object _currentView;
 
     // View models
@@ -47,6 +49,16 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
+    public ObservableCollection<TransactionCategory> TransactionsCategories
+    {
+        get => _transactionCategories;
+        private set
+        {
+            _transactionCategories = value;
+            OnPropertyChanged(nameof(TransactionsCategories));
+        }
+    }
+
     public MainViewModel(DbContextOptions<FinanceManagerDbContext> options)
     {
         _contextFactory = new PooledDbContextFactory<FinanceManagerDbContext>(options);
@@ -59,6 +71,7 @@ public class MainViewModel : INotifyPropertyChanged
     {
         _userRepository = new UserRepository(_contextFactory);
         _transactionRepository = new TransactionRepository(_contextFactory);
+        _transactionCategoryRepository = new TransactionCategoryRepository(_contextFactory);
     }
 
     private async Task LoadTransactions()
@@ -69,12 +82,23 @@ public class MainViewModel : INotifyPropertyChanged
         {
             Transactions.Add(transaction);
         }
+
+        var categories = await _transactionCategoryRepository.GetAllAsync();
+
+        foreach (var category in categories)
+        {
+            TransactionsCategories.Add(category);
+        }
     }
 
     private void InitializeViewModels()
     {
         _summaryViewModel = new SummaryViewModel(_userRepository, _transactions);
-        _transactionsViewModel = new TransactionsViewModel(_transactions);
+
+        _transactionsViewModel = new TransactionsViewModel(_transactions, _transactionCategories,
+            _transactionRepository,
+            _userRepository, _transactionCategoryRepository);
+
         _calendarViewModel = new CalendarViewModel();
         _reportsViewModel = new ReportsViewModel();
 

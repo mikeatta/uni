@@ -4,10 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:helpers="clr-namespace:FinanceManager.Helpers"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:models="clr-namespace:FinanceManager.Database.EntityModels;assembly=FinanceManager.Database"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="800">
     <UserControl.Resources>
         <helpers:IndexConverter x:Key="IndexConverter" />
+        <ObjectDataProvider x:Key="TransactionTypes" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="models:TransactionType"></x:Type>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </UserControl.Resources>
 
     <Grid Background="White">
@@ -27,6 +34,97 @@
             <Rectangle Grid.Row="0" Fill="Gray" />
             <TextBlock Grid.Row="0" Text="Add New Transaction" FontWeight="SemiBold" VerticalAlignment="Center"
                        HorizontalAlignment="Left" Padding="5px 0 0 0 " />
+
+            <!-- Content -->
+            <Grid Grid.Row="1" Margin="5" Grid.IsSharedSizeScope="True">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Row="0" Grid.Column="0" Margin="0 20 0 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.5*" />
+                        <ColumnDefinition Width="0.5*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Category" />
+                    <ComboBox Grid.Row="1" Grid.Column="0" x:Name="CategoryComboBox"
+                              IsEditable="True"
+                              ItemsSource="{Binding Categories}"
+                              DisplayMemberPath="Name"
+                              SelectedValuePath="Name"
+                              SelectedValue="{Binding CategoriesSelectedValue, Mode=TwoWay}"
+                              LostFocus="ComboBox_OnLostFocus">
+                    </ComboBox>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Type" />
+                    <ComboBox Grid.Row="1" Grid.Column="1" Margin="5 0 0 0"
+                              IsEditable="False"
+                              ItemsSource="{Binding Source={StaticResource TransactionTypes}}"
+                              SelectedItem="{Binding TransactionType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                    </ComboBox>
+                </Grid>
+
+                <Grid Grid.Row="1" Grid.Column="0" Margin="0 10 0 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.5*" />
+                        <ColumnDefinition Width="0.5*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Description" />
+                    <TextBox Grid.Row="1" Grid.Column="0"
+                             Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Note" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Margin="5 0 0 0"
+                             Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+
+                <Grid Grid.Row="2" Grid.Column="0" Margin="0 10 0 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.5*" />
+                        <ColumnDefinition Width="0.5*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Amount" />
+                    <TextBox Grid.Row="1" Grid.Column="0"
+                             Text="{Binding Amount, UpdateSourceTrigger=Default, StringFormat=N2}" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Date" />
+                    <DatePicker Grid.Row="1" Grid.Column="1" Margin="5 0 0 0"
+                                SelectedDate="{Binding Date, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+
+
+                <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" Margin="0 10 0 0 ">
+                    <Button Command="{Binding SubmitCommand}" Padding="5">Submit</Button>
+                    <Button Command="{Binding CancelCommand}"
+                            CommandParameter="{Binding ElementName=CategoryComboBox}"
+                            Padding="5" Margin="5 0 0 0">
+                        Clear
+                    </Button>
+                </StackPanel>
+            </Grid>
         </Grid>
 
         <!-- List of recent transactions -->
@@ -50,12 +148,16 @@
                                     <Style TargetType="Grid">
                                         <Style.Triggers>
                                             <DataTrigger
-                                                Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentPresenter}, Converter={StaticResource IndexConverter}}"
+                                                Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                AncestorType=ContentPresenter},
+                                                Converter={StaticResource IndexConverter}}"
                                                 Value="True">
                                                 <Setter Property="Background" Value="#F5F5F5" />
                                             </DataTrigger>
                                             <DataTrigger
-                                                Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentPresenter}, Converter={StaticResource IndexConverter}}"
+                                                Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                AncestorType=ContentPresenter},
+                                                Converter={StaticResource IndexConverter}}"
                                                 Value="False">
                                                 <Setter Property="Background" Value="White" />
                                             </DataTrigger>
