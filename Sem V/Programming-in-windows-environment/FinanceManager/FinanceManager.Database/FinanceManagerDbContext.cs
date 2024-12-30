@@ -55,6 +55,7 @@ public class FinanceManagerDbContext : DbContext
 
             entity.Property(fg => fg.CurrentAmount).HasColumnType("decimal(12, 2)");
             entity.Property(fg => fg.TargetAmount).HasColumnType("decimal(12, 2)");
+            entity.Property(fg => fg.Id).UseIdentityAlwaysColumn().HasColumnName("id");
 
             entity.HasIndex(fg => fg.UserId).HasDatabaseName("idx_financialgoals_userid");
         });
@@ -98,6 +99,7 @@ public class FinanceManagerDbContext : DbContext
 
             entity.Property(t => t.Date).HasColumnType("timestamp");
             entity.Property(t => t.Amount).HasColumnType("decimal(12,2)");
+            entity.Property(t => t.Id).UseIdentityAlwaysColumn().HasColumnName("id");
 
             entity.HasIndex(t => t.UserId).HasDatabaseName("idx_transactions_userid");
         });
@@ -113,6 +115,7 @@ public class FinanceManagerDbContext : DbContext
                 .HasForeignKey(t => t.CategoryId);
 
             entity.Property(tc => tc.Name).HasColumnType("varchar(50)");
+            entity.Property(tc => tc.Id).UseIdentityAlwaysColumn().HasColumnName("id");
         });
 
         // User model mapping

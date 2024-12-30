@@ -6,12 +6,12 @@ CREATE TABLE Users (
 );
 
 CREATE TABLE TransactionCategories (
-    ID integer PRIMARY KEY NOT NULL,
+    ID serial PRIMARY KEY NOT NULL,
     Name varchar(50)
 );
 
 CREATE TABLE Transactions (
-    ID bigint PRIMARY KEY NOT NULL,
+    ID bigserial PRIMARY KEY NOT NULL,
     UserID uuid REFERENCES Users (ID) ON UPDATE CASCADE,
     CategoryID integer REFERENCES TransactionCategories (ID),
     Type TransactionType,
@@ -23,7 +23,7 @@ CREATE TABLE Transactions (
 CREATE INDEX idx_transactions_userid ON Transactions(UserID);
 
 CREATE TABLE FinancialGoals (
-    ID bigint PRIMARY KEY NOT NULL,
+    ID bigserial PRIMARY KEY NOT NULL,
     UserID uuid REFERENCES Users (ID) ON UPDATE CASCADE,
     Description varchar(255),
     CurrentAmount decimal(12 ,2),
