@@ -5,6 +5,7 @@ using FinanceManager.Commands;
 using FinanceManager.Database;
 using FinanceManager.Database.EntityModels;
 using FinanceManager.Database.Repositories;
+using FinanceManager.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
@@ -18,7 +19,7 @@ public class MainViewModel : INotifyPropertyChanged
     private TransactionRepository _transactionRepository;
     private TransactionCategoryRepository _transactionCategoryRepository;
 
-    private ObservableCollection<Transaction> _transactions = new();
+    private ObservableCollection<TransactionDTO> _transactions = new();
     private ObservableCollection<TransactionCategory> _transactionCategories = new();
     private object _currentView;
 
@@ -39,7 +40,7 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public ObservableCollection<Transaction> Transactions
+    public ObservableCollection<TransactionDTO> Transactions
     {
         get => _transactions;
         private set
@@ -80,7 +81,7 @@ public class MainViewModel : INotifyPropertyChanged
 
         foreach (var transaction in transactions)
         {
-            Transactions.Add(transaction);
+            Transactions.Add(new TransactionDTO(transaction));
         }
 
         var categories = await _transactionCategoryRepository.GetAllAsync();

@@ -3,13 +3,14 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using FinanceManager.Database.EntityModels;
 using FinanceManager.Database.Repositories;
+using FinanceManager.DTOs;
 
 namespace FinanceManager.ViewModels;
 
 public class SummaryViewModel : INotifyPropertyChanged
 {
     private readonly UserRepository _userRepository;
-    private ObservableCollection<Transaction> _recentTransactions = new();
+    private ObservableCollection<TransactionDTO> _recentTransactions = new();
     private User _currentUser;
 
     public User CurrentUser
@@ -22,7 +23,7 @@ public class SummaryViewModel : INotifyPropertyChanged
         }
     }
 
-    public ObservableCollection<Transaction> RecentTransactions
+    public ObservableCollection<TransactionDTO> RecentTransactions
     {
         get => _recentTransactions;
         private set
@@ -32,7 +33,7 @@ public class SummaryViewModel : INotifyPropertyChanged
         }
     }
 
-    public SummaryViewModel(UserRepository userRepository, ObservableCollection<Transaction> allTransactions)
+    public SummaryViewModel(UserRepository userRepository, ObservableCollection<TransactionDTO> allTransactions)
     {
         _userRepository = userRepository;
         allTransactions.CollectionChanged += (s, e) => UpdateRecentTransactions(allTransactions);
@@ -76,7 +77,7 @@ public class SummaryViewModel : INotifyPropertyChanged
         return users.First();
     }
 
-    private void UpdateRecentTransactions(ObservableCollection<Transaction> allTransactions)
+    private void UpdateRecentTransactions(ObservableCollection<TransactionDTO> allTransactions)
     {
         var recentTransactions = allTransactions
             .OrderByDescending(t => t.Date)

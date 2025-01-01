@@ -1,6 +1,7 @@
 using System.Windows.Controls;
 using FinanceManager.Database.EntityModels;
 using FinanceManager.Database.Repositories;
+using FinanceManager.DTOs;
 using FinanceManager.ViewModels;
 
 namespace FinanceManager.Commands;
@@ -76,7 +77,7 @@ public class AddTransactionCommand : CommandBase
         await _transactionRepository.AddTransactionAsync(transaction);
 
         // Update the ObservableCollection to make changes on the frontend
-        _viewModel.Transactions.Add(transaction);
+        _viewModel.Transactions.Add(new TransactionDTO(transaction));
 
         ClearFormfields(parameter);
     }

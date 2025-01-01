@@ -90,11 +90,11 @@
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Column="0"
-                                           Text="{Binding Date, StringFormat={}{0:MM/dd/yyyy}}"
+                                           Text="{Binding Transaction.Date, StringFormat={}{0:MM/dd/yyyy}}"
                                            Margin="5" VerticalAlignment="Center" />
-                                <TextBlock Grid.Column="1" Text="{Binding Description}" Margin="5"
+                                <TextBlock Grid.Column="1" Text="{Binding Transaction.Description}" Margin="5"
                                            VerticalAlignment="Center" />
-                                <TextBlock Grid.Column="2" Text="{Binding Amount, StringFormat=C}"
+                                <TextBlock Grid.Column="2" Text="{Binding Transaction.Amount, StringFormat=C}"
                                            Margin="5"
                                            VerticalAlignment="Center" />
                             </Grid>
