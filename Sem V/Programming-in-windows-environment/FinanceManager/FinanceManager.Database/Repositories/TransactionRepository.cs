@@ -42,14 +42,14 @@ public class TransactionRepository
         await context.SaveChangesAsync();
     }
 
-    public async Task RemoveTransactionAsync(Transaction transactionId)
+    public async Task RemoveTransactionAsync(int transactionId)
     {
         await using var context = await _dbContextFactory.CreateDbContextAsync();
-        var transaction = await context.Transactions.FindAsync(transactionId);
+        var transactionMatch = await context.Transactions.FindAsync(transactionId);
 
-        if (transaction != null)
+        if (transactionMatch != null)
         {
-            context.Transactions.Remove(transaction);
+            context.Transactions.Remove(transactionMatch);
             await context.SaveChangesAsync();
         }
     }
