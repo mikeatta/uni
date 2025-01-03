@@ -12,16 +12,6 @@ public partial class TransactionsView : UserControl
         InitializeComponent();
     }
 
-    private void ComboBox_OnLostFocus(object sender, RoutedEventArgs e)
-    {
-        if (sender is ComboBox comboBox)
-        {
-            var viewModel = DataContext as TransactionsViewModel;
-            var categoryName = comboBox.Text;
-            viewModel.CategoriesSelectedValue = categoryName;
-        }
-    }
-
     private void ShowMenuButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button button && button.ContextMenu != null)

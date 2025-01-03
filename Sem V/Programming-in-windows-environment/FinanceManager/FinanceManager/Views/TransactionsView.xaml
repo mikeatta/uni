@@ -64,8 +64,8 @@
                               ItemsSource="{Binding Categories}"
                               DisplayMemberPath="Name"
                               SelectedValuePath="Name"
-                              SelectedValue="{Binding CategoriesSelectedValue, Mode=TwoWay}"
-                              LostFocus="ComboBox_OnLostFocus">
+                              Text="{Binding CategoriesSelectedValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                              StaysOpenOnEdit="True">
                     </ComboBox>
                     <TextBlock Grid.Row="0" Grid.Column="1" Text="Type" />
                     <ComboBox Grid.Row="1" Grid.Column="1" Margin="5 0 0 0"
