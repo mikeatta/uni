@@ -225,7 +225,7 @@
     }
 
     function formatCRC(value) {
-      const formattedValue = value.toString().padStart(5, '0'); // Affix zeros to CRC, if length is less than 5 chars
+      const formattedValue = value.toString(16).toUpperCase().padStart(4, '0'); // Prefix CRC with zeros, if length is shorter than 4 chars
       return formattedValue;
     }
 
