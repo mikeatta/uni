@@ -225,7 +225,8 @@
     }
 
     function formatCRC(value) {
-      const formattedValue = value.toString(16).toUpperCase().padStart(4, '0'); // Prefix CRC with zeros, if length is shorter than 4 chars
+      const stringHexValue = value.toString(16).toUpperCase(); // Convert CRC output to a hexadecimal string representation
+      const formattedValue = stringHexValue.padStart(4, '0'); // Prefix CRC with zeros, if length is shorter than 4 chars
       return formattedValue;
     }
 
@@ -233,7 +234,6 @@
       const inputData = document.querySelector('input.frame-window').value;
       const computedCRC = computeCRC(inputData);
       const frame = `[PC0STM${inputData}${formatCRC(computedCRC)}]`;
-      clearWindow(); // Clear input field after processing the frame
       return frame;
     }
 
@@ -252,6 +252,7 @@
 
       frameNode.setAttribute('onClick', 'copyElementContent(this)');
       outputContainer.appendChild(frameNode);
+      clearWindow(); // Clear input field after processing the frame
     }
 
     function clearOutput() {
