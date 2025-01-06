@@ -225,15 +225,77 @@
     }
 
     function formatCRC(value) {
-      const formattedValue = value.toString().padStart(5, '0'); // Affix zeros to CRC, if length is less than 5 chars
+      const stringHexValue = value.toString(16).toUpperCase(); // Convert CRC output to a hexadecimal string representation
+      const formattedValue = stringHexValue.padStart(4, '0'); // Prefix CRC with zeros, if length is shorter than 4 chars
       return formattedValue;
+    }
+
+    /**
+     * Converts decimal values in commands to hexadecimal within a frame.
+     * Handles multiple commands in the same input frame.
+     *
+     * @param {string} input - The frame body containing the commands.
+     * @returns {string} - Modified frame with decimal values converted to hexadecimal.
+     */
+    function convertInputData(input) {
+      const readSinglePattern = /READ\|(\d{3});/g;
+      const readRangePattern = /READ\|(\d{3})-(\d{3});/g;
+      const setIntervalPattern = /INTV\|(\d{1,10});/g;
+
+      let index = 0; // Current position in the input string
+      let result = ''; // Accumulated output
+
+      while (index < input.length) {
+        const substring = input.slice(index); // Remaining input to process
+        let match;
+
+        // Handle READ single value
+        if ((match = readSinglePattern.exec(substring))) {
+          const decimal = parseInt(match[1], 10);
+          const hex = decimal.toString(16).toUpperCase().padStart(4, '0');
+          result += input.slice(index, index + match.index) + `READ|${hex};`;
+          index += match.index + match[0].length; // Move index past the matched command
+          continue;
+        }
+
+        // Handle READ range
+        if ((match = readRangePattern.exec(substring))) {
+          const decimalStart = parseInt(match[1], 10);
+          const decimalEnd = parseInt(match[2], 10);
+          const hexStart = decimalStart
+            .toString(16)
+            .toUpperCase()
+            .padStart(4, '0');
+          const hexEnd = decimalEnd.toString(16).toUpperCase().padStart(4, '0');
+          result +=
+            input.slice(index, index + match.index) +
+            `READ|${hexStart}-${hexEnd};`;
+          index += match.index + match[0].length; // Move index past the matched command
+          continue;
+        }
+
+        // Handle INTV command
+        if ((match = setIntervalPattern.exec(substring))) {
+          const decimal = parseInt(match[1], 10);
+          const hex = decimal.toString(16).toUpperCase().padStart(8, '0');
+          result += input.slice(index, index + match.index) + `INTV|${hex};`;
+          index += match.index + match[0].length; // Move index past the matched command
+          continue;
+        }
+
+        // If no match is found, copy the current character and move forward
+        result += input[index];
+        index++;
+      }
+
+      return result;
     }
 
     function generateFrame() {
       const inputData = document.querySelector('input.frame-window').value;
-      const computedCRC = computeCRC(inputData);
-      const frame = `[PC0STM${inputData}${formatCRC(computedCRC)}]`;
-      clearWindow(); // Clear input field after processing the frame
+      const hexNumberInputData = convertInputData(inputData); // Convert the decimal values in the frame into hexadecimal
+      const computedCRC = computeCRC(hexNumberInputData);
+      const frame = `[PC0STM${hexNumberInputData}${formatCRC(computedCRC)}]`;
       return frame;
     }
 
@@ -252,6 +314,7 @@
 
       frameNode.setAttribute('onClick', 'copyElementContent(this)');
       outputContainer.appendChild(frameNode);
+      clearWindow(); // Clear input field after processing the frame
     }
 
     function clearOutput() {
