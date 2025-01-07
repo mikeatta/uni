@@ -22,6 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <ctype.h>
+#include <inttypes.h>
 
 #include "string.h"
 #include "math.h"
@@ -40,10 +42,10 @@ typedef struct {
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MAX_FRAME_LEN 513
-#define MIN_FRAME_LEN 13 // Frame length of a valid frame with an empty body
-#define UART3_TX_BUF_LEN 2052
-#define UART3_RX_BUF_LEN 2052
+#define MAX_FRAME_LEN 512
+#define MIN_FRAME_LEN 12 // Frame length of a valid frame with an empty body
+#define UART3_TX_BUF_LEN 2048
+#define UART3_RX_BUF_LEN 2048
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -187,20 +189,21 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
 			}
 
 			// Skip the frame on invalid CRC value
-			uint8_t *crc_value_ptr = &tmp[frame_length - 6]; // CRC value length (5) + frame end character (1)
+			uint8_t *crc_value_ptr = &tmp[frame_length - 5]; // CRC value length (4) + frame end character (1)
 
 			// Compute the CRC value based on received frame's data
 			uint8_t *data_value_ptr = &tmp[7];
-			uint16_t data_part_length = frame_length - 13;
+			uint16_t data_part_length = frame_length - MIN_FRAME_LEN;
 			uint16_t computed_crc = compute_CRC(data_value_ptr, data_part_length);
 
 			// Convert computed CRC to char array for value comparison
-			uint8_t crc_string[6];
-			sprintf((char *)crc_string, "%05d", computed_crc);
+			uint8_t crc_string[5];
+			sprintf((char *)crc_string, "%04X", computed_crc);
 
 			for (uint8_t i = 0; i < 5; i++)
 			{
-				if (*crc_value_ptr < '0' || *crc_value_ptr > '9')
+				if ((*crc_value_ptr < '0' || *crc_value_ptr > '9') &&
+					(*crc_value_ptr < 'A' || *crc_value_ptr > 'F'))
 				{
 					continue; // Skip the frame if CRC character is not a number
 				}
@@ -251,13 +254,13 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
  */
 void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
 {
-	uint16_t frame_length = strlen((char *)data) + MIN_FRAME_LEN; // Data length + other frame characters (13)
+	uint16_t frame_length = strlen((char *)data) + MIN_FRAME_LEN; // Data length + other frame characters (12)
 	uint8_t frame[frame_length + 3]; // Add (3) indexes for the special characters at the end of the frame
 	uint16_t index = 0;
 
 	// Cast the uint16_t CRC value to a uint8_t array
-	uint8_t crc_string[6];
-	sprintf((char *)crc_string, "%05d", crc_value);
+	uint8_t crc_string[5];
+	sprintf((char *)crc_string, "%04X", crc_value);
 
 	// Define pointers for easier data assignment in arrays
 	const uint8_t *device_address_ptr = DEVICE_ADDRESS;
@@ -277,7 +280,7 @@ void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
 			frame[index++] = *recipient_address;
 			recipient_address++;
 		}
-		else if (index < (frame_length - 6)) // Fill the data part
+		else if (index < (frame_length - 5)) // Fill the data part
 		{
 			frame[index++] = *data;
 			data++;
@@ -362,7 +365,7 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, uint16_t *read_idx, float te
 	ret = snprintf((char *)tmp_char_hum, char_array_length, "%d.%d", int_hum, frac_hum);
 	if (ret < 0 || ret >= char_array_length) return;
 
-	uint8_t sensor_read_output[30]; // Total size of tmp arrays - x4 skipped '\0's + final '\0' at the end of the array
+	uint8_t sensor_read_output[29]; // Total size of tmp arrays - x4 skipped '\0's + final '\0' at the end of the array
 	uint8_t index = 0;
 
 	// TODO: Validate passed indexes -- 000 would return false, but is a valid index
@@ -371,10 +374,10 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, uint16_t *read_idx, float te
 	if (read_idx != NULL)
 	{
 		uint8_t tmp_idx_desc[6] = "IDX: ";
-		uint8_t tmp_char_idx[4];
-		uint8_t idx_array_length = 4;
+		uint8_t tmp_char_idx[5];
+		uint8_t idx_array_length = 5;
 
-		ret = snprintf((char *)tmp_char_idx, idx_array_length, "%03d", *read_idx);
+		ret = snprintf((char *)tmp_char_idx, idx_array_length, "%04X", *read_idx);
 		if (ret < 0 || ret >= idx_array_length) return;
 
 		// Construct the final output array by concatenating the string arrays
@@ -407,26 +410,27 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, uint16_t *read_idx, float te
 }
 
 /**
- * @brief  Checks if the given string contains only decimal numeric values.
+ * @brief  Checks if the given string contains only hexadecimal values.
  *
- * @param  str A pointer to the array containing the string.
+ * @param  str A pointer to the array containing a string.
  * @param  length The length of the given string.
- * @retval Returns 1 when the string is numeric, 0 otherwise.
+ * @retval Returns 1 when the string is valid, 0 otherwise.
  */
-uint8_t is_numeric(const char *str, uint8_t length)
+uint8_t is_valid_hex(const char *str, uint8_t length)
 {
 	for (uint8_t i = 0; i < length; i++)
 	{
-		if (str[i] > '9' || str[i] < '0')
+		if ((str[i] > '9' || str[i] < '0') &&
+			(str[i] > 'F' || str[i] < 'A'))
 		{
 			return 0;
 		}
 	}
-	return 1; // All chars are decimal numbers
+	return 1; // All chars are valid hex digits
 }
 
 /**
- * @brief  Converts the string representation of a digit into an unsigned 16-bit integer.
+ * @brief  Converts a hexadecimal string to an unsigned 16-bit integer.
  *
  * @param  string_array A pointer to the string-digit array.
  * @param  string_length An unsigned int representing the amount of characters to convert.
@@ -434,13 +438,26 @@ uint8_t is_numeric(const char *str, uint8_t length)
  */
 uint16_t convert_char_string_to_uint16(uint8_t *string_array, uint8_t string_length)
 {
-	uint16_t decimal_multiplier = 1 * pow(10, (string_length - 1));
 	uint16_t result = 0;
 
-	while (decimal_multiplier != 0)
+	for (uint8_t i = 0; i < string_length; i++)
 	{
-		result += (*string_array++ - '0') * decimal_multiplier;
-		decimal_multiplier /= 10;
+		uint8_t character = *string_array++;
+
+		if (isdigit(character))
+		{
+			character -= '0';
+		}
+		else if (character >= 'A' && character <= 'F')
+		{
+			character -= 'A' - 10;
+		}
+		else if (character >= 'a' && character <= 'f')
+		{
+			character -= 'a' - 10;
+		}
+
+		result = (result << 4) | character;
 	}
 
 	return result;
@@ -512,9 +529,9 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 				}
 				else if (strncmp(available_commands[i], "INTV", strlen("INTV")) == 0)
 				{
-					uint8_t interval_ret_message[16] = "INTERVAL: ";
-					uint8_t tmp_interval_value_array[6];
-					sprintf((char *)tmp_interval_value_array, "%05d", sensor_read_interval);
+					uint8_t interval_ret_message[19] = "INTERVAL: ";
+					uint8_t tmp_interval_value_array[9];
+					sprintf((char *)tmp_interval_value_array, "%08" PRIX32, sensor_read_interval);
 
 					// Concatenate the arrays to form the message
 					size_t interval_array_size = sizeof(interval_ret_message) + sizeof(interval_ret_message[0]);
@@ -528,19 +545,19 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 			}
 			else if (match && *char_after_command_string == '|')
 			{
-				if (strncmp(available_commands[i], "READ", strlen("READ")) == 0 && *(char_after_command_string + 4) == ';')
+				if (strncmp(available_commands[i], "READ", strlen("READ")) == 0 && *(char_after_command_string + 5) == ';')
 				{
-					index = match + strlen((const char *)available_commands[i]) + 5; // Shift the index past the ';' char
+					index = match + strlen((const char *)available_commands[i]) + 6; // Shift the index past the ';' char
 					// Fill the read param's numerical values
-					uint8_t tmp_read_param[4];
-					for (uint8_t i = 0; i < 3; i++)
+					uint8_t tmp_read_param[5];
+					for (uint8_t i = 0; i < 4; i++)
 					{
 						tmp_read_param[i] = *(char_after_command_string++ + 1);
 					}
-					tmp_read_param[3] = '\0'; // Null-terminate the array
+					tmp_read_param[4] = '\0'; // Null-terminate the array
 
 					// Validate the numerical values in the array
-					if (!is_numeric((const char *)tmp_read_param, strlen((const char *)tmp_read_param)))
+					if (!is_valid_hex((const char *)tmp_read_param, strlen((const char *)tmp_read_param)))
 					{
 						continue;
 					}
@@ -559,26 +576,26 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					AM2320_Data archived_data = AM2320_Data_Buf[buffer_index];
 					AM2320_SendSensorDataFrame(recipient_address, &buffer_index, archived_data.temperature, archived_data.humidity);
 				}
-				else if (strncmp(available_commands[i], "READ", strlen("READ")) == 0 && *(char_after_command_string + 4) == '-' && *(char_after_command_string + 8) == ';')
+				else if (strncmp(available_commands[i], "READ", strlen("READ")) == 0 && *(char_after_command_string + 5) == '-' && *(char_after_command_string + 10) == ';')
 				{
-					index = match + strlen((const char *)available_commands[i]) + 9; // Shift the index past the ';' char
-					uint8_t tmp_read_param_start[4];
-					uint8_t tmp_read_param_stop[4];
+					index = match + strlen((const char *)available_commands[i]) + 11; // Shift the index past the ';' char
+					uint8_t tmp_read_param_start[5];
+					uint8_t tmp_read_param_stop[5];
 
 					// Fill the numerical string parameter arrays
-					for (uint8_t i = 0; i < 3; i++)
+					for (uint8_t i = 0; i < 4; i++)
 					{
 						tmp_read_param_start[i] = *(char_after_command_string + 1);
-						tmp_read_param_stop[i] = *(char_after_command_string + 5);
+						tmp_read_param_stop[i] = *(char_after_command_string + 6);
 						char_after_command_string++;
 					}
 					// Null-terminate the arrays
-					tmp_read_param_start[3] = '\0';
-					tmp_read_param_stop[3] = '\0';
+					tmp_read_param_start[4] = '\0';
+					tmp_read_param_stop[4] = '\0';
 
 					// Validate the numerical values in the arrays
-					if (!is_numeric((const char *)tmp_read_param_start, strlen((const char *)tmp_read_param_start)) ||
-						!is_numeric((const char *)tmp_read_param_stop, strlen((const char *)tmp_read_param_stop)))
+					if (!is_valid_hex((const char *)tmp_read_param_start, strlen((const char *)tmp_read_param_start)) ||
+						!is_valid_hex((const char *)tmp_read_param_stop, strlen((const char *)tmp_read_param_stop)))
 					{
 						continue;
 					}
@@ -605,20 +622,20 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 						buffer_start_index++;
 					}
 				}
-				else if (strncmp(available_commands[i], "INTV", strlen("INTV")) == 0 && *(char_after_command_string + 6) == ';')
+				else if (strncmp(available_commands[i], "INTV", strlen("INTV")) == 0 && *(char_after_command_string + 9) == ';')
 				{
-					index = match + strlen((const char *)available_commands[i]) + 7; // Shift the index past the ';' char
-					uint8_t tmp_intv_param[6];
+					index = match + strlen((const char *)available_commands[i]) + 10; // Shift the index past the ';' char
+					uint8_t tmp_intv_param[9];
 
 					// Fill the param's numerical values
-					for (uint8_t i = 0; i < 5; i++)
+					for (uint8_t i = 0; i < 8; i++)
 					{
 						tmp_intv_param[i] = *(char_after_command_string++ + 1);
 					}
-					tmp_intv_param[5] = '\0'; // Null-terminate the array
+					tmp_intv_param[8] = '\0'; // Null-terminate the array
 
 					// Validate the numerical values in the array
-					if (!is_numeric((const char *)tmp_intv_param, strlen((const char *)tmp_intv_param)))
+					if (!is_valid_hex((const char *)tmp_intv_param, strlen((const char *)tmp_intv_param)))
 					{
 						continue;
 					}
@@ -627,7 +644,7 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					sensor_read_interval = convert_char_string_to_uint16(tmp_intv_param, strlen((const char *)tmp_intv_param));
 
 					// TODO: Improve range check logic
-					// Only check for values under 2000ms -- values over 65535 will overflow
+					// Only check for values under 2000ms -- values over the max range will overflow
 					if (sensor_read_interval < 2000)
 					{
 						uint16_t crc_value = compute_CRC((uint8_t *)"IDX_ERROR", strlen((const char *)"IDX_ERROR"));
@@ -636,9 +653,9 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					}
 
 					// Prepare the return command message
-					uint8_t tmp_interval_array[20] = "NEW INTERVAL: ";
-					uint8_t tmp_interval_value_array[6];
-					sprintf((char *)tmp_interval_value_array, "%05d", sensor_read_interval);
+					uint8_t tmp_interval_array[23] = "NEW INTERVAL: ";
+					uint8_t tmp_interval_value_array[9];
+					sprintf((char *)tmp_interval_value_array, "%08" PRIX32, sensor_read_interval);
 
 					// Concatenate the arrays to form the message
 					size_t interval_array_size = sizeof(tmp_interval_array) / sizeof(tmp_interval_array[0]);
