@@ -80,7 +80,7 @@ uint8_t data_ready = 0;
 volatile uint8_t delay_elapsed = 1;
 volatile uint8_t sensor_active = 0;
 volatile uint8_t sensor_read_data = 0;
-volatile uint16_t sensor_read_interval = 2000;
+volatile uint32_t sensor_read_interval = 2000;
 
 AM2320_Data AM2320_Data_Buf[300];
 volatile uint16_t AM2320_Buf_Idx = 0;
