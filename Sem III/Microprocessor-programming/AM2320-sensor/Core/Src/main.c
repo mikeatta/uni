@@ -365,11 +365,9 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, uint16_t *read_idx, float te
 	ret = snprintf((char *)tmp_char_hum, char_array_length, "%d.%d", int_hum, frac_hum);
 	if (ret < 0 || ret >= char_array_length) return;
 
-	uint8_t sensor_read_output[29]; // Total size of tmp arrays - x4 skipped '\0's + final '\0' at the end of the array
+	uint8_t sensor_read_output[29]; // Max total size of tmp arrays - x4 skipped '\0's + final '\0' at the end of the array
 	uint8_t index = 0;
 
-	// TODO: Validate passed indexes -- 000 would return false, but is a valid index
-	// FIX: Processing stops at 'TEMP: 0.0' for empty data buffers
 	// If requested, prepare the 'IDX' output string
 	if (read_idx != NULL)
 	{
@@ -381,29 +379,29 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, uint16_t *read_idx, float te
 		if (ret < 0 || ret >= idx_array_length) return;
 
 		// Construct the final output array by concatenating the string arrays
-		memcpy(&sensor_read_output[index], tmp_idx_desc, sizeof(tmp_idx_desc) - 1); // Skip the null terminator
-		index += sizeof(tmp_idx_desc) - 1;
+		memcpy(&sensor_read_output[index], tmp_idx_desc, strlen((const char *)tmp_idx_desc)); // Skip the null terminator
+		index += strlen((const char *)tmp_idx_desc);
 
-		memcpy(&sensor_read_output[index], tmp_char_idx, sizeof(tmp_char_idx) - 1); // Skip the null terminator
-		index += sizeof(tmp_char_idx) - 1;
+		memcpy(&sensor_read_output[index], tmp_char_idx, strlen((const char *)tmp_char_idx)); // Skip the null terminator
+		index += strlen((const char *)tmp_char_idx);
 
 		sensor_read_output[index++] = ' '; // Add a space separator
 	}
 
 	// Construct the final output array by concatenating the string arrays
-	memcpy(&sensor_read_output[index], tmp_temp_desc, sizeof(tmp_temp_desc) - 1); // Skip the null terminator
-	index += sizeof(tmp_temp_desc) - 1;
+	memcpy(&sensor_read_output[index], tmp_temp_desc, strlen((const char *)tmp_temp_desc)); // Skip the null terminator
+	index += strlen((const char *)tmp_temp_desc);
 
-	memcpy(&sensor_read_output[index], tmp_char_temp, sizeof(tmp_char_temp) - 1); // Skip the null terminator
-	index += sizeof(tmp_char_temp) - 1;
+	memcpy(&sensor_read_output[index], tmp_char_temp, strlen((const char *)tmp_char_temp)); // Skip the null terminator
+	index += strlen((const char *)tmp_char_temp);
 
 	sensor_read_output[index++] = ' '; // Add a space separator
 
-	memcpy(&sensor_read_output[index], tmp_hum_desc, sizeof(tmp_hum_desc) - 1); // Skip the null terminator
-	index += sizeof(tmp_hum_desc) - 1;
+	memcpy(&sensor_read_output[index], tmp_hum_desc, strlen((const char *)tmp_hum_desc)); // Skip the null terminator
+	index += strlen((const char *)tmp_hum_desc);
 
-	memcpy(&sensor_read_output[index], tmp_char_hum, sizeof(tmp_char_hum)); // Copy the null terminator
-	index += sizeof(tmp_char_hum);
+	memcpy(&sensor_read_output[index], tmp_char_hum, strlen((const char *)tmp_char_hum) + 1); // Copy the null terminator
+	index += strlen((const char *)tmp_char_hum) + 1;
 
 	uint16_t crc_value = compute_CRC(sensor_read_output, index);
 	send_frame(recipient, sensor_read_output, crc_value);
