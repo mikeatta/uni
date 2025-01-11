@@ -38,6 +38,15 @@ typedef struct {
 	float temperature;
 	float humidity;
 } AM2320_Data;
+
+// Used for storing information about the microcontroller
+typedef struct {
+	uint32_t unique_id[3];
+	uint16_t rev_id;
+	uint16_t dev_id;
+} STM32_Info;
+
+STM32_Info dev_info = {0};
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -327,6 +336,95 @@ void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
 }
 
 /**
+ * @brief  Assigns information about the STM32 microcontroller to the info struct.
+ *
+ * @param  unique_id_address A pointer to the address where the unique ID is stored.
+ * @param  idcode_address A pointer to the address of the device's ID code register.
+ * @param  dev_info A pointer to the structure to assign the received data to.
+ * @retval None
+ */
+void STM32_GetDeviceInfo(uint32_t *unique_id_address, uint32_t *idcode_address, STM32_Info *dev_info)
+{
+	// Get the unique ID of the microcontroller
+	dev_info->unique_id[0] = unique_id_address[0];
+	dev_info->unique_id[1] = unique_id_address[1];
+	dev_info->unique_id[2] = unique_id_address[2];
+
+	// Get the DBGMCU information
+	uint32_t idcode = *(volatile uint32_t *)idcode_address;
+	dev_info->rev_id = (idcode >> 16) & 0xFFFF;
+	dev_info->dev_id = idcode & 0xFFF;
+}
+
+/**
+ * @brief  Constructs the return frame with the STM32 info, and sends it to the user.
+ *
+ * @param  recipient A pointer to the source, requesting the data.
+ * @param  device_info A pointer to the struct containing the STM info.
+ * @retval None
+ */
+void STM32_SendDeviceInfoFrame(uint8_t *recipient, STM32_Info *device_info)
+{
+	// Descriptions for the device information
+	uint8_t tmp_uid_desc[12] = "UNIQUE ID: ";
+	uint8_t tmp_rev_desc[9] = "REV_ID: ";
+	uint8_t tmp_id_desc[9] = "DEV_ID: ";
+
+	// Device info buffers
+	uint8_t tmp_uid_char[25];
+	uint8_t tmp_rev_char[5];
+	uint8_t tmp_id_char[4];
+
+	// Helper variables for tracking array lengths and validating char-casting
+	uint8_t char_array_length = 0;
+	uint8_t ret;
+
+	char_array_length = sizeof(tmp_uid_char);
+	ret = snprintf((char *)tmp_uid_char, char_array_length, "%08lX%08lX%08lX",
+			device_info->unique_id[0],
+			device_info->unique_id[1],
+			device_info->unique_id[2]);
+	if (ret < 0 || ret > char_array_length) return;
+
+	char_array_length = sizeof(tmp_rev_char);
+	ret = snprintf((char *)tmp_rev_char, char_array_length, "%03X", device_info->rev_id);
+	if (ret < 0 || ret > char_array_length) return;
+
+	char_array_length = sizeof(tmp_id_char);
+	ret = snprintf((char *)tmp_id_char, char_array_length, "%03X", device_info->dev_id);
+	if (ret < 0 || ret > char_array_length) return;
+
+	uint8_t info_output_data[61];
+	uint8_t index = 0;
+
+	// Construct the final output array by concatenating the string arrays
+	memcpy(&info_output_data[index], tmp_uid_desc, strlen((const char*)tmp_uid_desc)); // Skip the null terminator
+	index += strlen((const char *)tmp_uid_desc);
+
+	memcpy(&info_output_data[index], tmp_uid_char, strlen((const char*)tmp_uid_char)); // Skip the null terminator
+	index += strlen((const char *)tmp_uid_char);
+
+	info_output_data[index++] = ' '; // Add a space separator
+
+	memcpy(&info_output_data[index], tmp_rev_desc, strlen((const char*)tmp_rev_desc)); // Skip the null terminator
+	index += strlen((const char *)tmp_rev_desc);
+
+	memcpy(&info_output_data[index], tmp_rev_char, strlen((const char*)tmp_rev_char)); // Skip the null terminator
+	index += strlen((const char *)tmp_rev_char);
+
+	info_output_data[index++] = ' '; // Add a space separator
+
+	memcpy(&info_output_data[index], tmp_id_desc, strlen((const char*)tmp_id_desc)); // Skip the null terminator
+	index += strlen((const char *)tmp_id_desc);
+
+	memcpy(&info_output_data[index], tmp_id_char, strlen((const char*)tmp_id_char) + 1); // Copy the null-terminator
+	index += strlen((const char *)tmp_id_char) + 1;
+
+	uint16_t crc_value = compute_CRC(info_output_data, index);
+	send_frame(recipient, info_output_data, crc_value);
+}
+
+/**
  * @brief  Prepares and sends the formatted sensor reads.
  *
  * The function formats the read temperature and humidity values, constructs
@@ -476,7 +574,7 @@ uint16_t convert_char_string_to_uint16(uint8_t *string_array, uint8_t string_len
 void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t data_length)
 {
 	// Define available commands in char array format for string value comparison
-	const char *available_commands[] = { "START", "STOP", "READ", "INTV" };
+	const char *available_commands[] = { "START", "STOP", "READ", "INTV", "INFO" };
 	uint8_t command_count = sizeof(available_commands) / sizeof(available_commands[0]);
 
 	uint8_t tmp_command[data_length]; // Temporary array for processing commands in FIFO order
@@ -663,6 +761,31 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					// Send return message
 					uint16_t crc_value = compute_CRC(frame_data, interval_array_size);
 					send_frame(recipient_address, tmp_interval_array, crc_value);
+				}
+				else if (strncmp(available_commands[i], "INFO", strlen("INFO")) == 0 && *(char_after_command_string + 4) == ';')
+				{
+					index = match + strlen((const char *)available_commands[i]) + 5; // Shift the index past the ';' char
+
+					uint8_t tmp_info_param[4];
+					for (uint8_t i = 0; i < 3; i++)
+					{
+						tmp_info_param[i] = *(char_after_command_string++ + 1);
+					}
+					tmp_info_param[3] = '\0'; // Null-terminate the array
+
+					if (strncmp((const char *)tmp_info_param, "STM", strlen("STM")) == 0)
+					{
+						uint32_t *id_address = (uint32_t *)0x1FF0F420;
+						uint32_t *idcode_address = (uint32_t *)0xE0042000;
+						STM32_GetDeviceInfo(id_address, idcode_address, &dev_info);
+
+						STM32_SendDeviceInfoFrame(recipient_address, &dev_info);
+					}
+					else if (strncmp((const char *)tmp_info_param, "SNS", strlen("SNS")) == 0)
+					{
+
+					}
+					else continue;
 				}
 			}
 			else if (match && (*frame_data != '|' && *frame_data != ';'))
