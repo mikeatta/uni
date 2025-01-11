@@ -2,7 +2,7 @@ import {
   getCalendarEvents,
   getCalendarTasklists,
   getCalendarTasks,
-} from '../../backend/taskManager'
+} from '../api/entryHandlers'
 import {
   CalendarEvent,
   CalendarTask,
