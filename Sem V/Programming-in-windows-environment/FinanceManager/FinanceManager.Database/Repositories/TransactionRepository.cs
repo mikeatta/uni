@@ -57,7 +57,24 @@ public class TransactionRepository
     public async Task EditTransactionAsync(Transaction transaction)
     {
         await using var context = await _dbContextFactory.CreateDbContextAsync();
-        context.Transactions.Update(transaction);
+        var transactionMatch = await context.Transactions.FindAsync(transaction.Id);
+
+        if (transactionMatch == null)
+        {
+            throw new Exception("Failed to find transaction to update.");
+        }
+
+        // Modify the transaction properties
+        transactionMatch.CategoryId = transaction.CategoryId;
+        transactionMatch.Type = transaction.Type;
+        transactionMatch.Description = transaction.Description;
+        transactionMatch.Note = transaction.Note;
+        transactionMatch.Amount = transaction.Amount;
+        transactionMatch.Date = transaction.Date;
+
+        // Mark the transaction entity as modified
+        context.Entry(transactionMatch).State = EntityState.Modified;
+
         await context.SaveChangesAsync();
     }
 }
