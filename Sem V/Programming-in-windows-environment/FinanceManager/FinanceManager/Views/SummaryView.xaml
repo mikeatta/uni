@@ -8,6 +8,7 @@
              d:DesignHeight="300" d:DesignWidth="800">
     <UserControl.Resources>
         <helpers:IndexConverter x:Key="IndexConverter" />
+        <helpers:TrendIconConverter x:Key="TrendIconConverter" />
     </UserControl.Resources>
 
     <Grid Background="White">
@@ -119,18 +120,101 @@
             <!-- Content -->
         </Grid>
 
+        <!-- Monthly summary section -->
         <Grid Grid.Row="1" Grid.Column="1" Background="LightGray" Margin="5px">
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.2*" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.5*" />
+                <ColumnDefinition Width="0.5*" />
+            </Grid.ColumnDefinitions>
+
             <!-- Header -->
-            <Rectangle Grid.Row="0" Fill="Gray" />
-            <TextBlock Grid.Row="0" Text="Monthly Summary" FontWeight="SemiBold" HorizontalAlignment="Left"
-                       VerticalAlignment="Center" Padding="5px 0 0 0 " />
+            <Rectangle Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Fill="Gray" />
+            <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="Monthly Summary"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Center"
+                           Margin="5,0,0,0" />
+
+                <!-- Old color: 4A4A4A -->
+                <Border Grid.Column="1"
+                        Background="#E8E7E7"
+                        CornerRadius="4"
+                        Margin="10,4,5,4"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="{Binding SummaryInfoDateSpan}"
+                               FontWeight="Medium"
+                               Padding="10,4" />
+                </Border>
+            </Grid>
 
             <!-- Content -->
+            <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <!-- Income Panel -->
+                <Border Grid.Column="0"
+                        Background="White"
+                        CornerRadius="4"
+                        Margin="0,0,5,0"
+                        Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="Income"
+                                   FontWeight="SemiBold"
+                                   Foreground="#666666"
+                                   Margin="0,0,0,5" />
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0:C} {1} ({2:+0.00;-0.00;0.00}%)">
+                                    <Binding Path="MonthlySummary.TotalIncome" />
+                                    <Binding Path="MonthlySummary.IncomeTrend"
+                                             Converter="{StaticResource TrendIconConverter}" />
+                                    <Binding Path="MonthlySummary.IncomeChangePercentage" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Expenses Panel -->
+                <Border Grid.Column="1"
+                        Background="White"
+                        CornerRadius="4"
+                        Margin="5,0,0,0"
+                        Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="Expenses"
+                                   FontWeight="SemiBold"
+                                   Foreground="#666666"
+                                   Margin="0,0,0,5" />
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0:C} {1} ({2:+0.00;-0.00;0.00}%)">
+                                    <Binding Path="MonthlySummary.TotalExpenses" />
+                                    <Binding Path="MonthlySummary.ExpensesTrend"
+                                             Converter="{StaticResource TrendIconConverter}" />
+                                    <Binding Path="MonthlySummary.ExpensesChangePercentage" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

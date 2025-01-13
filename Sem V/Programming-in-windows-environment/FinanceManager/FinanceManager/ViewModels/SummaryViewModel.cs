@@ -10,7 +10,7 @@ namespace FinanceManager.ViewModels;
 public class SummaryViewModel : INotifyPropertyChanged
 {
     private readonly UserRepository _userRepository;
-    private ObservableCollection<TransactionDTO> _recentTransactions = new();
+
     private User _currentUser;
 
     public User CurrentUser
@@ -23,6 +23,8 @@ public class SummaryViewModel : INotifyPropertyChanged
         }
     }
 
+    private ObservableCollection<TransactionDTO> _recentTransactions = new();
+
     public ObservableCollection<TransactionDTO> RecentTransactions
     {
         get => _recentTransactions;
@@ -33,14 +35,92 @@ public class SummaryViewModel : INotifyPropertyChanged
         }
     }
 
+    private string _summaryInfoDateSpan = GetSummaryDateSpan();
+
+    public string SummaryInfoDateSpan
+    {
+        get => _summaryInfoDateSpan;
+        private set
+        {
+            _summaryInfoDateSpan = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private MonthlySummary _monthlySummary;
+
+    public MonthlySummary MonthlySummary
+    {
+        get => _monthlySummary;
+        set
+        {
+            _monthlySummary = value;
+            OnPropertyChanged();
+        }
+    }
+
     public SummaryViewModel(UserRepository userRepository, ObservableCollection<TransactionDTO> allTransactions)
     {
         _userRepository = userRepository;
-        allTransactions.CollectionChanged += (s, e) => UpdateRecentTransactions(allTransactions);
+
+        // Subscribe to transaction collection object changes
+        allTransactions.CollectionChanged += (s, e) =>
+        {
+            UpdateRecentTransactions(allTransactions);
+            UpdateMonthlySummary(allTransactions);
+        };
+
+        // Initialize the summary statistics
+        SummaryInfoDateSpan = GetSummaryDateSpan();
+
+        // Initialize the monthly summary
+        UpdateMonthlySummary(allTransactions);
+
+        // Initialize the user
         InitializeAsync();
 
         // Populate ObservableConnection on app init
         UpdateRecentTransactions(allTransactions);
+    }
+
+    private void UpdateMonthlySummary(ObservableCollection<TransactionDTO> allTransactions)
+    {
+        var currentDate = DateTime.Now;
+
+        var currentMonth = currentDate.Month;
+        var currentYear = currentDate.Year;
+
+        var previousMonth = currentMonth - 1;
+        var previousYear = currentYear;
+
+        // Adjust for rollover (when the current month is January)
+        if (previousMonth == 0)
+        {
+            previousMonth = 12;
+            previousYear -= 1;
+        }
+
+        var currentIncome = allTransactions.Where(t =>
+                t.Transaction.Date.Month == currentMonth && t.Transaction.Date.Year == currentYear &&
+                t.Transaction.Type == TransactionType.Income)
+            .Sum(t => t.Transaction.Amount);
+
+        var currentExpenses = allTransactions.Where(t =>
+                t.Transaction.Date.Month == currentMonth && t.Transaction.Date.Year == currentYear &&
+                t.Transaction.Type == TransactionType.Expense)
+            .Sum(t => t.Transaction.Amount);
+
+        var previousIncome = allTransactions.Where(t =>
+                t.Transaction.Date.Month == previousMonth && t.Transaction.Date.Year == previousYear &&
+                t.Transaction.Type == TransactionType.Income)
+            .Sum(t => t.Transaction.Amount);
+
+        var previousExpenses = allTransactions.Where(t =>
+                t.Transaction.Date.Month == previousMonth && t.Transaction.Date.Year == previousYear &&
+                t.Transaction.Type == TransactionType.Expense)
+            .Sum(t => t.Transaction.Amount);
+
+        MonthlySummary = GenerateMonthlySummary(currentIncome, currentExpenses, previousIncome, previousExpenses);
     }
 
     private async void InitializeAsync()
@@ -93,6 +173,52 @@ public class SummaryViewModel : INotifyPropertyChanged
     }
 
     public string UserBalance => CurrentUser.Balance.ToString("C2");
+
+    private static string GetSummaryDateSpan()
+    {
+        var currentDate = DateTime.Now;
+
+        // Determine the current month and the next month
+        var currentMonth = currentDate.ToString("MMM. yyyy");
+        var nextMonth = currentDate.AddMonths(1).ToString("MMM. yyyy");
+
+        return $"{currentMonth} - {nextMonth}";
+    }
+
+    private MonthlySummary GenerateMonthlySummary(decimal currentIncome, decimal currentExpenses,
+        decimal previousIncome, decimal previousExpenses)
+    {
+        // Calculate the change percentage based on the current and last month's performance
+        decimal incomeChangePercentage = CalculatePercentageChange(previousIncome, currentIncome);
+        decimal expensesChangePercentage = CalculatePercentageChange(previousExpenses, currentExpenses);
+
+        // Calculate the trend ("Up", "Down", "None") based on the income and expense data
+        string incomeTrend = GetTrend(previousIncome, currentIncome);
+        string expensesTrend = GetTrend(previousExpenses, currentExpenses);
+
+        return new MonthlySummary(
+            TotalIncome: currentIncome,
+            TotalExpenses: currentExpenses,
+            IncomeChangePercentage: incomeChangePercentage,
+            ExpensesChangePercentage: expensesChangePercentage,
+            IncomeTrend: incomeTrend,
+            ExpensesTrend: expensesTrend
+        );
+    }
+
+    private decimal CalculatePercentageChange(decimal previousValue, decimal currentValue)
+    {
+        if (previousValue == 0) return currentValue == 0 ? 0 : 100;
+        return ((currentValue - previousValue) / previousValue) * 100;
+    }
+
+    private string GetTrend(decimal previousValue, decimal currentValue)
+    {
+        if (currentValue > previousValue) return "Up";
+        if (currentValue < previousValue) return "Down";
+        return "None";
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
