@@ -89,6 +89,7 @@ uint8_t data_ready = 0;
 volatile uint8_t delay_elapsed = 1;
 volatile uint8_t sensor_active = 0;
 volatile uint8_t sensor_read_data = 0;
+volatile uint8_t sensor_read_info = 0;
 volatile uint32_t sensor_read_interval = 2000;
 
 AM2320_Data AM2320_Data_Buf[300];
@@ -783,7 +784,7 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					}
 					else if (strncmp((const char *)tmp_info_param, "SNS", strlen("SNS")) == 0)
 					{
-
+						sensor_read_info = 1;
 					}
 					else continue;
 				}
@@ -826,6 +827,11 @@ int main(void)
 
   float temperature = 0.0;
   float humidity = 0.0;
+
+  // Sensor info
+  uint32_t am2320_id = 0;
+  uint16_t am2320_model = 0;
+  uint8_t am2320_version = 0;
 
   AM2320_Data read_data;
   /* USER CODE END Init */
@@ -872,9 +878,16 @@ int main(void)
 	  {
 		  AM2320_InitSensorRead(&am2320);
 
-		  AM2320_ReadSensorData(&am2320);
+		  if (sensor_read_data == 1)
+		  {
+			  AM2320_ReadSensorData(&am2320);
+		  }
+		  else if (sensor_read_info == 1)
+		  {
+			  AM2320_ReadSensorInfo(&am2320);
+		  }
 
-		  if (data_ready == 1)
+		  if (data_ready == 1 && sensor_read_data == 1)
 		  {
 			  // Sensor data successfully read, process the data
 			  AM2320_ProcessSensorData(&am2320, &temperature, &humidity);
@@ -892,10 +905,7 @@ int main(void)
 			  }
 
 			  // Send the sensor data back
-			  if (sensor_read_data == 1)
-			  {
-				  AM2320_SendSensorDataFrame(sender_address, NULL, temperature, humidity);
-			  }
+			  AM2320_SendSensorDataFrame(sender_address, NULL, temperature, humidity);
 
 			  data_ready = 0;
 			  am2320_state = AM2320_STATE_IDLE;
@@ -905,6 +915,19 @@ int main(void)
 				  HAL_TIM_Base_Stop_IT(&htim6); // Manually stop the timer
 			  }
 			  TIM_StartDelay(sensor_read_interval); // Start the delay between sensor reads
+		  }
+		  else if (data_ready == 1 && sensor_read_info == 1)
+		  {
+			  AM2320_ProcessSensorInfo(&am2320, &am2320_id, &am2320_model, &am2320_version);
+
+			  sensor_read_info = 0;
+			  data_ready = 0;
+
+			  if (htim6.State != HAL_TIM_STATE_READY)
+			  {
+				  HAL_TIM_Base_Stop_IT(&htim6); // Manually stop the timer
+			  }
+			  TIM_StartDelay(sensor_read_interval); // Restart the delay for the reads
 		  }
 	  }
   }
@@ -1179,6 +1202,10 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
     	static uint8_t read_retries = 0;
 
 		if (am2320_state == AM2320_STATE_READ_DATA && (am2320.sensor_data[0] == 0x03 && am2320.sensor_data[1] == 0x04))
+		{
+			data_ready = 1;
+		}
+		else if (am2320_state == AM2320_STATE_READ_DATA && (am2320.sensor_data[0] == 0x03 && am2320.sensor_data[1] == 0x07))
 		{
 			data_ready = 1;
 		}

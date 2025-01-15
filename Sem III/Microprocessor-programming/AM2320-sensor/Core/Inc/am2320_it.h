@@ -12,7 +12,7 @@
 
 // Sensor constants
 #define AM2320_ADDRESS 0xB8
-#define AM2320_DATA_LENGTH 8
+#define AM2320_DATA_LENGTH 11
 
 // Sensor structure
 typedef struct {
@@ -39,6 +39,8 @@ void AM2320_Init(AM2320_HandleTypeDef *am2320, I2C_HandleTypeDef *hi2c, uint8_t 
 void AM2320_InitSensorRead(AM2320_HandleTypeDef *am2320);
 void AM2320_ReadSensorData(AM2320_HandleTypeDef *am2320);
 void AM2320_ProcessSensorData(AM2320_HandleTypeDef *am2320, float *temperature, float *humidity);
+void AM2320_ReadSensorInfo(AM2320_HandleTypeDef *am2320);
+void AM2320_ProcessSensorInfo(AM2320_HandleTypeDef *am2320, uint32_t *am2320_id, uint16_t *am2320_model, uint8_t *am2320_version);
 uint16_t compute_CRC(uint8_t *frame_data, uint16_t data_length);
 void TIM_StartDelay(uint16_t milliseconds);
 
