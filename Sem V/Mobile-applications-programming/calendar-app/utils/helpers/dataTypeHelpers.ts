@@ -1,9 +1,11 @@
 import { CalendarEvent, CalendarTask, FormData } from '../../components/types'
 
-/*
- * Function: 'getDataType'
+/**
+ * Determines the type of a calendar entry.
  *
- * A function returning the calendar entry data type.
+ * @param entry The calendar entry to check, which can be either a CalendarEvent or CalendarTask.
+ * @returns The type of the calendar entry, either 'event' or 'task'.
+ * @throws {Error} If the provided entry is of an unknown type.
  */
 export const getDataType = (entry: CalendarEvent | CalendarTask) => {
   if (isCalendarEvent(entry)) {
@@ -15,27 +17,39 @@ export const getDataType = (entry: CalendarEvent | CalendarTask) => {
   }
 }
 
+/**
+ * Type guard to check if a calendar entry is a CalendarEvent.
+ *
+ * @param entry The calendar entry to check.
+ * @returns True if the entry is a CalendarEvent, false otherwise.
+ */
 function isCalendarEvent(
   entry: CalendarEvent | CalendarTask,
 ): entry is CalendarEvent {
   return (entry as CalendarEvent).summary !== undefined
 }
 
+/**
+ * Type guard to check if a calendar entry is a CalendarTask.
+ *
+ * @param entry The calendar entry to check.
+ * @returns True if the entry is a CalendarTask, false otherwise.
+ */
 function isCalendarTask(
   entry: CalendarEvent | CalendarTask,
 ): entry is CalendarTask {
   return (entry as CalendarTask).title !== undefined
 }
 
-/*
- * Function: 'toCalendarEntry'
+/**
+ * Converts form data into a calendar entry object.
  *
- * Converts the formData object obtained from the 'EntryForm.tsx' component
- * into a calendar entry object.
+ * Converts a FormData object (likely from a form) into either a CalendarEvent or CalendarTask.
+ * For tasks, the status is initialized to 'needsAction'.
  *
- * For task entries, the 'status' field is set to 'needsAction' (incomplete).
- *
- * Return type varies based on the entry type.
+ * @param formData The form data to convert.
+ * @returns A CalendarEvent or CalendarTask object.
+ * @throws {Error} If the form data type is undefined.
  */
 export const toCalendarEntry = (
   formData: FormData,
@@ -69,10 +83,14 @@ export const toCalendarEntry = (
   }
 }
 
-/*
- * Function: 'toFormData'
+/**
+ * Converts a calendar entry into form data.
  *
- * Converts and returns the provided calendar entry as a 'FormData' object.
+ * Transforms a CalendarEvent or CalendarTask object into a FormData object, suitable for use in a form.
+ *
+ * @param calendarEntry The calendar entry to convert.
+ * @returns A FormData object representing the calendar entry.
+ * @throws {Error} If the calendar entry type cannot be converted.
  */
 export const toFormData = (
   calendarEntry: CalendarEvent | CalendarTask,
