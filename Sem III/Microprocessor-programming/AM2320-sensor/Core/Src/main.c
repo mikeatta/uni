@@ -36,8 +36,8 @@
 AM2320_HandleTypeDef am2320;
 
 typedef struct {
-	float temperature;
-	float humidity;
+	uint16_t temperature;
+	uint16_t humidity;
 } AM2320_Data;
 
 // Used for storing information about the microcontroller
@@ -211,7 +211,7 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
 			uint8_t crc_string[5];
 			sprintf((char *)crc_string, "%04X", computed_crc);
 
-			for (uint8_t i = 0; i < 5; i++)
+			for (uint8_t i = 0; i < 4; i++)
 			{
 				if (!is_valid_hex((const char *)crc_value_ptr, 1))
 				{
@@ -230,7 +230,7 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
 				data[i] = *data_value_ptr; // Assign value at the memory address to the data array
 				data_value_ptr++; // Move to the next memory address
 			}
-			data[data_part_length] = '\0'; // Null-terminate the char array at the last index of the data
+			data[data_part_length] = '\0'; // Null-terminate the array at the last index of the data
 
 			// Copy the frame's sender address
 			for (uint8_t i = 0; i < 4; i++)
@@ -437,34 +437,37 @@ void STM32_SendDeviceInfoFrame(uint8_t *recipient, STM32_Info *device_info)
  * @param  humidity A float storing the humidity read value.
  * @retval None
  */
-void AM2320_SendSensorDataFrame(uint8_t *recipient, uint16_t *read_idx, float temperature, float humidity)
+void AM2320_SendSensorDataFrame(uint8_t *recipient, uint16_t *read_idx, uint16_t temperature, uint16_t humidity)
 {
 	// Descriptions for the sensor data
 	uint8_t tmp_temp_desc[7] = "TEMP: ";
 	uint8_t tmp_hum_desc[6] = "HUM: ";
 
-	// Sensor output buffers for the 'X.XX' format
-	uint8_t tmp_char_temp[5];
-	uint8_t tmp_char_hum[5];
-
-	// Manually convert the float values to integers
-	int16_t int_temp = (int16_t)floor(temperature);
-	int16_t frac_temp = (int16_t)((temperature - int_temp) * 10);
-
-	int16_t int_hum = (int16_t)floor(humidity);
-	int16_t frac_hum = (int16_t)((humidity - int_hum) * 10);
+	// Sensor output buffers for the 4-bit hex format
+	uint8_t tmp_char_temp[6];
+	uint8_t tmp_char_hum[8];
 
 	// Check if 'snprintf()' returned encoding errors or had written an invalid amount of characters
-	uint8_t char_array_length = 5;
+	uint8_t char_array_length = 0;
 	uint8_t ret;
 
-	ret = snprintf((char *)tmp_char_temp, char_array_length, "%d.%d", int_temp, frac_temp);
+	char_array_length = sizeof(tmp_char_temp);
+	ret = snprintf((char *)tmp_char_temp, char_array_length, "%04X", temperature);
 	if (ret < 0 || ret >= char_array_length) return;
 
-	ret = snprintf((char *)tmp_char_hum, char_array_length, "%d.%d", int_hum, frac_hum);
+	tmp_char_temp[ret++] = 'C';
+	tmp_char_temp[ret] = '\0';
+
+	char_array_length = sizeof(tmp_char_hum);
+	ret = snprintf((char *)tmp_char_hum, char_array_length, "%04X", humidity);
 	if (ret < 0 || ret >= char_array_length) return;
 
-	uint8_t sensor_read_output[29]; // Max total size of tmp arrays - x4 skipped '\0's + final '\0' at the end of the array
+	tmp_char_hum[ret++] = '%';
+	tmp_char_hum[ret++] = 'R';
+	tmp_char_hum[ret++] = 'H';
+	tmp_char_hum[ret] = '\0';
+
+	uint8_t sensor_read_output[35]; // Max total size of tmp arrays - x4 skipped '\0's + final '\0' at the end of the array
 	uint8_t index = 0;
 
 	// If requested, prepare the 'IDX' output string
@@ -773,8 +776,8 @@ int main(void)
   uint8_t sender_address[4];
   uint8_t data[MAX_FRAME_LEN];
 
-  float temperature = 0.0;
-  float humidity = 0.0;
+  uint16_t temperature = 0;
+  uint16_t humidity = 0;
 
   // Sensor info
   uint32_t am2320_id = 0;

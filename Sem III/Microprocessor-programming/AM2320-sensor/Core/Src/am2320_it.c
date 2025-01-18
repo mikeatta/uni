@@ -104,7 +104,7 @@ void AM2320_ReadSensorData(AM2320_HandleTypeDef *am2320)
  * @param  humidity Pointer to the humidity variable.
  * @retval None
  */
-void AM2320_ProcessSensorData(AM2320_HandleTypeDef *am2320, float *temperature, float *humidity)
+void AM2320_ProcessSensorData(AM2320_HandleTypeDef *am2320, uint16_t *temperature, uint16_t *humidity)
 {
 	uint16_t rcrc = am2320->sensor_data[7] << 8 | am2320->sensor_data[6];
 	uint16_t sensor_data_crc = compute_CRC(am2320->sensor_data, 6); // Compute the CRC based on the first 6 bytes of data
@@ -131,8 +131,8 @@ void AM2320_ProcessSensorData(AM2320_HandleTypeDef *am2320, float *temperature, 
 	}
 
 	// Pass the sensor data to the function parameters
-	*temperature = (float)tmp_temp / 10.0f;
-	*humidity = (float)tmp_hum / 10.0f;
+	*temperature = tmp_temp;
+	*humidity = tmp_hum;
 }
 
 /**
