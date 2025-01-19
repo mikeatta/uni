@@ -35,7 +35,7 @@ void AM2320_InitSensorRead(AM2320_HandleTypeDef *am2320)
 {
 	if (am2320_state == AM2320_STATE_IDLE)
 	{
-		ret = HAL_I2C_Master_Transmit_IT(am2320->hi2c, am2320->sensor_address, 0x00, 0); // Send empty frame to wake the sensor
+		HAL_I2C_Master_Transmit_IT(am2320->hi2c, am2320->sensor_address, 0x00, 0); // Send empty frame to wake the sensor
 		if (ret == HAL_OK)
 		{
 			am2320_state = AM2320_STATE_SEND_COMMAND;
