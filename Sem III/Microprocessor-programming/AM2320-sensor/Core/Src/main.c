@@ -121,9 +121,10 @@ static void MX_TIM6_Init(void);
  *
  * @param  sender_address Pointer to a buffer for storing the sender's address from the frame.
  * @param  data Pointer to a buffer for storing the extracted data payload from the frame.
+ * @param  data_length Pointer to the variable storing the length of the data array.
  * @retval 1 if the frame is valid and processed successfully, 0 otherwise
  */
-uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
+uint8_t receive_frame(uint8_t *sender_address, uint8_t *data, uint16_t *data_length)
 {
 	static uint8_t tmp[MAX_FRAME_LEN];
 	static uint16_t index = 0;
@@ -238,6 +239,10 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data)
 				*sender_address = tmp[i + 1];
 				sender_address++;
 			}
+
+			// Pass the data length to the pointer variable
+			*data_length = data_part_length;
+
 			return 1;
 		}
 		else if (++index >= MAX_FRAME_LEN)
@@ -561,14 +566,14 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, 0); // Debug: Turn OFF RED LED
 					sensor_active = 1;
 					uint16_t crc_value = compute_CRC((uint8_t *)"SENSOR: STARTED", strlen("SENSOR: STARTED"));
-					send_frame(recipient_address, (uint8_t *)"SENSOR: STARTED", crc_value);
+					send_frame(recipient_address, (uint8_t *)"SENSOR: STARTED", strlen("SENSOR: STARTED"), crc_value);
 				}
 				else if (strncmp(available_commands[i], "STOP", strlen("STOP")) == 0)
 				{
 					HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, 1); // Debug: Turn ON RED LED
 					sensor_active = 0;
 					uint16_t crc_value = compute_CRC((uint8_t *)"SENSOR: STOPPED", strlen("SENSOR: STOPPED"));
-					send_frame(recipient_address, (uint8_t *)"SENSOR: STOPPED", crc_value);
+					send_frame(recipient_address, (uint8_t *)"SENSOR: STOPPED", strlen("SENSOR: STOPPED"), crc_value);
 				}
 				else if (strncmp(available_commands[i], "READ", strlen("READ")) == 0)
 				{
@@ -617,7 +622,7 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					if (buffer_index < 0 || buffer_index > 299)
 					{
 						uint16_t crc_value = compute_CRC((uint8_t *)"IDX_ERROR", strlen((const char *)"IDX_ERROR"));
-						send_frame(recipient_address, (uint8_t *)"IDX_ERROR", crc_value);
+						send_frame(recipient_address, (uint8_t *)"IDX_ERROR", strlen((const char *)"IDX_ERROR"), crc_value);
 						continue;
 					}
 
@@ -658,7 +663,7 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 						(buffer_stop_index < 0 || buffer_stop_index > 299))
 					{
 						uint16_t crc_value = compute_CRC((uint8_t *)"IDX_ERROR", strlen((const char *)"IDX_ERROR"));
-						send_frame(recipient_address, (uint8_t *)"IDX_ERROR", crc_value);
+						send_frame(recipient_address, (uint8_t *)"IDX_ERROR", strlen((const char *)"IDX_ERROR"), crc_value);
 						continue;
 					}
 
@@ -696,7 +701,7 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					if (sensor_read_interval < 2000)
 					{
 						uint16_t crc_value = compute_CRC((uint8_t *)"IDX_ERROR", strlen((const char *)"IDX_ERROR"));
-						send_frame(recipient_address, (uint8_t *)"IDX_ERROR", crc_value);
+						send_frame(recipient_address, (uint8_t *)"IDX_ERROR", strlen((const char *)"IDX_ERROR"), crc_value);
 						continue;
 					}
 
@@ -775,6 +780,7 @@ int main(void)
   /* USER CODE BEGIN Init */
   uint8_t sender_address[4];
   uint8_t data[MAX_FRAME_LEN];
+  uint16_t data_length = 0;
 
   uint16_t temperature = 0;
   uint16_t humidity = 0;
@@ -811,11 +817,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  uint8_t frame_received = receive_frame(sender_address, data);
+	  uint8_t frame_received = receive_frame(sender_address, data, &data_length);
 	  if (frame_received)
 	  {
-		  // TODO: Add sensor functions
-		  process_command(sender_address, data, strlen((const char *)data));
+		  process_command(sender_address, data, data_length);
 	  }
 
 	  // Return to the beginning of the loop if the sensor is idle
