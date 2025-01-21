@@ -424,10 +424,10 @@ void STM32_SendDeviceInfoFrame(uint8_t *recipient, STM32_Info *device_info)
 	index += strlen((const char *)tmp_id_desc);
 
 	memcpy(&info_output_data[index], tmp_id_char, strlen((const char*)tmp_id_char) + 1); // Copy the null-terminator
-	index += strlen((const char *)tmp_id_char) + 1;
+	index += strlen((const char *)tmp_id_char);
 
 	uint16_t crc_value = compute_CRC(info_output_data, index);
-	send_frame(recipient, info_output_data, crc_value);
+	send_frame(recipient, info_output_data, index, crc_value);
 }
 
 /**
@@ -508,12 +508,10 @@ void AM2320_SendSensorDataFrame(uint8_t *recipient, uint16_t *read_idx, uint16_t
 	index += strlen((const char *)tmp_hum_desc);
 
 	memcpy(&sensor_read_output[index], tmp_char_hum, strlen((const char *)tmp_char_hum) + 1); // Copy the null terminator
-	index += strlen((const char *)tmp_char_hum) + 1;
+	index += strlen((const char *)tmp_char_hum);
 
 	uint16_t crc_value = compute_CRC(sensor_read_output, index);
-	send_frame(recipient, sensor_read_output, crc_value);
-}
-
+	send_frame(recipient, sensor_read_output, index, crc_value);
 }
 
 /**
@@ -587,13 +585,13 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					sprintf((char *)tmp_interval_value_array, "%08" PRIX32, sensor_read_interval);
 
 					// Concatenate the arrays to form the message
-					size_t interval_array_size = sizeof(interval_ret_message) + sizeof(interval_ret_message[0]);
-					size_t concat_char_limit = interval_array_size - strlen((const char *)tmp_interval_value_array) - 1;
+					size_t interval_array_size = sizeof(interval_ret_message) / sizeof(interval_ret_message[0]) - 1;
+					size_t concat_char_limit = interval_array_size - strlen((const char *)tmp_interval_value_array);
 					strncat((char *)interval_ret_message, (const char *)tmp_interval_value_array, concat_char_limit);
 
 					// Send return message
 					uint16_t crc_value = compute_CRC(interval_ret_message, interval_array_size);
-					send_frame(recipient_address, interval_ret_message, crc_value);
+					send_frame(recipient_address, interval_ret_message, interval_array_size, crc_value);
 				}
 			}
 			else if (match && *char_after_command_string == '|')
@@ -711,13 +709,13 @@ void process_command(uint8_t *recipient_address, uint8_t *frame_data, uint16_t d
 					sprintf((char *)tmp_interval_value_array, "%08" PRIX32, sensor_read_interval);
 
 					// Concatenate the arrays to form the message
-					size_t interval_array_size = sizeof(tmp_interval_array) / sizeof(tmp_interval_array[0]);
-					size_t concat_char_limit = interval_array_size - strlen((const char *)tmp_interval_value_array) - 1;
+					size_t interval_array_size = sizeof(tmp_interval_array) / sizeof(tmp_interval_array[0]) - 1;
+					size_t concat_char_limit = interval_array_size - strlen((const char *)tmp_interval_value_array);
 					strncat((char *)tmp_interval_array, (const char *)tmp_interval_value_array, concat_char_limit);
 
 					// Send return message
-					uint16_t crc_value = compute_CRC(frame_data, interval_array_size);
-					send_frame(recipient_address, tmp_interval_array, crc_value);
+					uint16_t crc_value = compute_CRC(tmp_interval_array, interval_array_size);
+					send_frame(recipient_address, tmp_interval_array, interval_array_size, crc_value);
 				}
 				else if (strncmp(available_commands[i], "INFO", strlen("INFO")) == 0 && *(char_after_command_string + 4) == ';')
 				{
