@@ -94,9 +94,9 @@ public class MainViewModel : INotifyPropertyChanged
 
     private void InitializeViewModels()
     {
-        _summaryViewModel = new SummaryViewModel(_userRepository, _transactions);
+        _summaryViewModel = new SummaryViewModel(_userRepository, Transactions);
 
-        _transactionsViewModel = new TransactionsViewModel(_transactions, _transactionCategories,
+        _transactionsViewModel = new TransactionsViewModel(Transactions, _transactionCategories,
             _transactionRepository,
             _userRepository, _transactionCategoryRepository);
 

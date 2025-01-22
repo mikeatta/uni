@@ -34,26 +34,25 @@ public partial class TransactionsView : UserControl
         TransactionDTO transactionDto = new TransactionDTO(item.Transaction, viewModel);
 
         var editWindow = new EditTransactionWindow(transactionDto); // Pass the copy as a data-transfer-object
-        editWindow.Owner = Window.GetWindow(this); // Set the owner to 'TransactionsView' to center pop-up
+        editWindow.Owner = Window.GetWindow(this); // Set the owner to 'TransactionsView' to center the pop-up
 
         if (editWindow.ShowDialog() == true)
         {
             var modifiedTransaction = await transactionDto.UpdateTransactionProperties();
-            viewModel.EditTransactionProperties(modifiedTransaction);
             await viewModel.CallUpdateTransaction(modifiedTransaction);
         }
     }
 
-    private void RemoveMenuItem_Click(object sender, RoutedEventArgs e)
+    private async void RemoveMenuItem_Click(object sender, RoutedEventArgs e)
     {
         var menuItem = (MenuItem)sender;
         var contextMenu = (ContextMenu)menuItem.Parent;
         var button = contextMenu.PlacementTarget as Button;
         var item = button?.Tag as TransactionDTO;
-        var transactionId = item.Transaction.Id;
+        var transaction = item.Transaction;
 
         var viewModel = DataContext as TransactionsViewModel;
-        viewModel.CallRemoveTransaction(transactionId);
+        await viewModel.CallRemoveTransaction(transaction);
 
         // Update the UI list element
         viewModel.Transactions.Remove(item);

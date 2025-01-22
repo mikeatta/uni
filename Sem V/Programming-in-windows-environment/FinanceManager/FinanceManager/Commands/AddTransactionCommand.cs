@@ -2,6 +2,7 @@ using System.Windows.Controls;
 using FinanceManager.Database.EntityModels;
 using FinanceManager.Database.Repositories;
 using FinanceManager.DTOs;
+using FinanceManager.Services;
 using FinanceManager.ViewModels;
 
 namespace FinanceManager.Commands;
@@ -12,6 +13,7 @@ public class AddTransactionCommand : CommandBase
     private readonly TransactionRepository _transactionRepository;
     private readonly UserRepository _userRepository;
     private readonly TransactionCategoryRepository _transactionCategoryRepository;
+    private readonly UserBalanceService _userBalanceService;
 
     public AddTransactionCommand(TransactionsViewModel viewModel, TransactionRepository transactionRepository,
         UserRepository userRepository, TransactionCategoryRepository categoryRepository)
@@ -20,6 +22,7 @@ public class AddTransactionCommand : CommandBase
         _transactionRepository = transactionRepository;
         _userRepository = userRepository;
         _transactionCategoryRepository = categoryRepository;
+        _userBalanceService = new UserBalanceService(_userRepository);
     }
 
     public override async void Execute(object? parameter)
@@ -74,6 +77,7 @@ public class AddTransactionCommand : CommandBase
             Date = _viewModel.Date,
         };
 
+        await _userBalanceService.UpdateBalanceForNewTransaction(transaction);
         await _transactionRepository.AddTransactionAsync(transaction);
 
         // Update the ObservableCollection to make changes on the frontend

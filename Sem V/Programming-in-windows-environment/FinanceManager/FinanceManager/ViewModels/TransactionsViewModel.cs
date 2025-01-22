@@ -6,6 +6,7 @@ using FinanceManager.Commands;
 using FinanceManager.Database.EntityModels;
 using FinanceManager.Database.Repositories;
 using FinanceManager.DTOs;
+using FinanceManager.Services;
 
 namespace FinanceManager.ViewModels;
 
@@ -13,6 +14,9 @@ public class TransactionsViewModel : INotifyPropertyChanged
 {
     private TransactionRepository _transactionRepository;
     private TransactionCategoryRepository _transactionCategoryRepository;
+    private UserRepository _userRepository;
+
+    private readonly UserBalanceService _userBalanceService;
 
     private ObservableCollection<TransactionDTO> _transactions = new();
 
@@ -119,12 +123,14 @@ public class TransactionsViewModel : INotifyPropertyChanged
     {
         _transactionRepository = transactionRepository;
         _transactionCategoryRepository = transactionCategoryRepository;
+        _userRepository = userRepository;
+        _userBalanceService = new UserBalanceService(_userRepository);
         Transactions = transactions;
         Categories = transactionCategories;
         Date = DateTime.Now; // Select current date by default
 
         SubmitCommand =
-            new AddTransactionCommand(this, _transactionRepository, userRepository, _transactionCategoryRepository);
+            new AddTransactionCommand(this, _transactionRepository, _userRepository, _transactionCategoryRepository);
 
         CancelCommand = new CancelTransactionCommand(this);
     }
@@ -134,14 +140,15 @@ public class TransactionsViewModel : INotifyPropertyChanged
         Categories.Add(transactionCategory);
     }
 
-    public async void CallRemoveTransaction(int transactionId)
+    public async Task CallRemoveTransaction(Transaction transaction)
     {
-        await _transactionRepository.RemoveTransactionAsync(transactionId);
+        await _userBalanceService.UpdateBalanceForRemovedTransaction(transaction);
+        await _transactionRepository.RemoveTransactionAsync(transaction);
     }
 
-    public void EditTransactionProperties(Transaction transaction)
+    private void EditTransactionProperties(Transaction transaction)
     {
-        var selectedTransaction = Transactions.Where(t => t.Transaction.Id == transaction.Id).FirstOrDefault();
+        var selectedTransaction = Transactions.FirstOrDefault(t => t.Transaction.Id == transaction.Id);
 
         if (selectedTransaction == null)
         {
@@ -151,9 +158,14 @@ public class TransactionsViewModel : INotifyPropertyChanged
         selectedTransaction.Transaction = transaction;
     }
 
-    public async Task CallUpdateTransaction(Transaction transaction)
+    public async Task CallUpdateTransaction(Transaction updatedTransaction)
     {
-        await _transactionRepository.EditTransactionAsync(transaction);
+        var existingTransaction = await _transactionRepository.GetTransactionByIdAsync(updatedTransaction.Id);
+        if (existingTransaction == null) throw new NullReferenceException();
+
+        await _userBalanceService.UpdateBalanceForModifiedTransaction(existingTransaction, updatedTransaction);
+        await _transactionRepository.EditTransactionAsync(updatedTransaction);
+        EditTransactionProperties(updatedTransaction);
     }
 
     public async Task CallAddTransactionCategory(TransactionCategory transactionCategory)
@@ -164,7 +176,7 @@ public class TransactionsViewModel : INotifyPropertyChanged
     public async Task<TransactionCategory> CallGetTransactionCategory(TransactionCategory transactionCategory)
     {
         var transactionCategories = await _transactionCategoryRepository.GetAllAsync();
-        return transactionCategories.Where(c => c.Name == transactionCategory.Name).FirstOrDefault();
+        return transactionCategories.FirstOrDefault(c => c.Name == transactionCategory.Name);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

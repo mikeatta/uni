@@ -19,9 +19,11 @@ public class SummaryViewModel : INotifyPropertyChanged
         private set
         {
             _currentUser = value;
-            OnPropertyChanged(nameof(UserBalance));
+            OnPropertyChanged();
         }
     }
+
+    private ObservableCollection<TransactionDTO> _allTransactions;
 
     private ObservableCollection<TransactionDTO> _recentTransactions = new();
 
@@ -62,25 +64,59 @@ public class SummaryViewModel : INotifyPropertyChanged
     public SummaryViewModel(UserRepository userRepository, ObservableCollection<TransactionDTO> allTransactions)
     {
         _userRepository = userRepository;
-
-        // Subscribe to transaction collection object changes
-        allTransactions.CollectionChanged += (s, e) =>
-        {
-            UpdateRecentTransactions(allTransactions);
-            UpdateMonthlySummary(allTransactions);
-        };
+        _allTransactions = allTransactions;
 
         // Initialize the summary statistics
         SummaryInfoDateSpan = GetSummaryDateSpan();
 
         // Initialize the monthly summary
-        UpdateMonthlySummary(allTransactions);
+        UpdateMonthlySummary(_allTransactions);
 
         // Initialize the user
         InitializeAsync();
 
         // Populate ObservableConnection on app init
-        UpdateRecentTransactions(allTransactions);
+        UpdateRecentTransactions(_allTransactions);
+
+        // Subscribe to transaction collection object changes
+        allTransactions.CollectionChanged += (s, e) =>
+        {
+            if (e.NewItems != null)
+            {
+                foreach (TransactionDTO newItem in e.NewItems)
+                {
+                    // Subscribe to event changes on new items
+                    newItem.PropertyChanged += Transaction_PropertyChanged;
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (TransactionDTO oldItem in e.OldItems)
+                {
+                    // Unsubscribe from event changes of removed items
+                    oldItem.PropertyChanged -= Transaction_PropertyChanged;
+                }
+            }
+
+            UpdateRecentTransactions(_allTransactions);
+            UpdateMonthlySummary(_allTransactions);
+            UpdateUserBalance();
+        };
+
+        foreach (var transaction in allTransactions)
+        {
+            transaction.PropertyChanged += Transaction_PropertyChanged;
+        }
+    }
+
+    private void Transaction_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender is TransactionDTO)
+        {
+            UpdateMonthlySummary(_allTransactions);
+            UpdateUserBalance();
+        }
     }
 
     private void UpdateMonthlySummary(ObservableCollection<TransactionDTO> allTransactions)
@@ -121,6 +157,12 @@ public class SummaryViewModel : INotifyPropertyChanged
             .Sum(t => t.Transaction.Amount);
 
         MonthlySummary = GenerateMonthlySummary(currentIncome, currentExpenses, previousIncome, previousExpenses);
+    }
+
+    private async void UpdateUserBalance()
+    {
+        var updatedUser = await _userRepository.GetDefaultUserAsync();
+        CurrentUser = updatedUser;
     }
 
     private async void InitializeAsync()
@@ -171,8 +213,6 @@ public class SummaryViewModel : INotifyPropertyChanged
             RecentTransactions.Add(transaction);
         }
     }
-
-    public string UserBalance => CurrentUser.Balance.ToString("C2");
 
     private static string GetSummaryDateSpan()
     {

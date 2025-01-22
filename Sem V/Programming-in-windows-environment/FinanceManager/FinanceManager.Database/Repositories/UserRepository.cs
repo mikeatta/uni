@@ -12,6 +12,12 @@ public class UserRepository
         _dbContextFactory = dbContextFactory;
     }
 
+    public async Task<User> GetDefaultUserAsync()
+    {
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
+        return await context.Users.FirstOrDefaultAsync() ?? throw new NullReferenceException();
+    }
+
     public async Task<List<User>> GetAllUsersAsync()
     {
         await using var context = await _dbContextFactory.CreateDbContextAsync();
