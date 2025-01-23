@@ -71,7 +71,7 @@ public class AddTransactionCommand : CommandBase
             UserId = defaultUser.Id,
             CategoryId = categoryId,
             Type = _viewModel.TransactionType,
-            Description = _viewModel.Description,
+            Description = _viewModel.Description ?? "",
             Note = _viewModel.Note,
             Amount = _viewModel.Amount,
             Date = _viewModel.Date,
