@@ -20,8 +20,9 @@ public class Report
     [Column("datecreated", TypeName = "timestamp")]
     public DateTime DateCreated { get; set; }
 
-    [Required]
-    [Column("criteria", TypeName = "varchar(255)")]
-    [StringLength(255)]
-    public required string Criteria { get; set; }
+    [ForeignKey("ReportCriteria")]
+    [Column("criteriaid", TypeName = "int")]
+    public int CriteriaId { get; set; }
+    
+    public ReportCriteria Criteria { get; set; } // Navigation property
 }
