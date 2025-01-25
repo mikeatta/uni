@@ -15,6 +15,7 @@ public class FinanceManagerDbContext : DbContext
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<FinancialGoal> FinancialGoals { get; set; }
     public DbSet<Report> Reports { get; set; }
+    public DbSet<ReportCriteria> ReportCriteria { get; set; }
     public DbSet<Alert> Alerts { get; set; }
 
     public FinanceManagerDbContext(DbContextOptions<FinanceManagerDbContext> options)
@@ -74,7 +75,11 @@ public class FinanceManagerDbContext : DbContext
             entity.Property(r => r.DateCreated).HasColumnType("timestamp");
 
             entity.HasIndex(r => r.UserId).HasDatabaseName("idx_reports_userid");
+            entity.HasIndex(r => r.UserId).HasDatabaseName("idx_reports_criteriaid");
         });
+
+        // Report criteria model mapping
+        modelBuilder.Entity<ReportCriteria>(entity => { entity.HasKey(rc => rc.Id); });
 
         // Transaction model mapping
         modelBuilder.Entity<Transaction>(entity =>
