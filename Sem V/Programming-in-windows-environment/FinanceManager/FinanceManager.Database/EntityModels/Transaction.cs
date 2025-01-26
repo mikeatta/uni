@@ -25,7 +25,7 @@ public class Transaction
     public TransactionCategory TransactionCategory { get; set; } // Navigation property
 
     [Required]
-    [Column("type", TypeName = "varchar(10)")]
+    [Column("type", TypeName = "transactiontype")]
     public TransactionType Type { get; set; }
 
     [Required]
