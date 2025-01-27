@@ -36,16 +36,15 @@ import { UserTimeInfoProvider } from './contexts/UserTimeInfoProvider';
 import { toCalendarEntry } from './utils/helpers/dataTypeHelpers';
 import GoogleLogin from './components/forms/GoogleLogin';
 import { useGoogleSignin } from './hooks/useGoogleSignin';
-import GoogleAuthService from './services/auth/GoogleAuthService';
 
 function App() {
   const [displayMode, setDisplayMode] = useState<string>('list');
 
   const isConnected = useNetworkStatus();
   const { isLoggedIn, setIsLoggedIn } = useGoogleSignin();
+  const isDatabaseSetup = useSetupDatabase();
   const { localData, setLocalData, refreshLocalEntryList } =
     useFetchLocalData(isDatabaseSetup);
-
 
   useSyncChanges(
     localData,

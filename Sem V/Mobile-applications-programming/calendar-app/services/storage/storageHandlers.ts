@@ -87,7 +87,6 @@ export const overwriteOfflineEntry = async (
           return { ...prevData, events: updatedEvents }
         }
 
-
         return prevData
       })
     } else if (entryType === 'task') {
@@ -116,7 +115,6 @@ export const overwriteOfflineEntry = async (
 
           return { ...prevData, tasks: updatedTasks }
         }
-
 
         return prevData
       })

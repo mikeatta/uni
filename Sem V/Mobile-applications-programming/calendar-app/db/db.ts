@@ -8,7 +8,6 @@ export const connectToDatabase = async (): Promise<SQLiteDatabase> => {
       name: 'calendarDatabase.db',
       location: 'default',
     })
-    console.log('Connected to database')
     return db
   } catch (error) {
     console.error(error)
