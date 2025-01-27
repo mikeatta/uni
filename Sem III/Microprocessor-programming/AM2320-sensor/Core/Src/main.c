@@ -155,18 +155,18 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data, uint16_t *data_len
 			continue;
 		}
 
-		// If the current character is the escape character, encode the following characters
+		// If the current character is the escape character, decode the following characters
 		if (escape)
 		{
-			if (tmp[index] == '\\' && index < MAX_FRAME_LEN)
+			if (tmp[index] == '\\' && (index + 1) < MAX_FRAME_LEN)
 			{
 				tmp[index++] = '\\';
 			}
-			else if (tmp[index] == '{' && index < MAX_FRAME_LEN)
+			else if (tmp[index] == '{' && (index + 1) < MAX_FRAME_LEN)
 			{
 				tmp[index++] = '[';
 			}
-			else if (tmp[index] == '}' && index < MAX_FRAME_LEN)
+			else if (tmp[index] == '}' && (index + 1) < MAX_FRAME_LEN)
 			{
 				tmp[index++] = ']';
 			}
