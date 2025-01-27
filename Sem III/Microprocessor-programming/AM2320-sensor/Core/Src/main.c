@@ -776,7 +776,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-  uint8_t sender_address[4];
+  uint8_t sender_address[4] = {0};
   uint8_t data[MAX_FRAME_LEN];
   uint16_t data_length = 0;
 
