@@ -3,9 +3,165 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:models="clr-namespace:FinanceManager.Database.EntityModels;assembly=FinanceManager.Database"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Background="Aquamarine">
-        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24">Reports</TextBlock>
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="TransactionTypes" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="models:TransactionType" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
+
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.35*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- New report panel -->
+        <Grid Grid.Column="0" Background="LightGray" Margin="5px">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.2*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Rectangle Grid.Row="0" Fill="Gray" />
+            <TextBlock Grid.Row="0" Text="Add New Report" FontWeight="SemiBold" VerticalAlignment="Center"
+                       HorizontalAlignment="Left" Padding="5px 0 0 0" />
+
+            <!-- Content -->
+            <Grid Grid.Row="1" Margin="5" Grid.IsSharedSizeScope="True">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0">
+                    <!-- Date range from -->
+                    <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Orientation="Horizontal">
+                        <TextBlock Text="From:" />
+                        <DatePicker Margin="5 0 0 0"
+                                    SelectedDate="{Binding ReportForm.StartDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <!-- Date range to -->
+                    <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal">
+                        <TextBlock Text="To:" />
+                        <DatePicker Margin="5 0 0 0"
+                                    SelectedDate="{Binding ReportForm.EndDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1">
+                    <!-- Category -->
+                    <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal">
+                        <TextBlock Text="Category:" />
+                        <ComboBox x:Name="CategoryComboBox" IsEditable="False"
+                                  ItemsSource="{Binding TransactionCategories}"
+                                  DisplayMemberPath="Name"
+                                  SelectedItem="{Binding ReportForm.Category, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <!-- Type -->
+                    <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal">
+                        <TextBlock Text="Type:" />
+                        <ComboBox IsEditable="False" ItemsSource="{Binding Source={StaticResource TransactionTypes}}"
+                                  SelectedItem="{Binding ReportForm.TransactionType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <!-- Part of description -->
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Contains:" />
+                        <TextBox
+                            Text="{Binding ReportForm.ContainsText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2">
+                    <!-- Above amount -->
+                    <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal">
+                        <TextBlock Text="Above:" />
+                        <TextBox Text="{Binding ReportForm.MinAmount, UpdateSourceTrigger=Default, StringFormat=N2}" />
+                    </StackPanel>
+
+                    <!-- Below amount -->
+                    <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal">
+                        <TextBlock Text="Below:" />
+                        <TextBox
+                            Text="{Binding ReportForm.MaxAmount, UpdateSourceTrigger=Default, StringFormat=N2}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3">
+                    <Button Command="{Binding AddReportCommand}" Padding="5">Create</Button>
+                    <Button Command="{Binding CancelReportCommand}"
+                            CommandParameter="{Binding ElementName=CategoryComboBox}" Padding="5">
+                        Reset
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <!-- List of generated reports -->
+        <Grid Grid.Column="1" Background="LightGray" Margin="5px">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Rectangle Grid.Row="0" Fill="Gray" />
+            <TextBlock Grid.Row="0" Text="Generated reports" FontWeight="SemiBold" VerticalAlignment="Center"
+                       HorizontalAlignment="Left" Padding="5px 0 0 0" />
+
+            <!-- Content -->
+            <ListView Grid.Row="1" ItemsSource="{Binding Reports}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Report ID">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Report.Id}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="Date created">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Report.DateCreated, StringFormat={}{0:MM/dd/yyyy}}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="Actions">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="⋮" Click="ShowMenuButton_Click" Tag="{Binding}" Width="30">
+                                        <Button.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="View" Click="ViewMenuItem_Click" />
+                                                <MenuItem Header="Remove" Click="RemoveMenuItem_Click" />
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
+                                    </Button>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
     </Grid>
 </UserControl>

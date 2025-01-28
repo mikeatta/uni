@@ -18,9 +18,12 @@ public class MainViewModel : INotifyPropertyChanged
     private UserRepository _userRepository;
     private TransactionRepository _transactionRepository;
     private TransactionCategoryRepository _transactionCategoryRepository;
+    private ReportRepository _reportRepository;
+    private ReportCriteriaRepository _reportCriteriaRepository;
 
     private ObservableCollection<TransactionDTO> _transactions = new();
     private ObservableCollection<TransactionCategory> _transactionCategories = new();
+    private ObservableCollection<ReportDTO> _reports = new();
     private object _currentView;
 
     // View models
@@ -60,11 +63,22 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
+    public ObservableCollection<ReportDTO> Reports
+    {
+        get => _reports;
+        set
+        {
+            _reports = value;
+            OnPropertyChanged(nameof(Reports));
+        }
+    }
+
     public MainViewModel(DbContextOptions<FinanceManagerDbContext> options)
     {
         _contextFactory = new PooledDbContextFactory<FinanceManagerDbContext>(options);
         InitializeRepositories();
         LoadTransactions();
+        LoadReports();
         InitializeViewModels();
     }
 
@@ -73,6 +87,8 @@ public class MainViewModel : INotifyPropertyChanged
         _userRepository = new UserRepository(_contextFactory);
         _transactionRepository = new TransactionRepository(_contextFactory);
         _transactionCategoryRepository = new TransactionCategoryRepository(_contextFactory);
+        _reportRepository = new ReportRepository(_contextFactory);
+        _reportCriteriaRepository = new ReportCriteriaRepository(_contextFactory);
     }
 
     private async Task LoadTransactions()
@@ -92,16 +108,29 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
+    private async Task LoadReports()
+    {
+        var reports = await _reportRepository.GetAllReportsAsync();
+
+        foreach (var report in reports)
+        {
+            Reports.Add(new ReportDTO(report));
+        }
+    }
+
     private void InitializeViewModels()
     {
         _summaryViewModel = new SummaryViewModel(_userRepository, Transactions);
 
-        _transactionsViewModel = new TransactionsViewModel(Transactions, _transactionCategories,
+        _transactionsViewModel = new TransactionsViewModel(Transactions, TransactionsCategories,
             _transactionRepository,
             _userRepository, _transactionCategoryRepository);
 
         _calendarViewModel = new CalendarViewModel();
-        _reportsViewModel = new ReportsViewModel();
+
+        _reportsViewModel =
+            new ReportsViewModel(_reportRepository, _reportCriteriaRepository, _userRepository, Reports, Transactions,
+                TransactionsCategories);
 
         CurrentView = _summaryViewModel;
         NavigateCommand = new RelayCommand(Navigate);
