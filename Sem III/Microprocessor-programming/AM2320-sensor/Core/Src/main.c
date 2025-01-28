@@ -52,10 +52,10 @@ STM32_Info dev_info = {0};
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MAX_FRAME_LEN 512
+#define MAX_FRAME_LEN 1024
 #define MIN_FRAME_LEN 12 // Frame length of a valid frame with an empty body
-#define UART3_TX_BUF_LEN 2048
-#define UART3_RX_BUF_LEN 2048
+#define UART3_TX_BUF_LEN 4096
+#define UART3_RX_BUF_LEN 4096
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
