@@ -1,0 +1,81 @@
+<Window x:Class="FinanceManager.Views.ViewReportWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        Title="ViewReportWindow" Height="640" Width="480">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.5*" />
+            <ColumnDefinition Width="0.5*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Report info header -->
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Orientation="Vertical" VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+            <TextBlock Text="{Binding Report.Id, StringFormat='Report ID: {0}'}" FontWeight="Bold" Margin="5" />
+            <TextBlock Text="{Binding Report.DateCreated, StringFormat='Date Created: {0}'}" Margin="5" />
+        </StackPanel>
+
+        <!-- Date range -->
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal"
+                    VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Text="{Binding StartDate, StringFormat='From: {0}'}" />
+            <TextBlock Text="{Binding EndDate, StringFormat='To: {0}'}" />
+        </StackPanel>
+
+        <!-- Report statistics -->
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Orientation="Vertical" VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+            <TextBlock Text="{Binding Report.TotalIncome, StringFormat='Total Income: {0}'}" />
+            <TextBlock Text="{Binding Report.TotalExpenses, StringFormat='Total Expenses: {0}'}" />
+            <TextBlock Text="{Binding Report.NetSavings, StringFormat='Net savings: {0}'}" />
+        </StackPanel>
+
+        <!-- Per-category statistics -->
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" Orientation="Vertical"
+                    VerticalAlignment="Center" HorizontalAlignment="Center">
+            <!-- Income by category -->
+            <TextBlock Text="Income by category" />
+            <ItemsControl ItemsSource="{Binding Report.IncomeByCategory}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="{Binding Key}" />
+                            <TextBlock Text="{Binding Value, StringFormat={}{0:C}}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Expenses by category -->
+            <TextBlock Text="Expenses by category" />
+            <ItemsControl ItemsSource="{Binding Report.ExpensesByCategory}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="{Binding Key}" />
+                            <TextBlock Text="{Binding Value, StringFormat={}{0:C}}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+
+        <!-- Control buttons -->
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" Orientation="Horizontal"
+                    VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Button Content="Delete" Width="80" Click="DeleteButton_Click" Margin="0 0 10 0" />
+            <Button Content="Close" Width="80" Click="CloseButton_Click" />
+        </StackPanel>
+    </Grid>
+</Window>
