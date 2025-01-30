@@ -73,6 +73,8 @@ public class FinanceManagerDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.Property(r => r.DateCreated).HasColumnType("timestamp");
+            entity.Property(r => r.IncomeByCategory).HasColumnType("jsonb");
+            entity.Property(r => r.ExpensesByCategory).HasColumnType("jsonb");
 
             entity.HasIndex(r => r.UserId).HasDatabaseName("idx_reports_userid");
             entity.HasIndex(r => r.UserId).HasDatabaseName("idx_reports_criteriaid");

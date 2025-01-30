@@ -6,6 +6,7 @@ using FinanceManager.Database.EntityModels;
 using FinanceManager.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace FinanceManager;
 
@@ -16,8 +17,6 @@ public partial class App : Application
 {
     protected override void OnStartup(StartupEventArgs e)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<FinanceManagerDbContext>();
-
         // Calculate the path to the .env file relative to the base directory
         string envPath = Path.Combine(AppContext.BaseDirectory, @"..\..\..\..\FinanceManager.Database\.env");
 
@@ -33,8 +32,15 @@ public partial class App : Application
         var connectionString =
             $"Host={host};Port={port};Database={database};Username={username};Password={password};";
 
-        // Configure the DbContext
-        optionsBuilder.UseNpgsql(connectionString, o =>
+        // Configure the context
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        dataSourceBuilder.EnableDynamicJson();
+        dataSourceBuilder.EnableUnmappedTypes();
+        var dataSource = dataSourceBuilder.Build();
+
+        var optionsBuilder = new DbContextOptionsBuilder<FinanceManagerDbContext>();
+
+        optionsBuilder.UseNpgsql(dataSource, o =>
             o.MapEnum<TransactionType>("transactiontype"));
 
         optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
