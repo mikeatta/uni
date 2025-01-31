@@ -3,9 +3,218 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:helpers="clr-namespace:FinanceManager.Helpers"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Background="Coral">
-        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24">Calendar</TextBlock>
+    <UserControl.Resources>
+        <!-- Add converters -->
+        <helpers:NullToBooleanConverter x:Key="NullToBooleanConverter" />
+
+        <!-- Add calendar date button styling -->
+        <Style x:Key="CalendarDayButton" TargetType="Button">
+            <!-- Default styling for all buttons -->
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="LightGray" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <!-- Triggers for dynamic styling -->
+            <Style.Triggers>
+
+                <!-- Selected Date (Highest priority) -->
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter Property="Background" Value="SlateGray" />
+                    <Setter Property="Foreground" Value="White" />
+                    <Setter Property="BorderBrush" Value="DarkGray" />
+                    <Setter Property="BorderThickness" Value="2" />
+                </DataTrigger>
+
+                <!-- HasTransactions (Only if NOT Selected) -->
+                <DataTrigger Binding="{Binding HasTransactions}" Value="True">
+                    <Setter Property="Background" Value="LightBlue" />
+                    <Setter Property="BorderBrush" Value="CornflowerBlue" />
+                    <Setter Property="BorderThickness" Value="2" />
+                </DataTrigger>
+
+                <!-- MouseOver for Non-Transaction Dates -->
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="LightGray" />
+                </Trigger>
+
+                <!-- MouseOver for Transaction Dates -->
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True" />
+                        <Condition Binding="{Binding HasTransactions}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="PowderBlue" />
+                </MultiDataTrigger>
+
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.6*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Calendar date picker -->
+        <Grid Grid.Column="0" Background="LightGray" Margin="5px">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.1*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Rectangle Grid.Row="0" Fill="Gray" />
+            <TextBlock Grid.Row="0" Text="Calendar" FontWeight="SemiBold" VerticalAlignment="Center"
+                       HorizontalAlignment="Left" Padding="5px 0 0 0" />
+
+            <!-- Content -->
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.3*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Calendar date controls -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center"
+                            HorizontalAlignment="Center">
+                    <Button Content="Prev" Command="{Binding PreviousMonthCommand}" />
+                    <DatePicker
+                        SelectedDate="{Binding DisplayedMonth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Content="Next" Command="{Binding NextMonthCommand}" />
+                </StackPanel>
+
+                <!-- Calendar grid -->
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Static weekday headers -->
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Sun" HorizontalAlignment="Center" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="Mon" HorizontalAlignment="Center" />
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Tue" HorizontalAlignment="Center" />
+                        <TextBlock Grid.Row="0" Grid.Column="3" Text="Wed" HorizontalAlignment="Center" />
+                        <TextBlock Grid.Row="0" Grid.Column="4" Text="Thu" HorizontalAlignment="Center" />
+                        <TextBlock Grid.Row="0" Grid.Column="5" Text="Fri" HorizontalAlignment="Center" />
+                        <TextBlock Grid.Row="0" Grid.Column="6" Text="Sat" HorizontalAlignment="Center" />
+                    </Grid>
+
+
+                    <!-- Clickable date buttons -->
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding CalendarDays}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="6" Columns="7" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource CalendarDayButton}"
+                                        Command="{Binding DataContext.SelectDateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding Date}"
+                                        IsEnabled="{Binding Date, Converter={StaticResource NullToBooleanConverter}}">
+                                    <Grid>
+                                        <TextBlock Text="{Binding Date.Day}" VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsToday}" Value="True">
+                                                            <Setter Property="FontWeight" Value="Bold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- Transactions list -->
+        <Grid Grid.Column="1" Background="LightGray" Margin="5px">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.1*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Rectangle Grid.Row="0" Fill="Gray" />
+            <TextBlock Grid.Row="0" Text="Operations" FontWeight="SemiBold" VerticalAlignment="Center"
+                       HorizontalAlignment="Left" Padding="5px 0 0 0" />
+
+            <!-- List of transactions -->
+            <ListView Grid.Row="1" ItemsSource="{Binding TransactionsFromSelectedDate}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Amount" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Transaction.Amount, StringFormat=C}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="Category" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Transaction.TransactionCategory.Name}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="Description" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Transaction.Description}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="Note" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Transaction.Note}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
     </Grid>
 </UserControl>

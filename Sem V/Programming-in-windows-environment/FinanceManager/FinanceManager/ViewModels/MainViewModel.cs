@@ -126,7 +126,7 @@ public class MainViewModel : INotifyPropertyChanged
             _transactionRepository,
             _userRepository, _transactionCategoryRepository);
 
-        _calendarViewModel = new CalendarViewModel();
+        _calendarViewModel = new CalendarViewModel(Transactions);
 
         _reportsViewModel =
             new ReportsViewModel(_reportRepository, _reportCriteriaRepository, _userRepository, Reports, Transactions,
