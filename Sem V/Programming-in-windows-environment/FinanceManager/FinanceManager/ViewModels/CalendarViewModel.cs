@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using FinanceManager.Commands;
+using FinanceManager.Database.EntityModels;
 using FinanceManager.DTOs;
 
 namespace FinanceManager.ViewModels;
@@ -21,6 +22,18 @@ public class CalendarViewModel : INotifyPropertyChanged
         set
         {
             _transactions = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private ObservableCollection<TransactionCategory> _transactionCategories;
+
+    public ObservableCollection<TransactionCategory> TransactionCategories
+    {
+        get => _transactionCategories;
+        set
+        {
+            _transactionCategories = value;
             OnPropertyChanged();
         }
     }
@@ -97,9 +110,11 @@ public class CalendarViewModel : INotifyPropertyChanged
         });
     }
 
-    public CalendarViewModel(ObservableCollection<TransactionDTO> transactions)
+    public CalendarViewModel(ObservableCollection<TransactionDTO> transactions,
+        ObservableCollection<TransactionCategory> transactionCategories)
     {
         _transactions = transactions;
+        _transactionCategories = transactionCategories;
         _displayedMonth = DateTime.Today;
         _selectedDate = DateTime.Today;
 
@@ -138,10 +153,28 @@ public class CalendarViewModel : INotifyPropertyChanged
         }
     }
 
+    private ObservableCollection<TransactionDTO> AddCategoriesToTransactionsFromDate(
+        ObservableCollection<TransactionDTO> transactions)
+    {
+        foreach (var transaction in transactions)
+        {
+            transaction.Transaction.TransactionCategory =
+                TransactionCategories.FirstOrDefault(tc => tc.Id == transaction.Transaction.CategoryId) ??
+                throw new NullReferenceException();
+        }
+
+        return transactions;
+    }
+
     public ObservableCollection<TransactionDTO> GetTransactionsFromSelectedDate(DateTime date)
     {
         var transactionsFromDate = Transactions.Where(t => t.Transaction.Date.Date == date.Date);
-        return new ObservableCollection<TransactionDTO>(transactionsFromDate);
+
+        // Assign the TransactionCategory object to each transaction from selected date to get access to the 'Name' property
+        var transactionsFromDateWithCategories =
+            AddCategoriesToTransactionsFromDate(new ObservableCollection<TransactionDTO>(transactionsFromDate));
+
+        return new ObservableCollection<TransactionDTO>(transactionsFromDateWithCategories);
     }
 
     private void UpdateCalendarDays()

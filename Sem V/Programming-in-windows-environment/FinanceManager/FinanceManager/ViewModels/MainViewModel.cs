@@ -78,6 +78,7 @@ public class MainViewModel : INotifyPropertyChanged
         _contextFactory = new PooledDbContextFactory<FinanceManagerDbContext>(options);
         InitializeRepositories();
         LoadTransactions();
+        LoadCategories();
         LoadReports();
         InitializeViewModels();
     }
@@ -99,7 +100,10 @@ public class MainViewModel : INotifyPropertyChanged
         {
             Transactions.Add(new TransactionDTO(transaction));
         }
+    }
 
+    private async Task LoadCategories()
+    {
         var categories = await _transactionCategoryRepository.GetAllAsync();
 
         foreach (var category in categories)
@@ -126,7 +130,7 @@ public class MainViewModel : INotifyPropertyChanged
             _transactionRepository,
             _userRepository, _transactionCategoryRepository);
 
-        _calendarViewModel = new CalendarViewModel(Transactions);
+        _calendarViewModel = new CalendarViewModel(Transactions, TransactionsCategories);
 
         _reportsViewModel =
             new ReportsViewModel(_reportRepository, _reportCriteriaRepository, _userRepository, Reports, Transactions,

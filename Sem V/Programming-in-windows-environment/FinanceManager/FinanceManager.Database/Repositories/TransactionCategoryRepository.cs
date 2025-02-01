@@ -12,7 +12,7 @@ public class TransactionCategoryRepository
         _dbContextFactory = dbContextFactory;
     }
 
-    public async Task<IList<TransactionCategory>> GetAllAsync()
+    public async Task<IEnumerable<TransactionCategory>> GetAllAsync()
     {
         await using var context = await _dbContextFactory.CreateDbContextAsync();
         return await context.TransactionCategories.ToListAsync();
