@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using FinanceManager.Database.EntityModels;
 using FinanceManager.Database.Repositories;
 using FinanceManager.DTOs;
@@ -10,6 +11,7 @@ namespace FinanceManager.ViewModels;
 public class SummaryViewModel : INotifyPropertyChanged
 {
     private readonly UserRepository _userRepository;
+    private readonly AlertRepository _alertRepository;
 
     private User _currentUser;
 
@@ -33,6 +35,18 @@ public class SummaryViewModel : INotifyPropertyChanged
         private set
         {
             _recentTransactions = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private Alert _alert;
+
+    public Alert Alert
+    {
+        get => _alert;
+        set
+        {
+            _alert = value;
             OnPropertyChanged();
         }
     }
@@ -61,10 +75,36 @@ public class SummaryViewModel : INotifyPropertyChanged
         }
     }
 
-    public SummaryViewModel(UserRepository userRepository, ObservableCollection<TransactionDTO> allTransactions)
+    private decimal _alertThreshold;
+
+    public decimal AlertThreshold
+    {
+        get => _alertThreshold;
+        set
+        {
+            _alertThreshold = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private string _alertMessage;
+
+    public string AlertMessage
+    {
+        get => _alertMessage;
+        set
+        {
+            _alertMessage = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public SummaryViewModel(UserRepository userRepository, ObservableCollection<TransactionDTO> allTransactions,
+        AlertRepository alertRepository)
     {
         _userRepository = userRepository;
         _allTransactions = allTransactions;
+        _alertRepository = alertRepository;
 
         // Initialize the summary statistics
         SummaryInfoDateSpan = GetSummaryDateSpan();
@@ -173,6 +213,9 @@ public class SummaryViewModel : INotifyPropertyChanged
 
             var users = await _userRepository.GetAllUsersAsync();
             CurrentUser = users.FirstOrDefault() ?? throw new InvalidOperationException();
+
+            var alert = await _alertRepository.GetAlert();
+            Alert = alert;
         }
         catch (Exception ex)
         {
@@ -257,6 +300,11 @@ public class SummaryViewModel : INotifyPropertyChanged
         if (currentValue > previousValue) return "Up";
         if (currentValue < previousValue) return "Down";
         return "None";
+    }
+
+    public async Task CallAddAlert(Alert alert)
+    {
+        await _alertRepository.AddAlert(alert);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -20,6 +20,7 @@ public class MainViewModel : INotifyPropertyChanged
     private TransactionCategoryRepository _transactionCategoryRepository;
     private ReportRepository _reportRepository;
     private ReportCriteriaRepository _reportCriteriaRepository;
+    private AlertRepository _alertRepository;
 
     private ObservableCollection<TransactionDTO> _transactions = new();
     private ObservableCollection<TransactionCategory> _transactionCategories = new();
@@ -90,6 +91,7 @@ public class MainViewModel : INotifyPropertyChanged
         _transactionCategoryRepository = new TransactionCategoryRepository(_contextFactory);
         _reportRepository = new ReportRepository(_contextFactory);
         _reportCriteriaRepository = new ReportCriteriaRepository(_contextFactory);
+        _alertRepository = new AlertRepository(_contextFactory);
     }
 
     private async Task LoadTransactions()
@@ -124,7 +126,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     private void InitializeViewModels()
     {
-        _summaryViewModel = new SummaryViewModel(_userRepository, Transactions);
+        _summaryViewModel = new SummaryViewModel(_userRepository, Transactions, _alertRepository);
 
         _transactionsViewModel = new TransactionsViewModel(Transactions, TransactionsCategories,
             _transactionRepository,

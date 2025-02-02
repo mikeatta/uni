@@ -166,6 +166,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
 
                 <!-- Income Panel -->
@@ -196,7 +197,7 @@
                 <Border Grid.Column="1"
                         Background="White"
                         CornerRadius="4"
-                        Margin="5,0,0,0"
+                        Margin="5,0,5,0"
                         Padding="10">
                     <StackPanel>
                         <TextBlock Text="Expenses"
@@ -213,6 +214,20 @@
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Spending Alert Section -->
+                <Border Grid.Column="2" Background="White" CornerRadius="4" Margin="5, 0, 0, 0" Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="Alert" FontWeight="SemiBold" Foreground="#666666" Margin="0, 0,0, 5" />
+
+                        <!-- Show 'Add alert' button when no alert is set -->
+                        <Button Click="AddAlertButton_Click"
+                                Background="#4CAF50"
+                                Foreground="White"
+                                Padding="10, 5"
+                                Content="Set alert" />
                     </StackPanel>
                 </Border>
             </Grid>

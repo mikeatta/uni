@@ -1,7 +1,4 @@
 using System.Windows;
-using System.Windows.Controls;
-using FinanceManager.DTOs;
-using FinanceManager.ViewModels;
 
 namespace FinanceManager.Views;
 
