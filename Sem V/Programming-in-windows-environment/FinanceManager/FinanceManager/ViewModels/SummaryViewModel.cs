@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using FinanceManager.Database.EntityModels;
 using FinanceManager.Database.Repositories;
 using FinanceManager.DTOs;
+using FinanceManager.Services;
 
 namespace FinanceManager.ViewModels;
 
@@ -11,6 +12,7 @@ public class SummaryViewModel : INotifyPropertyChanged
 {
     private readonly UserRepository _userRepository;
     private readonly AlertRepository _alertRepository;
+    private SpendingAlertService? _spendingAlertService;
 
     private User _currentUser;
 
@@ -46,6 +48,7 @@ public class SummaryViewModel : INotifyPropertyChanged
         set
         {
             _alert = value;
+            UpdateSpendingAlertService();
             OnPropertyChanged();
         }
     }
@@ -141,6 +144,7 @@ public class SummaryViewModel : INotifyPropertyChanged
             UpdateRecentTransactions(_allTransactions);
             UpdateMonthlySummary(_allTransactions);
             UpdateUserBalance();
+            UpdateSpendingAlertService();
         };
 
         foreach (var transaction in allTransactions)
@@ -299,6 +303,35 @@ public class SummaryViewModel : INotifyPropertyChanged
         if (currentValue > previousValue) return "Up";
         if (currentValue < previousValue) return "Down";
         return "None";
+    }
+
+    private void UpdateSpendingAlertService()
+    {
+        if (Alert != null)
+        {
+            if (_spendingAlertService == null)
+            {
+                _spendingAlertService = new SpendingAlertService(Alert.Threshold, Alert.Message);
+            }
+            else
+            {
+                _spendingAlertService.UpdateLimit(Alert.Threshold);
+            }
+
+            UpdateSpendingCheck();
+        }
+        else
+        {
+            _spendingAlertService = null;
+        }
+    }
+
+    private void UpdateSpendingCheck()
+    {
+        if (_spendingAlertService != null && MonthlySummary.TotalExpenses > 0)
+        {
+            _spendingAlertService.UpdateSpending(MonthlySummary.TotalExpenses);
+        }
     }
 
     public async Task CallAddAlert(Alert alert)
