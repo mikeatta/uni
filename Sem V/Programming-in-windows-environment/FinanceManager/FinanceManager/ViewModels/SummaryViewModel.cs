@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
 using FinanceManager.Database.EntityModels;
 using FinanceManager.Database.Repositories;
 using FinanceManager.DTOs;
@@ -39,9 +38,9 @@ public class SummaryViewModel : INotifyPropertyChanged
         }
     }
 
-    private Alert _alert;
+    private Alert? _alert;
 
-    public Alert Alert
+    public Alert? Alert
     {
         get => _alert;
         set
@@ -305,6 +304,13 @@ public class SummaryViewModel : INotifyPropertyChanged
     public async Task CallAddAlert(Alert alert)
     {
         await _alertRepository.AddAlert(alert);
+        Alert = alert;
+    }
+
+    public async Task CallRemoveAlert(Alert alert)
+    {
+        await _alertRepository.RemoveAlert(alert);
+        Alert = null;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

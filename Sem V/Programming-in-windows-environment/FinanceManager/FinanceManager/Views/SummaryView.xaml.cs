@@ -14,7 +14,7 @@ public partial class SummaryView : UserControl
     private async void AddAlertButton_Click(object sender, RoutedEventArgs e)
     {
         var viewModel = DataContext as SummaryViewModel;
-        // if (viewModel != null) return;
+        if (viewModel == null) return;
 
         var addAlertWindow = new AddAlertWindow(viewModel);
         addAlertWindow.Owner = Window.GetWindow(this);
@@ -27,5 +27,13 @@ public partial class SummaryView : UserControl
             viewModel.AlertThreshold = Decimal.Zero;
             viewModel.AlertMessage = string.Empty;
         }
+    }
+
+    private async void RemoveAlertButton_CLick(object sender, RoutedEventArgs e)
+    {
+        var viewModel = DataContext as SummaryViewModel;
+        if (viewModel == null) return;
+
+        await viewModel.CallRemoveAlert(viewModel.Alert);
     }
 }

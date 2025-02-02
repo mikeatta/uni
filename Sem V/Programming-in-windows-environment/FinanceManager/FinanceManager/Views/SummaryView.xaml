@@ -9,6 +9,8 @@
     <UserControl.Resources>
         <helpers:IndexConverter x:Key="IndexConverter" />
         <helpers:TrendIconConverter x:Key="TrendIconConverter" />
+        <helpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <helpers:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter" />
     </UserControl.Resources>
 
     <Grid Background="White">
@@ -224,10 +226,25 @@
 
                         <!-- Show 'Add alert' button when no alert is set -->
                         <Button Click="AddAlertButton_Click"
+                                Visibility="{Binding Alert, Converter={StaticResource NullToVisibilityConverter}}"
                                 Background="#4CAF50"
                                 Foreground="White"
                                 Padding="10, 5"
                                 Content="Set alert" />
+
+                        <!-- Show alert properties when an alert is set -->
+                        <StackPanel
+                            Visibility="{Binding Alert, Converter={StaticResource NotNullToVisibilityConverter}}">
+                            <TextBlock Text="{Binding Alert.Threshold, StringFormat='Threshold: {0:C}'}" />
+                            <TextBlock Text="{Binding Alert.Message, StringFormat='Message: {0}'}" />
+                        </StackPanel>
+
+                        <Button Click="RemoveAlertButton_CLick"
+                                Visibility="{Binding Alert, Converter={StaticResource NotNullToVisibilityConverter}}"
+                                Background="LightGray"
+                                Foreground="Black"
+                                Padding="10, 5"
+                                Content="Remove alert" />
                     </StackPanel>
                 </Border>
             </Grid>
