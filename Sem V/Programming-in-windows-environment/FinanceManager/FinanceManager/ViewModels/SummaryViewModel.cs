@@ -12,6 +12,7 @@ public class SummaryViewModel : INotifyPropertyChanged
 {
     private readonly UserRepository _userRepository;
     private readonly AlertRepository _alertRepository;
+    private readonly FinancialGoalRepository _financialGoalRepository;
     private SpendingAlertService? _spendingAlertService;
 
     private User _currentUser;
@@ -36,6 +37,54 @@ public class SummaryViewModel : INotifyPropertyChanged
         private set
         {
             _recentTransactions = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private FinancialGoal? _financialGoal;
+
+    public FinancialGoal? FinancialGoal
+    {
+        get => _financialGoal;
+        set
+        {
+            _financialGoal = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private string? _goalDescription;
+
+    public string? GoalDescription
+    {
+        get => _goalDescription;
+        set
+        {
+            _goalDescription = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private decimal _goalTarget;
+
+    public decimal GoalTarget
+    {
+        get => _goalTarget;
+        set
+        {
+            _goalTarget = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private decimal _goalPercentage;
+
+    public decimal GoalPercentage
+    {
+        get => _goalPercentage;
+        set
+        {
+            _goalPercentage = value;
             OnPropertyChanged();
         }
     }
@@ -102,10 +151,11 @@ public class SummaryViewModel : INotifyPropertyChanged
     }
 
     public SummaryViewModel(UserRepository userRepository, ObservableCollection<TransactionDTO> allTransactions,
-        AlertRepository alertRepository)
+        FinancialGoalRepository financialGoalRepository, AlertRepository alertRepository)
     {
         _userRepository = userRepository;
         _allTransactions = allTransactions;
+        _financialGoalRepository = financialGoalRepository;
         _alertRepository = alertRepository;
 
         // Initialize the summary statistics
@@ -114,8 +164,11 @@ public class SummaryViewModel : INotifyPropertyChanged
         // Initialize the monthly summary
         UpdateMonthlySummary(_allTransactions);
 
-        // Initialize the user
+        // Initialize the summary view content
         InitializeAsync();
+
+        // Initialize the added goal (if exists)
+        LoadFinancialGoals();
 
         // Populate ObservableConnection on app init
         UpdateRecentTransactions(_allTransactions);
@@ -206,6 +259,17 @@ public class SummaryViewModel : INotifyPropertyChanged
     {
         var updatedUser = await _userRepository.GetDefaultUserAsync();
         CurrentUser = updatedUser;
+
+        // If a goal is set
+        if (FinancialGoal != null)
+        {
+            // Update the balance to match the current user's balance
+            FinancialGoal.CurrentAmount = CurrentUser.Balance;
+            UpdateGoalProgressPercentage();
+
+            // Update the database
+            await _financialGoalRepository.UpdateGoal(FinancialGoal);
+        }
     }
 
     private async void InitializeAsync()
@@ -224,6 +288,18 @@ public class SummaryViewModel : INotifyPropertyChanged
         {
             System.Diagnostics.Debug.WriteLine($"Initialization error: ", ex.Message);
         }
+    }
+
+    private async void LoadFinancialGoals()
+    {
+        var goal = await _financialGoalRepository.GetFinancialGoalAsync();
+
+        if (goal != null)
+        {
+            FinancialGoal = goal;
+        }
+
+        UpdateGoalProgressPercentage();
     }
 
     private async Task<User> EnsureUserExists()
@@ -334,6 +410,22 @@ public class SummaryViewModel : INotifyPropertyChanged
         }
     }
 
+    private void UpdateGoalProgressPercentage()
+    {
+        if (FinancialGoal != null)
+        {
+            var percentage = (FinancialGoal.CurrentAmount / FinancialGoal.TargetAmount) * 100;
+
+            // Cap the goal at 100%
+            if (percentage > 100)
+            {
+                percentage = 100;
+            }
+
+            GoalPercentage = percentage;
+        }
+    }
+
     public async Task CallAddAlert(Alert alert)
     {
         await _alertRepository.AddAlert(alert);
@@ -344,6 +436,23 @@ public class SummaryViewModel : INotifyPropertyChanged
     {
         await _alertRepository.RemoveAlert(alert);
         Alert = null;
+    }
+
+    public async Task CallAddGoal(FinancialGoal goal)
+    {
+        await _financialGoalRepository.AddGoal(goal);
+
+        // Request the goal back from the database (database autofills the ID)
+        var goalWithId = await _financialGoalRepository.GetFinancialGoalAsync();
+
+        // Update added financial goal with the ID from the database
+        FinancialGoal = goalWithId;
+    }
+
+    public async Task CallRemoveGoal(FinancialGoal goal)
+    {
+        await _financialGoalRepository.RemoveGoal(goal);
+        FinancialGoal = null;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

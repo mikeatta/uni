@@ -36,4 +36,27 @@ public partial class SummaryView : UserControl
 
         await viewModel.CallRemoveAlert(viewModel.Alert);
     }
+
+    private async void AddGoalButton_Click(object sender, RoutedEventArgs e)
+    {
+        var viewModel = DataContext as SummaryViewModel;
+        if (viewModel == null) return;
+
+        var addGoalWindow = new AddGoalWindow(viewModel);
+        addGoalWindow.Owner = Window.GetWindow(this);
+
+        if (addGoalWindow.ShowDialog() == true)
+        {
+            // Add the goal to the database
+            await viewModel.CallAddGoal(addGoalWindow.FinancialGoal);
+        }
+    }
+
+    private async void RemoveGoalButton_Click(object sender, RoutedEventArgs e)
+    {
+        var viewModel = DataContext as SummaryViewModel;
+        if (viewModel == null) return;
+
+        await viewModel.CallRemoveGoal(viewModel.FinancialGoal);
+    }
 }

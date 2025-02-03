@@ -119,8 +119,49 @@
             <Rectangle Grid.Row="0" Fill="Gray" />
             <TextBlock Grid.Row="0" Text="Goal Progress" FontWeight="SemiBold" HorizontalAlignment="Left"
                        VerticalAlignment="Center" Padding="5px 0 0 0 " />
+            <Border Grid.Row="0"
+                    Visibility="{Binding FinancialGoal, Converter={StaticResource NotNullToVisibilityConverter}}"
+                    Background="#E8E7E7"
+                    CornerRadius="4"
+                    Margin="10, 4, 5, 4"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center">
+                <TextBlock Text="{Binding GoalPercentage, StringFormat={}{0:0.00}%}" FontWeight="SemiBold"
+                           Padding="10, 4" />
+            </Border>
 
             <!-- Content -->
+            <StackPanel Grid.Row="1">
+                <!-- Add goal button -->
+                <Button Click="AddGoalButton_Click"
+                        Visibility="{Binding FinancialGoal, Converter={StaticResource NullToVisibilityConverter}}"
+                        Background="#4CAF50"
+                        Foreground="White"
+                        Padding="10, 5"
+                        Content="Set goal" />
+
+                <!-- Financial goal progress -->
+                <StackPanel
+                    Visibility="{Binding FinancialGoal, Converter={StaticResource NotNullToVisibilityConverter}}">
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0}: {1}/{2}">
+                                <Binding Path="FinancialGoal.Description" />
+                                <Binding Path="FinancialGoal.CurrentAmount" />
+                                <Binding Path="FinancialGoal.TargetAmount" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+
+                    <!-- Remove goal button -->
+                    <Button Click="RemoveGoalButton_Click"
+
+                            Background="LightGray"
+                            Foreground="Black"
+                            Padding="10, 5"
+                            Content="Close goal" />
+                </StackPanel>
+            </StackPanel>
         </Grid>
 
         <!-- Monthly summary section -->
@@ -150,7 +191,6 @@
                            VerticalAlignment="Center"
                            Margin="5,0,0,0" />
 
-                <!-- Old color: 4A4A4A -->
                 <Border Grid.Column="1"
                         Background="#E8E7E7"
                         CornerRadius="4"
