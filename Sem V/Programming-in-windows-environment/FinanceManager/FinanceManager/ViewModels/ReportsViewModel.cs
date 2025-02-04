@@ -39,14 +39,26 @@ public class ReportsViewModel : INotifyPropertyChanged
         }
     }
 
-    private ObservableCollection<TransactionCategory> _transactionCategories;
+    private ObservableCollection<TransactionCategory?> _transactionCategories;
 
-    public ObservableCollection<TransactionCategory> TransactionCategories
+    public ObservableCollection<TransactionCategory?> TransactionCategories
     {
         get => _transactionCategories;
         set
         {
             _transactionCategories = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private ObservableCollection<TransactionType?> _transactionTypes;
+
+    public ObservableCollection<TransactionType?> TransactionTypes
+    {
+        get => _transactionTypes;
+        set
+        {
+            _transactionTypes = value;
             OnPropertyChanged();
         }
     }
@@ -67,6 +79,7 @@ public class ReportsViewModel : INotifyPropertyChanged
 
         ReportForm = new ReportDTO();
         AddReportCommand = new AddReportCommand(this, transactions, transactionCategories);
+        CancelReportCommand = new CancelReportCommand(this);
     }
 
     public async Task<User> GetDefaultUser()

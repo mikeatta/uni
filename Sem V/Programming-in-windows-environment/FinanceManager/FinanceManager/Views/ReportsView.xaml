@@ -77,7 +77,7 @@
                     <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal">
                         <TextBlock Text="Type:" />
                         <ComboBox IsEditable="False" ItemsSource="{Binding Source={StaticResource TransactionTypes}}"
-                                  SelectedItem="{Binding ReportForm.TransactionType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                  SelectedItem="{Binding ReportForm.Type, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </StackPanel>
 
                     <!-- Part of description -->

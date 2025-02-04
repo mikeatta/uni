@@ -45,9 +45,9 @@ public class ReportDTO : INotifyPropertyChanged
         }
     }
 
-    private TransactionCategory _category;
+    private TransactionCategory? _category;
 
-    public TransactionCategory Category
+    public TransactionCategory? Category
     {
         get => _category;
         set
@@ -57,9 +57,9 @@ public class ReportDTO : INotifyPropertyChanged
         }
     }
 
-    private TransactionType _type;
+    private TransactionType? _type;
 
-    public TransactionType Type
+    public TransactionType? Type
     {
         get => _type;
         set

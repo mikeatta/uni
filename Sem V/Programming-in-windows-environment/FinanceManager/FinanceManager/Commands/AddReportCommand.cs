@@ -118,8 +118,8 @@ public class AddReportCommand : CommandBase
     {
         _viewModel.ReportForm.StartDate = DateTime.Now;
         _viewModel.ReportForm.EndDate = DateTime.Now + TimeSpan.FromDays(30);
-        _viewModel.ReportForm.Category = _transactionCategories.FirstOrDefault();
-        _viewModel.ReportForm.Type = TransactionType.Income;
+        _viewModel.ReportForm.Category = null;
+        _viewModel.ReportForm.Type = null;
         _viewModel.ReportForm.ContainsText = string.Empty;
         _viewModel.ReportForm.MinAmount = Decimal.Zero;
         _viewModel.ReportForm.MaxAmount = Decimal.Zero;
