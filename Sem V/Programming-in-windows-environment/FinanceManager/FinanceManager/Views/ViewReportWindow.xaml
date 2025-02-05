@@ -5,77 +5,127 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         mc:Ignorable="d"
         Title="ViewReportWindow" Height="640" Width="480">
-    <Grid>
+    <Grid Background="White" Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.5*" />
-            <ColumnDefinition Width="0.5*" />
-        </Grid.ColumnDefinitions>
+        <!-- Report Header Section -->
+        <Border Grid.Row="0" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Padding="0,0,0,10" Margin="0,0,0,15">
+            <StackPanel>
+                <TextBlock Text="{Binding Report.Id, StringFormat='Report ID: {0}'}"
+                           FontSize="16" FontWeight="SemiBold" Margin="0,0,0,5" />
+                <TextBlock Text="{Binding Report.DateCreated, StringFormat='Generated on {0:MMMM dd, yyyy}'}"
+                           Foreground="#666666" />
+            </StackPanel>
+        </Border>
 
-        <!-- Report info header -->
-        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Orientation="Vertical" VerticalAlignment="Center"
-                    HorizontalAlignment="Center">
-            <TextBlock Text="{Binding Report.Id, StringFormat='Report ID: {0}'}" FontWeight="Bold" Margin="5" />
-            <TextBlock Text="{Binding Report.DateCreated, StringFormat='Date Created: {0}'}" Margin="5" />
-        </StackPanel>
+        <!-- Date Range Section -->
+        <Border Grid.Row="1" Background="#F5F5F5" CornerRadius="4" Padding="10" Margin="0,0,0,15">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="{Binding StartDate, StringFormat='From: {0:MMM dd, yyyy}'}"
+                           Margin="0,0,15,0" />
+                <TextBlock Text="{Binding EndDate, StringFormat='To: {0:MMM dd, yyyy}'}" />
+            </StackPanel>
+        </Border>
 
-        <!-- Date range -->
-        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal"
-                    VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Text="{Binding StartDate, StringFormat='From: {0}'}" />
-            <TextBlock Text="{Binding EndDate, StringFormat='To: {0}'}" />
-        </StackPanel>
+        <!-- Summary Statistics Section -->
+        <Border Grid.Row="2" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4"
+                Padding="15" Margin="0,0,0,20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-        <!-- Report statistics -->
-        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Orientation="Vertical" VerticalAlignment="Center"
-                    HorizontalAlignment="Center">
-            <TextBlock Text="{Binding Report.TotalIncome, StringFormat='Total Income: {0}'}" />
-            <TextBlock Text="{Binding Report.TotalExpenses, StringFormat='Total Expenses: {0}'}" />
-            <TextBlock Text="{Binding Report.NetSavings, StringFormat='Net savings: {0}'}" />
-        </StackPanel>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Total Income" FontWeight="SemiBold" Margin="0,0,0,5" />
+                    <TextBlock Text="{Binding Report.TotalIncome, StringFormat={}{0:C}}"
+                               Foreground="#2E7D32" FontSize="16" />
+                </StackPanel>
 
-        <!-- Per-category statistics -->
-        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" Orientation="Vertical"
-                    VerticalAlignment="Center" HorizontalAlignment="Center">
-            <!-- Income by category -->
-            <TextBlock Text="Income by category" />
-            <ItemsControl ItemsSource="{Binding Report.IncomeByCategory}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{Binding Key}" />
-                            <TextBlock Text="{Binding Value, StringFormat={}{0:C}}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Total Expenses" FontWeight="SemiBold" Margin="0,0,0,5" />
+                    <TextBlock Text="{Binding Report.TotalExpenses, StringFormat={}{0:C}}"
+                               Foreground="#C62828" FontSize="16" />
+                </StackPanel>
 
-            <!-- Expenses by category -->
-            <TextBlock Text="Expenses by category" />
-            <ItemsControl ItemsSource="{Binding Report.ExpensesByCategory}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{Binding Key}" />
-                            <TextBlock Text="{Binding Value, StringFormat={}{0:C}}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Net Savings" FontWeight="SemiBold" Margin="0,0,0,5" />
+                    <TextBlock Text="{Binding Report.NetSavings, StringFormat={}{0:C}}"
+                               Foreground="#1565C0" FontSize="16" />
+                </StackPanel>
+            </Grid>
+        </Border>
 
-        <!-- Control buttons -->
-        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" Orientation="Horizontal"
-                    VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Button Content="Delete" Width="80" Click="DeleteButton_Click" Margin="0 0 10 0" />
-            <Button Content="Close" Width="80" Click="CloseButton_Click" />
+        <!-- Category Details Section -->
+        <Grid Grid.Row="3" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Income Categories -->
+            <Border Grid.Column="0" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4"
+                    Margin="0,0,10,0" Padding="15">
+                <StackPanel>
+                    <TextBlock Text="Income by Category" FontSize="14" FontWeight="SemiBold"
+                               Margin="0,0,0,10" />
+                    <ItemsControl ItemsSource="{Binding Report.IncomeByCategory}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding Key}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Value, StringFormat={}{0:C}}"
+                                               Foreground="#2E7D32" FontWeight="SemiBold" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- Expense Categories -->
+            <Border Grid.Column="1" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4"
+                    Margin="10,0,0,0" Padding="15">
+                <StackPanel>
+                    <TextBlock Text="Expenses by Category" FontSize="14" FontWeight="SemiBold"
+                               Margin="0,0,0,10" />
+                    <ItemsControl ItemsSource="{Binding Report.ExpensesByCategory}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding Key}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Value, StringFormat={}{0:C}}"
+                                               Foreground="#C62828" FontWeight="SemiBold" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Buttons Section -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center"
+                    Margin="0,10,0,0">
+            <Button Content="Delete" Width="100" Height="35" Click="DeleteButton_Click"
+                    Margin="0,0,15,0" Background="#C62828" Foreground="White" />
+            <Button Content="Close" Width="100" Height="35" Click="CloseButton_Click"
+                    Background="#424242" Foreground="White" />
         </StackPanel>
     </Grid>
 </Window>

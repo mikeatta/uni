@@ -21,8 +21,9 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
+
         <!-- New report panel -->
-        <Grid Grid.Column="0" Background="LightGray" Margin="5px">
+        <Grid Grid.Column="0" Background="LightGray" Margin="5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.2*" />
                 <RowDefinition Height="*" />
@@ -30,85 +31,71 @@
 
             <!-- Header -->
             <Rectangle Grid.Row="0" Fill="Gray" />
-            <TextBlock Grid.Row="0" Text="Add New Report" FontWeight="SemiBold" VerticalAlignment="Center"
-                       HorizontalAlignment="Left" Padding="5px 0 0 0" />
+            <TextBlock Grid.Row="0" Text="Add New Report" FontWeight="SemiBold"
+                       VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0" />
 
             <!-- Content -->
-            <Grid Grid.Row="1" Margin="5" Grid.IsSharedSizeScope="True">
+            <Grid Grid.Row="1" Margin="10" Grid.IsSharedSizeScope="True">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="Labels" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0">
-                    <!-- Date range from -->
-                    <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Orientation="Horizontal">
-                        <TextBlock Text="From:" />
-                        <DatePicker Margin="5 0 0 0"
-                                    SelectedDate="{Binding ReportForm.StartDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                    </StackPanel>
+                <!-- Date range from -->
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="From:" VerticalAlignment="Center" Margin="0,0,10,5" />
+                <DatePicker Grid.Row="0" Grid.Column="1" Margin="0,0,0,5"
+                            SelectedDate="{Binding ReportForm.StartDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-                    <!-- Date range to -->
-                    <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal">
-                        <TextBlock Text="To:" />
-                        <DatePicker Margin="5 0 0 0"
-                                    SelectedDate="{Binding ReportForm.EndDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                    </StackPanel>
-                </StackPanel>
+                <!-- Date range to -->
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="To:" VerticalAlignment="Center" Margin="0,0,10,5" />
+                <DatePicker Grid.Row="1" Grid.Column="1" Margin="0,0,0,5"
+                            SelectedDate="{Binding ReportForm.EndDate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1">
-                    <!-- Category -->
-                    <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal">
-                        <TextBlock Text="Category:" />
-                        <ComboBox x:Name="CategoryComboBox" IsEditable="False"
-                                  ItemsSource="{Binding TransactionCategories}"
-                                  DisplayMemberPath="Name"
-                                  SelectedItem="{Binding ReportForm.Category, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                    </StackPanel>
+                <!-- Category -->
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Category:" VerticalAlignment="Center" Margin="0,0,10,5" />
+                <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,0,0,5"
+                          IsEditable="False" ItemsSource="{Binding TransactionCategories}"
+                          DisplayMemberPath="Name"
+                          SelectedItem="{Binding ReportForm.Category, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-                    <!-- Type -->
-                    <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal">
-                        <TextBlock Text="Type:" />
-                        <ComboBox IsEditable="False" ItemsSource="{Binding Source={StaticResource TransactionTypes}}"
-                                  SelectedItem="{Binding ReportForm.Type, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                    </StackPanel>
+                <!-- Type -->
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Type:" VerticalAlignment="Center" Margin="0,0,10,5" />
+                <ComboBox Grid.Row="3" Grid.Column="1" Margin="0,0,0,5"
+                          IsEditable="False" ItemsSource="{Binding Source={StaticResource TransactionTypes}}"
+                          SelectedItem="{Binding ReportForm.Type, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-                    <!-- Part of description -->
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Contains:" />
-                        <TextBox
-                            Text="{Binding ReportForm.ContainsText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                    </StackPanel>
-                </StackPanel>
+                <!-- Contains -->
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Contains:" VerticalAlignment="Center" Margin="0,0,10,5" />
+                <TextBox Grid.Row="4" Grid.Column="1" Margin="0,0,0,5"
+                         Text="{Binding ReportForm.ContainsText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2">
-                    <!-- Above amount -->
-                    <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal">
-                        <TextBlock Text="Above:" />
-                        <TextBox Text="{Binding ReportForm.MinAmount, UpdateSourceTrigger=Default, StringFormat=N2}" />
-                    </StackPanel>
+                <!-- Above amount -->
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Above:" VerticalAlignment="Center" Margin="0,0,10,5" />
+                <TextBox Grid.Row="5" Grid.Column="1" Margin="0,0,0,5"
+                         Text="{Binding ReportForm.MinAmount, UpdateSourceTrigger=Default, StringFormat=N2}" />
 
-                    <!-- Below amount -->
-                    <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal">
-                        <TextBlock Text="Below:" />
-                        <TextBox
-                            Text="{Binding ReportForm.MaxAmount, UpdateSourceTrigger=Default, StringFormat=N2}" />
-                    </StackPanel>
-                </StackPanel>
+                <!-- Below amount -->
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="Below:" VerticalAlignment="Center" Margin="0,0,10,5" />
+                <TextBox Grid.Row="6" Grid.Column="1" Margin="0,0,0,5"
+                         Text="{Binding ReportForm.MaxAmount, UpdateSourceTrigger=Default, StringFormat=N2}" />
 
-                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3">
-                    <Button Command="{Binding AddReportCommand}" Padding="5">Create</Button>
-                    <Button Command="{Binding CancelReportCommand}"
-                            CommandParameter="{Binding ElementName=CategoryComboBox}" Padding="5">
-                        Reset
-                    </Button>
+                <!-- Buttons -->
+                <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2"
+                            Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Left">
+                    <Button Command="{Binding AddReportCommand}" Padding="10,5" Margin="0,0,10,0">Create</Button>
+                    <Button Command="{Binding CancelReportCommand}" Padding="10,5">Reset</Button>
                 </StackPanel>
             </Grid>
         </Grid>
@@ -116,8 +103,8 @@
         <!-- List of generated reports -->
         <Grid Grid.Column="1" Background="LightGray" Margin="5px">
             <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
+                <RowDefinition Height="0.2*" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <!-- Header -->
