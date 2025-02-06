@@ -66,6 +66,18 @@ public class TransactionsViewModel : INotifyPropertyChanged
         }
     }
 
+    private string _transactionTypeSelectedValue;
+
+    public string TransactionTypeSelectedValue
+    {
+        get => _transactionTypeSelectedValue;
+        set
+        {
+            _transactionTypeSelectedValue = value;
+            OnPropertyChanged();
+        }
+    }
+
     private string _description;
 
     public string Description
@@ -78,9 +90,9 @@ public class TransactionsViewModel : INotifyPropertyChanged
         }
     }
 
-    private string _note;
+    private string? _note;
 
-    public string Note
+    public string? Note
     {
         get => _note;
         set

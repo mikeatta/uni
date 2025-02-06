@@ -1,4 +1,3 @@
-using System.Windows.Controls;
 using FinanceManager.Database.EntityModels;
 using FinanceManager.Database.Repositories;
 using FinanceManager.DTOs;
@@ -65,13 +64,17 @@ public class AddTransactionCommand : CommandBase
             }
         }
 
+        // Parse the selected transaction type to the corresponding enum value
+        var transactionType =
+            (TransactionType)Enum.Parse(typeof(TransactionType), _viewModel.TransactionTypeSelectedValue);
+
         // Create new transaction object
         var transaction = new Transaction
         {
             UserId = defaultUser.Id,
             CategoryId = categoryId,
-            Type = _viewModel.TransactionType,
-            Description = _viewModel.Description ?? "",
+            Type = transactionType,
+            Description = _viewModel.Description,
             Note = _viewModel.Note,
             Amount = _viewModel.Amount,
             Date = _viewModel.Date,
@@ -83,7 +86,8 @@ public class AddTransactionCommand : CommandBase
         // Update the ObservableCollection to make changes on the frontend
         _viewModel.Transactions.Add(new TransactionDTO(transaction));
 
-        ClearFormfields(parameter);
+        // Reset the form input fields
+        ClearFormfields();
     }
 
     private bool CategoryExists(int categoryId)
@@ -91,18 +95,10 @@ public class AddTransactionCommand : CommandBase
         return _viewModel.Categories.Any(category => category.Id == categoryId);
     }
 
-    private void ClearFormfields(object? parameter)
+    private void ClearFormfields()
     {
-        // Unselect and clear input on the category ComboBox
-        if (parameter is ComboBox comboBox)
-        {
-            comboBox.SelectedItem = null;
-            comboBox.Text = string.Empty;
-        }
-
-        // Reset the class' property values
         _viewModel.CategoriesSelectedValue = string.Empty;
-        _viewModel.TransactionType = TransactionType.Expense;
+        _viewModel.TransactionTypeSelectedValue = string.Empty;
         _viewModel.Description = string.Empty;
         _viewModel.Note = string.Empty;
         _viewModel.Amount = Decimal.Zero;

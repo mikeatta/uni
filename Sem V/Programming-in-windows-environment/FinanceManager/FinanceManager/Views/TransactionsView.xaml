@@ -65,7 +65,7 @@
                 <ComboBox Grid.Row="1" Grid.Column="1" Margin="0 0 0 5"
                           IsEditable="False"
                           ItemsSource="{Binding Source={StaticResource TransactionTypes}}"
-                          SelectedItem="{Binding TransactionType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                          SelectedValue="{Binding TransactionTypeSelectedValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
                 <!-- Description TextBox -->
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Description:" VerticalAlignment="Center"
