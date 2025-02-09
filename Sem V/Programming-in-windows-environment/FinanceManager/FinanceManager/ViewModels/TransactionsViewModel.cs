@@ -2,16 +2,18 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Data;
 using System.Windows.Input;
 using FinanceManager.Commands;
 using FinanceManager.Database.EntityModels;
 using FinanceManager.Database.Repositories;
 using FinanceManager.DTOs;
+using FinanceManager.Helpers;
 using FinanceManager.Services;
 
 namespace FinanceManager.ViewModels;
 
-public class TransactionsViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
+public class TransactionsViewModel : INotifyPropertyChanged, INotifyDataErrorInfo, ISortableObservableCollection
 {
     private TransactionRepository _transactionRepository;
     private TransactionCategoryRepository _transactionCategoryRepository;
@@ -19,6 +21,14 @@ public class TransactionsViewModel : INotifyPropertyChanged, INotifyDataErrorInf
 
     private readonly UserBalanceService _userBalanceService;
     private readonly Dictionary<string, List<string>> _errors = new();
+
+    public string DataSortPropertyName
+    {
+        get => "Transaction.Date";
+    }
+
+    private ListCollectionView _transactionsCollectionView;
+    public ListCollectionView TransactionsCollectionView => _transactionsCollectionView;
 
     private ObservableCollection<TransactionDTO> _transactions = new();
 
@@ -28,7 +38,13 @@ public class TransactionsViewModel : INotifyPropertyChanged, INotifyDataErrorInf
         private set
         {
             _transactions = value;
+            _transactionsCollectionView = new ListCollectionView(_transactions);
+
+            _transactionsCollectionView.SortDescriptions.Add(new SortDescription(DataSortPropertyName,
+                ListSortDirection.Descending));
+
             OnPropertyChanged();
+            OnPropertyChanged(nameof(TransactionsCollectionView));
         }
     }
 
@@ -211,6 +227,9 @@ public class TransactionsViewModel : INotifyPropertyChanged, INotifyDataErrorInf
         await _userBalanceService.UpdateBalanceForModifiedTransaction(existingTransaction, updatedTransaction);
         await _transactionRepository.EditTransactionAsync(updatedTransaction);
         EditTransactionProperties(updatedTransaction);
+
+        // Sort the Transactions collection by descending date
+        SortCollection(TransactionsCollectionView);
     }
 
     public async Task CallAddTransactionCategory(TransactionCategory transactionCategory)
@@ -229,6 +248,11 @@ public class TransactionsViewModel : INotifyPropertyChanged, INotifyDataErrorInf
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void SortCollection(ListCollectionView collection)
+    {
+        collection.Refresh();
     }
 
     public bool HasErrors
@@ -412,6 +436,9 @@ public class TransactionsViewModel : INotifyPropertyChanged, INotifyDataErrorInf
 
             // Update the ObservableCollection to make changes on the frontend
             Transactions.Add(new TransactionDTO(transaction));
+
+            // Sort the Transactions collection by descending date
+            SortCollection(TransactionsCollectionView);
 
             // Clear the form fields
             CategoriesSelectedValue = string.Empty;

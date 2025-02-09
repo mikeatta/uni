@@ -1,19 +1,29 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Data;
 using System.Windows.Input;
 using FinanceManager.Commands;
 using FinanceManager.Database.EntityModels;
 using FinanceManager.Database.Repositories;
 using FinanceManager.DTOs;
+using FinanceManager.Helpers;
 
 namespace FinanceManager.ViewModels;
 
-public class ReportsViewModel : INotifyPropertyChanged
+public class ReportsViewModel : INotifyPropertyChanged, ISortableObservableCollection
 {
     private readonly ReportRepository _reportRepository;
     private readonly ReportCriteriaRepository _reportCriteriaRepository;
     private readonly UserRepository _userRepository;
+
+    public string DataSortPropertyName
+    {
+        get => "Report.DateCreated";
+    }
+
+    private ListCollectionView _reportsCollectionView;
+    public ListCollectionView ReportsCollectionView => _reportsCollectionView;
 
     private ObservableCollection<ReportDTO> _reports = new();
 
@@ -23,7 +33,13 @@ public class ReportsViewModel : INotifyPropertyChanged
         set
         {
             _reports = value;
+            _reportsCollectionView = new ListCollectionView(_reports);
+
+            _reportsCollectionView.SortDescriptions.Add(new SortDescription(DataSortPropertyName,
+                ListSortDirection.Descending));
+
             OnPropertyChanged();
+            OnPropertyChanged(nameof(ReportsCollectionView));
         }
     }
 
@@ -109,6 +125,9 @@ public class ReportsViewModel : INotifyPropertyChanged
 
         // Update the UI report list
         Reports.Add(new ReportDTO(report));
+
+        // Sort the Reports collection by descending date
+        SortCollection(ReportsCollectionView);
     }
 
     public async Task CallRemoveReport(Report report)
@@ -121,5 +140,10 @@ public class ReportsViewModel : INotifyPropertyChanged
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void SortCollection(ListCollectionView collection)
+    {
+        collection.Refresh();
     }
 }

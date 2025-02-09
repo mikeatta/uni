@@ -41,6 +41,9 @@ public partial class ReportsView : UserControl
 
             // Update the UI report list
             viewModel.Reports.Remove(item);
+
+            // Re-sort the Reports collection by descending date
+            viewModel.SortCollection(viewModel.ReportsCollectionView);
         }
     }
 
@@ -56,5 +59,8 @@ public partial class ReportsView : UserControl
 
         // Update the UI report list
         viewModel.Reports.Remove(item);
+
+        // Re-sort the Reports collection by descending date
+        viewModel.SortCollection(viewModel.ReportsCollectionView);
     }
 }

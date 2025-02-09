@@ -165,7 +165,7 @@
                        HorizontalAlignment="Left" Padding="5px 0 0 0 " />
 
             <!-- Content -->
-            <ListView Grid.Row="1" ItemsSource="{Binding Transactions}">
+            <ListView Grid.Row="1" ItemsSource="{Binding TransactionsCollectionView}">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Amount" Width="100">

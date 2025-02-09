@@ -113,7 +113,7 @@
                        HorizontalAlignment="Left" Padding="5px 0 0 0" />
 
             <!-- Content -->
-            <ListView Grid.Row="1" ItemsSource="{Binding Reports}">
+            <ListView Grid.Row="1" ItemsSource="{Binding ReportsCollectionView}">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Report ID">
