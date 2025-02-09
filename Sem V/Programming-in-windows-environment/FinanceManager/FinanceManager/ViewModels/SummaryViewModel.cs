@@ -324,8 +324,8 @@ public class SummaryViewModel : INotifyPropertyChanged
     private void UpdateRecentTransactions(ObservableCollection<TransactionDTO> allTransactions)
     {
         var recentTransactions = allTransactions
-            .OrderByDescending(t => t.Date)
-            .Take(5)
+            .OrderByDescending(t => t.Transaction.Date)
+            .Take(30)
             .ToList();
 
         RecentTransactions.Clear();
