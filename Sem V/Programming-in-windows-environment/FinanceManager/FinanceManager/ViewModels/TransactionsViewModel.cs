@@ -194,6 +194,55 @@ public class TransactionsViewModel : INotifyPropertyChanged, INotifyDataErrorInf
 
         SubmitCommand = new RelayCommand(Submit, CanSubmit);
         CancelCommand = new RelayCommand(ClearFormfields);
+
+        // Subscribe to event changes of the TransactionDTOs' properties
+        Transactions.CollectionChanged += (s, e) =>
+        {
+            if (e.NewItems != null)
+            {
+                foreach (TransactionDTO item in e.NewItems)
+                {
+                    item.PropertyChanged += Transaction_PropertyChanged;
+                }
+            }
+            else if (e.OldItems != null)
+            {
+                foreach (TransactionDTO item in e.OldItems)
+                {
+                    item.PropertyChanged -= Transaction_PropertyChanged;
+                }
+            }
+
+            FillCategoryNameProperty(Transactions);
+        };
+    }
+
+    private void Transaction_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender is TransactionDTO transactionDto)
+        {
+            FillCategoryNameProperty(null, transactionDto); // Update the category for a single transaction
+        }
+    }
+
+    private void FillCategoryNameProperty(ObservableCollection<TransactionDTO>? transactions = null,
+        TransactionDTO? transactionDTO = null)
+    {
+        if (transactions != null)
+        {
+            foreach (var transaction in transactions)
+            {
+                transaction.Transaction.TransactionCategory =
+                    Categories.FirstOrDefault(tc => tc.Id == transaction.Transaction.CategoryId) ??
+                    throw new NullReferenceException("Category not found while assigning category names");
+            }
+        }
+        else if (transactionDTO != null)
+        {
+            transactionDTO.Transaction.TransactionCategory =
+                Categories.FirstOrDefault(tc => tc.Id == transactionDTO.Transaction.CategoryId) ??
+                throw new NullReferenceException("Category not found while assigning category name");
+        }
     }
 
     private void AddCategoryToCollection(TransactionCategory transactionCategory)
