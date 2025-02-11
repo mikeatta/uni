@@ -165,10 +165,10 @@
                        HorizontalAlignment="Left" Padding="5px 0 0 0 " />
 
             <!-- Content -->
-            <ListView Grid.Row="1" ItemsSource="{Binding TransactionsCollectionView}">
+            <ListView Grid.Row="1" x:Name="TransactionsListView" ItemsSource="{Binding TransactionsCollectionView}">
                 <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Amount" Width="100">
+                    <GridView AllowsColumnReorder="False">
+                        <GridViewColumn Header="Amount">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Transaction.Amount, StringFormat=C}" />
@@ -176,10 +176,18 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Header="Description" Width="100">
+                        <GridViewColumn Header="Description">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Transaction.Description}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="Note">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Transaction.Note}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -200,7 +208,7 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Header="Actions" Width="50">
+                        <GridViewColumn Header="Actions">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button

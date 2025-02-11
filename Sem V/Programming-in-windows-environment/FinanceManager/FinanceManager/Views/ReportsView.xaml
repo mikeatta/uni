@@ -113,9 +113,9 @@
                        HorizontalAlignment="Left" Padding="5px 0 0 0" />
 
             <!-- Content -->
-            <ListView Grid.Row="1" ItemsSource="{Binding ReportsCollectionView}">
+            <ListView Grid.Row="1" x:Name="TransactionsListView" ItemsSource="{Binding ReportsCollectionView}">
                 <ListView.View>
-                    <GridView>
+                    <GridView AllowsColumnReorder="False">
                         <GridViewColumn Header="Report ID">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>

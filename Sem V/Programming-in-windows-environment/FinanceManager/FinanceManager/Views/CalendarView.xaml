@@ -129,7 +129,6 @@
                         <TextBlock Grid.Row="0" Grid.Column="6" Text="Sat" HorizontalAlignment="Center" />
                     </Grid>
 
-
                     <!-- Clickable date buttons -->
                     <ItemsControl Grid.Row="1" ItemsSource="{Binding CalendarDays}">
                         <ItemsControl.ItemsPanel>
@@ -142,7 +141,8 @@
                                 <Button Style="{StaticResource CalendarDayButton}"
                                         Command="{Binding DataContext.SelectDateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding Date}"
-                                        IsEnabled="{Binding Date, Converter={StaticResource NullToBooleanConverter}}">
+                                        IsEnabled="{Binding Date,
+                                        Converter={StaticResource NullToBooleanConverter}}">
                                     <Grid>
                                         <TextBlock Text="{Binding Date.Day}" VerticalAlignment="Center"
                                                    HorizontalAlignment="Center">
@@ -178,10 +178,10 @@
                        HorizontalAlignment="Left" Padding="5px 0 0 0" />
 
             <!-- List of transactions -->
-            <ListView Grid.Row="1" ItemsSource="{Binding TransactionsFromSelectedDate}">
+            <ListView Grid.Row="1" x:Name="TransactionsListView" ItemsSource="{Binding TransactionsFromSelectedDate}">
                 <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Amount" Width="100">
+                    <GridView AllowsColumnReorder="False">
+                        <GridViewColumn Header="Amount">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Transaction.Amount, StringFormat=C}" />
@@ -189,15 +189,7 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Header="Category" Width="100">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Transaction.TransactionCategory.Name}" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-
-                        <GridViewColumn Header="Description" Width="100">
+                        <GridViewColumn Header="Description">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Transaction.Description}" />
@@ -205,10 +197,18 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Header="Note" Width="100">
+                        <GridViewColumn Header="Note">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Transaction.Note}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
+                        <GridViewColumn Header="Category">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Transaction.TransactionCategory.Name}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
