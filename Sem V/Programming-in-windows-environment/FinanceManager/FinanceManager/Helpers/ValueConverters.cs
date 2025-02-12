@@ -88,7 +88,7 @@ public class TransactionAmountConverter : IValueConverter
         {
             return transaction.Type == TransactionType.Expense
                 ? $"-{transaction.Amount:C}" // Prefix the amount value with a '-' sign
-                : transaction.Amount.ToString("C"); // Return the original amount
+                : $" {transaction.Amount:C}"; // Return the original amount (prefix with a whitespace to align the items in the UI)
         }
 
         return value;
