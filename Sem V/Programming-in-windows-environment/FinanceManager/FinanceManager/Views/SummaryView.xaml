@@ -11,6 +11,8 @@
         <helpers:TrendIconConverter x:Key="TrendIconConverter" />
         <helpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <helpers:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter" />
+        <helpers:TransactionAmountConverter x:Key="TransactionAmountConverter" />
+        <helpers:TransactionColorConverter x:Key="TransactionColorConverter" />
     </UserControl.Resources>
 
     <Grid Background="White">
@@ -98,7 +100,12 @@
                                            Margin="5" VerticalAlignment="Center" />
                                 <TextBlock Grid.Column="1" Text="{Binding Transaction.Description}" Margin="5"
                                            VerticalAlignment="Center" />
-                                <TextBlock Grid.Column="2" Text="{Binding Transaction.Amount, StringFormat=C}"
+
+                                <!-- Dynamically binds TextBlock color and prefixes 'Expense' type transaction with a minus sign using the Transaction object -->
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding Transaction, Converter={StaticResource TransactionAmountConverter}}"
+                                           Foreground="{Binding Transaction, Converter={StaticResource TransactionColorConverter}}"
+                                           FontWeight="SemiBold"
                                            Margin="5"
                                            VerticalAlignment="Center" />
                             </Grid>

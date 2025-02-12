@@ -9,6 +9,8 @@
     <UserControl.Resources>
         <!-- Add converters -->
         <helpers:NullToBooleanConverter x:Key="NullToBooleanConverter" />
+        <helpers:TransactionAmountConverter x:Key="TransactionAmountConverter" />
+        <helpers:TransactionColorConverter x:Key="TransactionColorConverter" />
 
         <!-- Add calendar date button styling -->
         <Style x:Key="CalendarDayButton" TargetType="Button">
@@ -184,7 +186,10 @@
                         <GridViewColumn Header="Amount">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Transaction.Amount, StringFormat=C}" />
+                                    <!-- Dynamically binds TextBlock color and prefixes 'Expense' type transaction with a minus sign using the Transaction object -->
+                                    <TextBlock
+                                        Text="{Binding Transaction, Converter={StaticResource TransactionAmountConverter}}"
+                                        Foreground="{Binding Transaction, Converter={StaticResource TransactionColorConverter}}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

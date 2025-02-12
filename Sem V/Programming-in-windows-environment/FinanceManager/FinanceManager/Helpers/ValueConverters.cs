@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
+using FinanceManager.Database.EntityModels;
 
 namespace FinanceManager.Helpers;
 
@@ -75,5 +77,45 @@ public class StringToNullableDecimalConverter : IValueConverter
         }
 
         return strValue; // Leave input as-is
+    }
+}
+
+public class TransactionAmountConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is Transaction transaction)
+        {
+            return transaction.Type == TransactionType.Expense
+                ? $"-{transaction.Amount:C}" // Prefix the amount value with a '-' sign
+                : transaction.Amount.ToString("C"); // Return the original amount
+        }
+
+        return value;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class TransactionColorConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is Transaction transaction)
+        {
+            return transaction.Type == TransactionType.Expense
+                ? new SolidColorBrush(Colors.IndianRed)
+                : new SolidColorBrush(Colors.MediumSeaGreen);
+        }
+
+        return new SolidColorBrush(Colors.Black);
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
     }
 }
