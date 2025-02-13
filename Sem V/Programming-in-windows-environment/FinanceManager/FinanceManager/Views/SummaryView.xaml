@@ -138,37 +138,41 @@
             </Border>
 
             <!-- Content -->
-            <StackPanel Grid.Row="1">
-                <!-- Add goal button -->
-                <Button Click="AddGoalButton_Click"
-                        Visibility="{Binding FinancialGoal, Converter={StaticResource NullToVisibilityConverter}}"
-                        Background="#4CAF50"
-                        Foreground="White"
-                        Padding="10, 5"
-                        Content="Set goal" />
+            <Border Grid.Row="1" Background="White" CornerRadius="4" Margin="10" Padding="10">
+                <Grid>
+                    <!-- Add goal button (displayed when no goal is set) -->
+                    <StackPanel
+                        Visibility="{Binding FinancialGoal, Converter={StaticResource NullToVisibilityConverter}}">
+                        <TextBlock Text="No goal currently set" Margin="0, 0, 0, 10" />
+                        <Button Click="AddGoalButton_Click"
+                                Background="#4CAF50"
+                                Foreground="White"
+                                Padding="10, 5"
+                                Content="Set goal" />
+                    </StackPanel>
 
-                <!-- Financial goal progress -->
-                <StackPanel
-                    Visibility="{Binding FinancialGoal, Converter={StaticResource NotNullToVisibilityConverter}}">
-                    <TextBlock>
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="{}{0}: {1}/{2}">
-                                <Binding Path="FinancialGoal.Description" />
-                                <Binding Path="FinancialGoal.CurrentAmount" />
-                                <Binding Path="FinancialGoal.TargetAmount" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
+                    <!-- Financial goal progress (when a goal has been set and loaded) -->
+                    <StackPanel
+                        Visibility="{Binding FinancialGoal, Converter={StaticResource NotNullToVisibilityConverter}}">
+                        <TextBlock TextWrapping="WrapWithOverflow" Margin="0, 0, 0, 10">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0}: {1}/{2}">
+                                    <Binding Path="FinancialGoal.Description" />
+                                    <Binding Path="FinancialGoal.CurrentAmount" />
+                                    <Binding Path="FinancialGoal.TargetAmount" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
 
-                    <!-- Remove goal button -->
-                    <Button Click="RemoveGoalButton_Click"
-
-                            Background="LightGray"
-                            Foreground="Black"
-                            Padding="10, 5"
-                            Content="Close goal" />
-                </StackPanel>
-            </StackPanel>
+                        <!-- Remove goal button -->
+                        <Button Click="RemoveGoalButton_Click"
+                                Background="LightGray"
+                                Foreground="Black"
+                                Padding="10, 5"
+                                Content="Close goal" />
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Grid>
 
         <!-- Monthly summary section -->
