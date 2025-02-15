@@ -49,6 +49,7 @@ public class SummaryViewModel : INotifyPropertyChanged
         set
         {
             _financialGoal = value;
+            UpdateGoalProgressPercentage();
             OnPropertyChanged();
         }
     }
