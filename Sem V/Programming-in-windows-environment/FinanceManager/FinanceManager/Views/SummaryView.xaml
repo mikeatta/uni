@@ -285,7 +285,8 @@
 
                         <!-- Show alert properties when an alert is set -->
                         <StackPanel
-                            Visibility="{Binding Alert, Converter={StaticResource NotNullToVisibilityConverter}}">
+                            Visibility="{Binding Alert, Converter={StaticResource NotNullToVisibilityConverter}}"
+                            Margin="0, 0, 0, 10">
                             <TextBlock Text="{Binding Alert.Threshold, StringFormat='Threshold: {0:C}'}" />
                             <TextBlock Text="{Binding Alert.Message, StringFormat='Message: {0}'}" />
                         </StackPanel>
