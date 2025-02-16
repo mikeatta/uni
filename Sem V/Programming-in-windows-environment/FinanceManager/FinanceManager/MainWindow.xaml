@@ -5,9 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:FinanceManager.ViewModels"
         xmlns:views="clr-namespace:FinanceManager.Views"
+        xmlns:helpers="clr-namespace:FinanceManager.Helpers"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
+        <helpers:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
         <DataTemplate DataType="{x:Type vm:SummaryViewModel}">
             <views:SummaryView />
         </DataTemplate>
@@ -48,5 +51,19 @@
             <!-- Content Area -->
             <ContentControl Content="{Binding CurrentView}" />
         </DockPanel>
+
+        <!-- Loading overlay -->
+        <Grid Visibility="{Binding ShowLoadingOverlay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Rectangle Fill="White" Opacity="0.7" />
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <ProgressBar IsIndeterminate="True"
+                             Width="200"
+                             Height="20"
+                             Margin="0,0,0,10" />
+                <TextBlock Text="Loading data..."
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

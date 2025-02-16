@@ -35,6 +35,37 @@ public class MainViewModel : INotifyPropertyChanged
     private ReportsViewModel _reportsViewModel;
 
 
+    private bool _isLoadingData = true;
+
+    public bool IsLoadingData
+    {
+        get => _isLoadingData;
+        set
+        {
+            _isLoadingData = value;
+            OnPropertyChanged(nameof(IsLoadingData));
+            OnPropertyChanged(nameof(ShowLoadingOverlay));
+        }
+    }
+
+    private bool _isViewModelReady;
+
+    public bool IsViewModelReady
+    {
+        get => _isViewModelReady;
+        set
+        {
+            _isViewModelReady = value;
+            OnPropertyChanged(nameof(IsViewModelReady));
+            OnPropertyChanged(nameof(ShowLoadingOverlay));
+        }
+    }
+
+    public bool ShowLoadingOverlay
+    {
+        get => IsLoadingData || !IsViewModelReady;
+    }
+
     public object CurrentView
     {
         get => _currentView;
@@ -79,10 +110,8 @@ public class MainViewModel : INotifyPropertyChanged
     {
         _contextFactory = new PooledDbContextFactory<FinanceManagerDbContext>(options);
         InitializeRepositories();
-        LoadTransactions();
-        LoadCategories();
-        LoadReports();
-        InitializeViewModels();
+        InitializeViewModelsWithPlaceholders();
+        InitializeAsync();
     }
 
     private void InitializeRepositories()
@@ -94,6 +123,69 @@ public class MainViewModel : INotifyPropertyChanged
         _reportCriteriaRepository = new ReportCriteriaRepository(_contextFactory);
         _alertRepository = new AlertRepository(_contextFactory);
         _financialGoalRepository = new FinancialGoalRepository(_contextFactory);
+    }
+
+    private void InitializeViewModelsWithPlaceholders()
+    {
+        // Initialize ViewModels with empty collections
+        Transactions = new ObservableCollection<TransactionDTO>();
+        TransactionsCategories = new ObservableCollection<TransactionCategory>();
+        Reports = new ObservableCollection<ReportDTO>();
+
+        _summaryViewModel = new SummaryViewModel(
+            _userRepository,
+            Transactions,
+            _financialGoalRepository,
+            _alertRepository
+        );
+
+        _transactionsViewModel = new TransactionsViewModel(
+            Transactions,
+            TransactionsCategories,
+            _transactionRepository,
+            _userRepository,
+            _transactionCategoryRepository
+        );
+
+        _calendarViewModel = new CalendarViewModel(
+            Transactions,
+            TransactionsCategories
+        );
+
+        _reportsViewModel = new ReportsViewModel(
+            _reportRepository,
+            _reportCriteriaRepository,
+            _userRepository,
+            Reports,
+            Transactions,
+            TransactionsCategories
+        );
+
+        CurrentView = _summaryViewModel;
+        NavigateCommand = new RelayCommand(Navigate);
+
+        IsViewModelReady = true;
+    }
+
+    private async void InitializeAsync()
+    {
+        try
+        {
+            IsLoadingData = true;
+
+            await Task.WhenAll(
+                LoadTransactions(),
+                LoadCategories(),
+                LoadReports()
+            );
+
+            IsLoadingData = false;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error during initialization: {ex}");
+            IsLoadingData = false;
+        }
     }
 
     private async Task LoadTransactions()
@@ -124,25 +216,6 @@ public class MainViewModel : INotifyPropertyChanged
         {
             Reports.Add(new ReportDTO(report));
         }
-    }
-
-    private void InitializeViewModels()
-    {
-        _summaryViewModel =
-            new SummaryViewModel(_userRepository, Transactions, _financialGoalRepository, _alertRepository);
-
-        _transactionsViewModel = new TransactionsViewModel(Transactions, TransactionsCategories,
-            _transactionRepository,
-            _userRepository, _transactionCategoryRepository);
-
-        _calendarViewModel = new CalendarViewModel(Transactions, TransactionsCategories);
-
-        _reportsViewModel =
-            new ReportsViewModel(_reportRepository, _reportCriteriaRepository, _userRepository, Reports, Transactions,
-                TransactionsCategories);
-
-        CurrentView = _summaryViewModel;
-        NavigateCommand = new RelayCommand(Navigate);
     }
 
     public ICommand NavigateCommand { get; set; }
