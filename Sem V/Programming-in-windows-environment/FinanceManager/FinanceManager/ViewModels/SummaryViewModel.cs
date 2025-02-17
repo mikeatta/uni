@@ -15,6 +15,24 @@ public class SummaryViewModel : INotifyPropertyChanged
     private readonly FinancialGoalRepository _financialGoalRepository;
     private SpendingAlertService? _spendingAlertService;
 
+    private bool _isApplicationLoading;
+
+    public bool IsApplicationLoading
+    {
+        get => _isApplicationLoading;
+        set
+        {
+            _isApplicationLoading = value;
+            OnPropertyChanged();
+
+            // Run once the application is done loading, and an Alert is set
+            if (value is false && Alert != null)
+            {
+                UpdateSpendingCheck();
+            }
+        }
+    }
+
     private User _currentUser;
 
     public User CurrentUser
@@ -151,13 +169,15 @@ public class SummaryViewModel : INotifyPropertyChanged
         }
     }
 
-    public SummaryViewModel(UserRepository userRepository, ObservableCollection<TransactionDTO> allTransactions,
-        FinancialGoalRepository financialGoalRepository, AlertRepository alertRepository)
+    public SummaryViewModel(UserRepository userRepository,
+        ObservableCollection<TransactionDTO> allTransactions,
+        FinancialGoalRepository financialGoalRepository, AlertRepository alertRepository, bool isLoading = true)
     {
         _userRepository = userRepository;
         _allTransactions = allTransactions;
         _financialGoalRepository = financialGoalRepository;
         _alertRepository = alertRepository;
+        _isApplicationLoading = isLoading;
 
         // Initialize the summary statistics
         SummaryInfoDateSpan = GetSummaryDateSpan();
@@ -211,6 +231,7 @@ public class SummaryViewModel : INotifyPropertyChanged
     {
         if (sender is TransactionDTO)
         {
+            UpdateRecentTransactions(_allTransactions);
             UpdateMonthlySummary(_allTransactions);
             UpdateUserBalance();
         }
@@ -258,18 +279,21 @@ public class SummaryViewModel : INotifyPropertyChanged
 
     private async void UpdateUserBalance()
     {
-        var updatedUser = await _userRepository.GetDefaultUserAsync();
-        CurrentUser = updatedUser;
-
-        // If a goal is set
-        if (FinancialGoal != null)
+        if (!_isApplicationLoading)
         {
-            // Update the balance to match the current user's balance
-            FinancialGoal.CurrentAmount = CurrentUser.Balance;
-            UpdateGoalProgressPercentage();
+            var updatedUser = await _userRepository.GetDefaultUserAsync();
+            CurrentUser = updatedUser;
 
-            // Update the database
-            await _financialGoalRepository.UpdateGoal(FinancialGoal);
+            // If a goal is set (and application data has finished loading)
+            if (FinancialGoal != null)
+            {
+                // Update the balance to match the current user's balance
+                FinancialGoal.CurrentAmount = CurrentUser.Balance;
+                UpdateGoalProgressPercentage();
+
+                // Update the database
+                await _financialGoalRepository.UpdateGoal(FinancialGoal);
+            }
         }
     }
 
@@ -395,7 +419,11 @@ public class SummaryViewModel : INotifyPropertyChanged
                 _spendingAlertService.UpdateLimit(Alert.Threshold);
             }
 
-            UpdateSpendingCheck();
+            // Only update spending if the app isn't loading
+            if (!IsApplicationLoading)
+            {
+                UpdateSpendingCheck();
+            }
         }
         else
         {
@@ -405,7 +433,8 @@ public class SummaryViewModel : INotifyPropertyChanged
 
     private void UpdateSpendingCheck()
     {
-        if (_spendingAlertService != null && MonthlySummary.TotalExpenses > 0)
+        // Only check spending if the app isn't loading
+        if (!IsApplicationLoading && _spendingAlertService != null && MonthlySummary.TotalExpenses > 0)
         {
             _spendingAlertService.UpdateSpending(MonthlySummary.TotalExpenses);
         }

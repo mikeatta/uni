@@ -12,6 +12,7 @@ public class TransactionRepository
         _dbContextFactory = dbContextFactory;
     }
 
+    // TODO: Add pagination to incrementally request content from the database 
     public async Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
     {
         await using var context = await _dbContextFactory.CreateDbContextAsync();

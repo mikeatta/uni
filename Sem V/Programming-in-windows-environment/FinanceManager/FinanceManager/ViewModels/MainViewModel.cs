@@ -141,7 +141,8 @@ public class MainViewModel : INotifyPropertyChanged
             _userRepository,
             Transactions,
             _financialGoalRepository,
-            _alertRepository
+            _alertRepository,
+            isLoading: true
         );
 
         _transactionsViewModel = new TransactionsViewModel(
