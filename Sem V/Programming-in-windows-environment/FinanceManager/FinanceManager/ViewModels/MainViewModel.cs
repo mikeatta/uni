@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Input;
 using FinanceManager.Commands;
 using FinanceManager.Database;
@@ -110,8 +111,17 @@ public class MainViewModel : INotifyPropertyChanged
     {
         _contextFactory = new PooledDbContextFactory<FinanceManagerDbContext>(options);
         InitializeRepositories();
-        InitializeViewModelsWithPlaceholders();
         InitializeAsync();
+
+        while (!IsViewModelReady)
+        {
+            if (!ShowLoadingOverlay)
+            {
+                break;
+            }
+
+            InitializeViewModels();
+        }
     }
 
     private void InitializeRepositories()
@@ -125,13 +135,8 @@ public class MainViewModel : INotifyPropertyChanged
         _financialGoalRepository = new FinancialGoalRepository(_contextFactory);
     }
 
-    private void InitializeViewModelsWithPlaceholders()
+    private void InitializeViewModels()
     {
-        // Initialize ViewModels with empty collections
-        Transactions = new ObservableCollection<TransactionDTO>();
-        TransactionsCategories = new ObservableCollection<TransactionCategory>();
-        Reports = new ObservableCollection<ReportDTO>();
-
         _summaryViewModel = new SummaryViewModel(
             _userRepository,
             Transactions,
@@ -173,11 +178,11 @@ public class MainViewModel : INotifyPropertyChanged
         {
             IsLoadingData = true;
 
-            await Task.WhenAll(
-                LoadTransactions(),
-                LoadCategories(),
-                LoadReports()
-            );
+            await Task.Run(LoadCategories).ConfigureAwait(false);
+            await Task.Run(LoadTransactions).ConfigureAwait(false);
+            await Task.Run(LoadReports).ConfigureAwait(false);
+
+            Application.Current.Dispatcher.Invoke(() => { _summaryViewModel.IsApplicationLoading = false; });
 
             IsLoadingData = false;
         }
@@ -192,30 +197,45 @@ public class MainViewModel : INotifyPropertyChanged
     {
         var transactions = await _transactionRepository.GetAllTransactionsAsync();
 
-        foreach (var transaction in transactions)
+        Application.Current.Dispatcher.Invoke(() =>
         {
-            Transactions.Add(new TransactionDTO(transaction));
-        }
+            Transactions.Clear();
+
+            foreach (var transaction in transactions)
+            {
+                Transactions.Add(new TransactionDTO(transaction));
+            }
+        });
     }
 
     private async Task LoadCategories()
     {
         var categories = await _transactionCategoryRepository.GetAllAsync();
 
-        foreach (var category in categories)
+        Application.Current.Dispatcher.Invoke(() =>
         {
-            TransactionsCategories.Add(category);
-        }
+            TransactionsCategories.Clear();
+
+            foreach (var category in categories)
+            {
+                TransactionsCategories.Add(category);
+            }
+        });
     }
 
     private async Task LoadReports()
     {
         var reports = await _reportRepository.GetAllReportsAsync();
 
-        foreach (var report in reports)
+        Application.Current.Dispatcher.Invoke(() =>
         {
-            Reports.Add(new ReportDTO(report));
-        }
+            Reports.Clear();
+
+            foreach (var report in reports)
+            {
+                Reports.Add(new ReportDTO(report));
+            }
+        });
     }
 
     public ICommand NavigateCommand { get; set; }
