@@ -218,7 +218,12 @@ public class SummaryViewModel : INotifyPropertyChanged
             UpdateRecentTransactions(_allTransactions);
             UpdateMonthlySummary(_allTransactions);
             UpdateUserBalance();
-            UpdateSpendingAlertService();
+
+            if (s is TransactionDTO { Transaction.Type: TransactionType.Expense })
+            {
+                // Only trigger the spending service update on 'Expense' type transaction change
+                UpdateSpendingAlertService();
+            }
         };
 
         foreach (var transaction in allTransactions)
@@ -229,11 +234,17 @@ public class SummaryViewModel : INotifyPropertyChanged
 
     private void Transaction_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (sender is TransactionDTO)
+        if (sender is TransactionDTO transactionDto)
         {
             UpdateRecentTransactions(_allTransactions);
             UpdateMonthlySummary(_allTransactions);
             UpdateUserBalance();
+
+            if (transactionDto.Transaction.Type == TransactionType.Expense)
+            {
+                // Only trigger the spending service update on 'Expense' type transaction change
+                UpdateSpendingAlertService();
+            }
         }
     }
 
