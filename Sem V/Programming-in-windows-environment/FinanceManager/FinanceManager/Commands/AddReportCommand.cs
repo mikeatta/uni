@@ -27,11 +27,11 @@ public class AddReportCommand : CommandBase
         {
             StartDate = _viewModel.ReportForm.StartDate,
             EndDate = _viewModel.ReportForm.EndDate,
-            CategoryId = _viewModel.ReportForm.Category.Id,
+            CategoryId = _viewModel.ReportForm.Category?.Id,
             Type = _viewModel.ReportForm.Type,
             Content = _viewModel.ReportForm.ContainsText,
-            MinAmount = _viewModel.ReportForm.MinAmount,
-            MaxAmount = _viewModel.ReportForm.MaxAmount,
+            MinAmount = _viewModel.ReportForm.MinAmount == (decimal)0.00 ? null : _viewModel.ReportForm.MinAmount,
+            MaxAmount = _viewModel.ReportForm.MaxAmount == (decimal)0.00 ? null : _viewModel.ReportForm.MaxAmount,
         };
 
         // Submit the report criteria to the database
@@ -68,19 +68,35 @@ public class AddReportCommand : CommandBase
         var dateTo = reportCriteria.EndDate;
 
         // Get all transactions within the date range (inclusive)
-        var transactionWithinDateRange =
+        var filteredTransactions =
             _transactions.Select(t => t.Transaction).Where(t => t.Date >= dateFrom && t.Date <= dateTo);
 
-        // Get total income and expenses for selected date range
-        var totalIncome = transactionWithinDateRange.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount);
+        // Apply the other filters
+        if (reportCriteria.CategoryId != null)
+            filteredTransactions = filteredTransactions.Where(t => t.CategoryId == reportCriteria.CategoryId);
 
-        var totalExpenses = transactionWithinDateRange.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount);
+        if (reportCriteria.Type != null)
+            filteredTransactions = filteredTransactions.Where(t => t.Type == reportCriteria.Type);
+
+        if (reportCriteria.Content != null)
+            filteredTransactions = filteredTransactions.Where(t => t.Description.Contains(reportCriteria.Content));
+
+        if (reportCriteria.MinAmount != null)
+            filteredTransactions = filteredTransactions.Where(t => t.Amount >= reportCriteria.MinAmount);
+
+        if (reportCriteria.MaxAmount != null)
+            filteredTransactions = filteredTransactions.Where(t => t.Amount <= reportCriteria.MaxAmount);
+
+        // Get total income and expenses for selected date range
+        var totalIncome = filteredTransactions.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount);
+
+        var totalExpenses = filteredTransactions.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount);
 
         // Get net balance for the selected date range
         var netSavings = totalIncome - totalExpenses;
 
         // Group the income and expenses by categories
-        var incomeByCategory = transactionWithinDateRange
+        var incomeByCategory = filteredTransactions
             .Where(t => t.Type == TransactionType.Income)
             .Join(
                 _transactionCategories,
@@ -94,7 +110,7 @@ public class AddReportCommand : CommandBase
                 g => g.Sum(x => x.Transaction.Amount)
             );
 
-        var expensesByCategory = transactionWithinDateRange
+        var expensesByCategory = filteredTransactions
             .Where(t => t.Type == TransactionType.Expense)
             .Join(_transactionCategories,
                 transaction => transaction.CategoryId,
