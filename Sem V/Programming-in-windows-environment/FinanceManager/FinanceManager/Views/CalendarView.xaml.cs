@@ -1,7 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Threading;
 using FinanceManager.ViewModels;
 
 namespace FinanceManager.Views;
@@ -35,12 +34,10 @@ public partial class CalendarView : UserControl
 
     private void CalculateListViewColumnWidths()
     {
-        if (TransactionsListView.View is GridView gridView) // TransactionsListView is the name of the ListView element
+        if (TransactionsListView.View is GridView gridView)
         {
             int gridColumnCount = gridView.Columns.Count;
             if (gridColumnCount == 0) return;
-
-            double maxCategoryWidth = CalculateMaxColumnWidth();
 
             // Calculate the available space across the X axis
             double availableSpace = TransactionsListView.ActualWidth -
@@ -49,69 +46,56 @@ public partial class CalendarView : UserControl
                                     TransactionsListView.BorderThickness.Left -
                                     TransactionsListView.BorderThickness.Right;
 
-            availableSpace -=
-                24; // Remove margins, hardcoded into the element (default margin: (6, 0, 6, 0)), and the maxCategoryWidth
+            availableSpace -= 12; // Remove margins
 
             // Return if the width is not yet available
             if (availableSpace <= 0) return;
 
-            double descriptionWidth = 0;
-            double noteWidth = 0;
+            // Calculate and reserve the amount column width
+            double maxAmountWidth = CalculateMaxAmountColumnWidth();
+            availableSpace -= maxAmountWidth;
 
-            // Calculate the available space remaining after subtracting the columns' widths
-            for (int i = 0; i < gridColumnCount; i++)
+            if (availableSpace > 0 && gridView.Columns.Count >= gridColumnCount)
             {
-                // Skip the description and note columns, they should fill the remaining space
-                if (i is 1 or 2) continue;
+                // Calculate minimum width needed for the note column
+                double minNoteWidth = 60;
+                availableSpace -= minNoteWidth;
 
-                if (i is 3)
-                {
-                    availableSpace -= maxCategoryWidth;
-                    continue;
-                }
+                // Divide remaining space in 2:1 ratio between description and category
+                double partWidth = availableSpace / 3;
 
-                availableSpace -= gridView.Columns[i].ActualWidth;
-            }
-
-            // Assign the remaining width to the desired column(s)
-            if (availableSpace > 0)
-            {
-                descriptionWidth = availableSpace / 2;
-                noteWidth = availableSpace / 2;
-            }
-
-            if (gridView.Columns.Count >= gridColumnCount)
-            {
-                gridView.Columns[1].Width = descriptionWidth; // Description
-                gridView.Columns[2].Width = noteWidth; // Note (field could be empty)
-                gridView.Columns[3].Width = maxCategoryWidth; // Category name
+                gridView.Columns[0].Width = maxAmountWidth; // Amount (maximum width)
+                gridView.Columns[1].Width = partWidth * 2; // Description (2 parts)
+                gridView.Columns[2].Width = minNoteWidth; // Note (minimum width)
+                gridView.Columns[3].Width = partWidth; // Category (1 part)
             }
         }
     }
 
-    private double CalculateMaxColumnWidth()
+    private double CalculateMaxAmountColumnWidth()
     {
         double maxWidth = 0;
 
         if (DataContext is CalendarViewModel calendarViewModel)
         {
-            var longestCategoryName = calendarViewModel.Transactions
-                .Select(t => t.Transaction.TransactionCategory.Name)
-                .Where(name => !string.IsNullOrEmpty(name))
-                .OrderByDescending(name => name.Length)
+            decimal? longestAmount = calendarViewModel.Transactions
+                .Select(t => t.Transaction.Amount)
+                .OrderDescending()
                 .FirstOrDefault();
 
-            if (!string.IsNullOrEmpty(longestCategoryName))
+            if (longestAmount != null)
             {
+                FontFamily systemFontFamily = SystemFonts.MessageFontFamily;
+
                 FormattedText formattedText = new FormattedText(
-                    longestCategoryName,
+                    longestAmount.Value.ToString("C"),
                     System.Globalization.CultureInfo.CurrentCulture,
                     FlowDirection.LeftToRight,
-                    new Typeface("Arial"),
+                    new Typeface(systemFontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
                     12,
                     Brushes.Black);
 
-                maxWidth = formattedText.Width + 12; // Add width of default left and right margins
+                maxWidth = formattedText.Width + 36; // Add width of default left and right margins
             }
         }
 

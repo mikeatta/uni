@@ -46,8 +46,7 @@ public partial class TransactionsView : UserControl
                                     TransactionsListView.BorderThickness.Left -
                                     TransactionsListView.BorderThickness.Right;
 
-            availableSpace -=
-                12; // Remove the left and right margins, hardcoded into the element (default margin: (6, 0, 6, 0))
+            availableSpace -= 36; // Remove the margins
 
             // Return if the width is not yet available
             if (availableSpace <= 0) return;
@@ -55,17 +54,14 @@ public partial class TransactionsView : UserControl
             // Calculate the available space remaining after subtracting the columns' widths
             for (int i = 0; i < gridColumnCount; i++)
             {
-                if (i is 1 or 2)
-                    continue; // Skip the description and note columns, they should fill the remaining space
-
+                if (i is 1) continue; // Skip the description column, it should fill the remaining space
                 availableSpace -= gridView.Columns[i].ActualWidth;
             }
 
             // Assign the remaining width to the desired column(s)
             if (availableSpace > 0)
             {
-                gridView.Columns[1].Width = availableSpace / 2; // Description
-                gridView.Columns[2].Width = availableSpace / 2; // Note (field could be empty)
+                gridView.Columns[1].Width = availableSpace; // Description. minus the default margins
             }
         }
     }
