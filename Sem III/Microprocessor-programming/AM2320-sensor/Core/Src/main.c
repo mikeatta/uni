@@ -254,24 +254,25 @@ uint8_t receive_frame(uint8_t *sender_address, uint8_t *data, uint16_t *data_len
 }
 
 /**
- * @brief  Sends a formatted communication frame over UART from the STM32 device.
+ * @brief  Sends a formatted and encoded communication frame over UART from the STM32 device.
  *
  * This function creates a communication frame that includes the sender address,
  * recipient address, data payload, and CRC value, encapsulated within start ('[')
- * and end (']') characters. It also appends the carriage return and newline characters
+ * and end (']') characters. The function encodes the frame start ('['), frame end (']'),
+ * and the escape ('\') characters. It also appends the carriage return and newline characters
  * at the end of the frame for line termination. The frame is then transferred to the
  * UART TX buffer, and the UART transmission is initiated using interrupt communication.
  *
  * @param  recipient_address Pointer to the buffer containing the recipient address.
  * @param  data Pointer to the buffer containing the data payload to be sent.
+ * @param  data_length The length of the payload to be sent.
  * @param  crc_value The 16-bit CRC value.
  * @retval None
  */
-void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
+void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t data_length, uint16_t crc_value)
 {
-	uint16_t frame_length = strlen((char *)data) + MIN_FRAME_LEN; // Data length + other frame characters (12)
-	uint8_t frame[frame_length + 3]; // Add (3) indexes for the special characters at the end of the frame
-	uint16_t index = 0;
+	uint8_t frame[MAX_FRAME_LEN + 3]; // Add (3) indexes for the special characters at the end of the frame
+	uint16_t index = 0; // Index tracking the address of the characters on the output frame
 
 	// Cast the uint16_t CRC value to a uint8_t array
 	uint8_t crc_string[5];
@@ -283,29 +284,74 @@ void send_frame(uint8_t *recipient_address, uint8_t *data, uint16_t crc_value)
 
 	// Create the communication frame
 	frame[index++] = '['; // Add frame start character
-	while (index < frame_length - 1) // Subtract (1) to omit copying the '\0' from the CRC string
+
+	// Fill out the sender part
+	for (uint8_t i = 0; i < 3; i++)
 	{
-		if (index < 4) // Fill the sender address (STM)
+		if (*device_address_ptr == '['  || *device_address_ptr == ']' || *device_address_ptr == '\\')
+		{
+			frame[index++] = '\\';
+			switch (*device_address_ptr)
+			{
+				case '[': frame[index++] = '{'; break;
+				case ']': frame[index++] = '}'; break;
+				case '\\': frame[index++] = '\\'; break;
+			}
+		}
+		else
 		{
 			frame[index++] = *device_address_ptr;
-			device_address_ptr++;
 		}
-		else if (index < 7) // Fill the recipient address
+		device_address_ptr++;
+	}
+
+	// Fill out the recipient address
+	for (uint8_t i = 0; i < 3; i++)
+	{
+		if (*recipient_address == '['  || *recipient_address == ']' || *recipient_address == '\\')
+		{
+			frame[index++] = '\\';
+			switch (*recipient_address)
+			{
+				case '[': frame[index++] = '{'; break;
+				case ']': frame[index++] = '}'; break;
+				case '\\': frame[index++] = '\\'; break;
+			}
+		}
+		else
 		{
 			frame[index++] = *recipient_address;
-			recipient_address++;
 		}
-		else if (index < (frame_length - 5)) // Fill the data part
+		recipient_address++;
+	}
+
+	// Fill out the data part
+	for (uint16_t i = 0; i < data_length; i++)
+	{
+		if (*data == '['  || *data == ']' || *data == '\\')
+		{
+			frame[index++] = '\\';
+			switch (*data)
+			{
+				case '[': frame[index++] = '{'; break;
+				case ']': frame[index++] = '}'; break;
+				case '\\': frame[index++] = '\\'; break;
+			}
+		}
+		else
 		{
 			frame[index++] = *data;
-			data++;
 		}
-		else // Fill the CRC value
-		{
-			frame[index++] = *crc_string_ptr;
-			crc_string_ptr++;
-		}
+		data++;
 	}
+
+	// Fill out the CRC part
+	for (uint8_t i = 0; i < 4; i++)
+	{
+		frame[index++] = *crc_string_ptr;
+		crc_string_ptr++;
+	}
+
 	frame[index++] = ']'; // Add frame end character
 	frame[index++] = '\r'; // Add the carriage return character
 	frame[index++] = '\n'; // Add the newline character
