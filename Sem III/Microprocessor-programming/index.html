@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>STM32 Project Frame Generator</title>
+    <style>
+      :root {
+        --primary-color: #000308;
+        --primary-color-lighter: #0e0e0e;
+        --secondary-color: #1f2535;
+        --btn-bg-color: #16181d;
+        --btn-bg-highlight-color: #1b1e24;
+        --btn-text-color: #ffffff;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--primary-color);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 600px;
+        padding: 1rem;
+        background-color: var(--primary-color);
+        text-align: center;
+      }
+
+      header h1 {
+        margin: 0 0 2rem 0;
+      }
+
+      /* Frame Window Styles */
+      .frame-input {
+        margin: 0 0 1.2rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+      }
+
+      .frame-window {
+        padding: 0.75rem 0.5rem;
+        font-size: 1rem;
+        background-color: var(--primary-color-lighter);
+        color: var(--btn-text-color);
+        border: 4px solid var(--secondary-color);
+        border-radius: 1rem;
+      }
+
+      .frame-window:hover {
+        background-color: var(--btn-bg-highlight-color);
+      }
+
+      .frame-window-control-btns {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+      }
+
+      .frame-window-btn {
+        flex: 1;
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
+        background-color: var(--btn-bg-color);
+        color: var(--btn-text-color);
+        border: 1px solid var(--btn-bg-color);
+        border-radius: 0.35rem;
+      }
+
+      .frame-window-btn:hover {
+        background-color: var(--btn-bg-highlight-color);
+        cursor: pointer;
+      }
+
+      /* Frame Output Styles */
+      .frame-gen-output {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        height: 200px;
+        overflow-y: auto;
+      }
+
+      .frame-gen-output p {
+        margin: 0;
+        padding: 0.125rem;
+        font-size: 1rem;
+        border-radius: 0.25rem;
+      }
+
+      .frame-gen-output p:hover {
+        background-color: var(--primary-color-lighter);
+        cursor: pointer;
+      }
+
+      /* Footer Styles */
+      footer {
+        text-align: center;
+      }
+
+      footer.sticky {
+        position: sticky;
+        bottom: 0;
+        width: 100%;
+      }
+
+      .footer-info {
+        margin: 1.2rem 0 0 0;
+      }
+
+      .footer-info p {
+        margin: auto;
+      }
+
+      .footer-author-link {
+        color: var(--btn-text-color);
+        text-decoration: none;
+      }
+
+      .footer-author-link:hover {
+        color: var(--btn-bg-highlight-color);
+      }
+
+      /* Copied Frame Overlay Styles */
+      .copied-overlay {
+        position: absolute;
+        z-index: 1000;
+        opacity: 0.987;
+        transition: opacity 0.5s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Frame generator</h1>
+      </header>
+      <main>
+        <div class="frame-input">
+          <input
+            class="frame-window"
+            type="text"
+            placeholder="Frame data..."
+            title="Frame data input field"
+          />
+          <div class="frame-window-control-btns">
+            <button
+              class="frame-window-btn"
+              type="button"
+              title="Submit"
+              onclick="printOutput()"
+            >
+              Submit
+            </button>
+            <button
+              id="clear-input-btn"
+              class="frame-window-btn"
+              type="reset"
+              title="Reset"
+              onclick="clearWindow()"
+            >
+              Clear input
+            </button>
+          </div>
+          <button
+            class="frame-window-btn"
+            type="reset"
+            title="Remove generated frames"
+            onclick="clearOutput()"
+          >
+            Clear generated frames
+          </button>
+        </div>
+        <div class="frame-gen-output"></div>
+      </main>
+      <footer class="sticky">
+        <div class="footer-info">
+          <p>Made by Atami</p>
+          <a
+            href="https://x.com/m_chaels"
+            target="_blank"
+            class="footer-author-link"
+            >@m_chaels</a
+          >
+          <span> | </span>
+          <a
+            href="https://github.com/mikeatta"
+            target="_blank"
+            class="footer-author-link"
+            >@mikeatta</a
+          >
+        </div>
+      </footer>
+    </div>
+  </body>
+  <script>
+    function computeCRC(data) {
+      const dataLength = data.length;
+      let CRC = 0xffff; // Initialize the CRC value
+
+      for (let byteIndex = 0; byteIndex < dataLength; byteIndex++) {
+        // Get the ASCII code of the individual character at the specified index of data
+        CRC ^= data.charCodeAt(byteIndex); // XOR the CRC with the data byte value
+
+        // Process each bit of the byte
+        for (i = 0; i < 8; i++) {
+          if (CRC & 0x0001) {
+            CRC >>= 1;
+            CRC ^= 0xa001;
+          } else {
+            CRC >>= 1;
+          }
+        }
+      }
+
+      return CRC;
+    }
+
+    function formatCRC(value) {
+      const stringHexValue = value.toString(16).toUpperCase(); // Convert CRC output to a hexadecimal string representation
+      const formattedValue = stringHexValue.padStart(4, '0'); // Prefix CRC with zeros, if length is shorter than 4 chars
+      return formattedValue;
+    }
+
+    /**
+     * Converts decimal values in commands to hexadecimal within a frame.
+     * Handles multiple commands in the same input frame.
+     *
+     * @param {string} input - The frame body containing the commands.
+     * @returns {string} - Modified frame with decimal values converted to hexadecimal.
+     */
+    function convertInputData(input) {
+      const readSinglePattern = /READ\|(\d{3});/g;
+      const readRangePattern = /READ\|(\d{3})-(\d{3});/g;
+      const setIntervalPattern = /INTV\|(\d{1,10});/g;
+
+      let index = 0; // Current position in the input string
+      let result = ''; // Accumulated output
+
+      while (index < input.length) {
+        const substring = input.slice(index); // Remaining input to process
+        let match;
+
+        // Handle READ single value
+        if ((match = readSinglePattern.exec(substring))) {
+          const decimal = parseInt(match[1], 10);
+          const hex = decimal.toString(16).toUpperCase().padStart(4, '0');
+          result += input.slice(index, index + match.index) + `READ|${hex};`;
+          index += match.index + match[0].length; // Move index past the matched command
+          continue;
+        }
+
+        // Handle READ range
+        if ((match = readRangePattern.exec(substring))) {
+          const decimalStart = parseInt(match[1], 10);
+          const decimalEnd = parseInt(match[2], 10);
+          const hexStart = decimalStart
+            .toString(16)
+            .toUpperCase()
+            .padStart(4, '0');
+          const hexEnd = decimalEnd.toString(16).toUpperCase().padStart(4, '0');
+          result +=
+            input.slice(index, index + match.index) +
+            `READ|${hexStart}-${hexEnd};`;
+          index += match.index + match[0].length; // Move index past the matched command
+          continue;
+        }
+
+        // Handle INTV command
+        if ((match = setIntervalPattern.exec(substring))) {
+          const decimal = parseInt(match[1], 10);
+          const hex = decimal.toString(16).toUpperCase().padStart(8, '0');
+          result += input.slice(index, index + match.index) + `INTV|${hex};`;
+          index += match.index + match[0].length; // Move index past the matched command
+          continue;
+        }
+
+        // If no match is found, copy the current character and move forward
+        result += input[index];
+        index++;
+      }
+
+      return result;
+    }
+
+    function generateFrame() {
+      const inputData = document.querySelector('input.frame-window').value;
+      const hexNumberInputData = convertInputData(inputData); // Convert the decimal values in the frame into hexadecimal
+      const computedCRC = computeCRC(hexNumberInputData);
+      const frame = `[PC0STM${hexNumberInputData}${formatCRC(computedCRC)}]`;
+      return frame;
+    }
+
+    function clearWindow() {
+      const window = document.querySelector('input.frame-window');
+      const windowHasData = window.value.length > 0;
+      if (windowHasData) window.value = '';
+    }
+
+    function printOutput() {
+      const outputContainer = document.querySelector('div.frame-gen-output');
+      const generatedFrame = generateFrame();
+      const frameNode = document.createElement('p');
+
+      frameNode.textContent = generatedFrame;
+
+      frameNode.setAttribute('onClick', 'copyElementContent(this)');
+      outputContainer.appendChild(frameNode);
+      clearWindow(); // Clear input field after processing the frame
+    }
+
+    function clearOutput() {
+      const outputContainer = document.querySelector('div.frame-gen-output');
+      outputContainer.innerHTML = ''; // Remove the child nodes (output frames)
+    }
+
+    // UI-related functions
+    function copyElementContent(element) {
+      const clickedElementContent = element.innerHTML;
+      console.log('Clicked:', clickedElementContent);
+
+      navigator.clipboard
+        .writeText(clickedElementContent)
+        .then(showCopiedOverlay(element))
+        .catch((error) => {
+          console.error(error, 'Failed to copy element content.');
+        });
+    }
+
+    /**
+     * Adds an overlay above the copied (clicked) element. There can only
+     * be one overlay at a time, so if a previous overlay is still present,
+     * it will be removed from the DOM.
+     *
+     * @param {Element} element - The currently copied element.
+     * @returns {void}
+     */
+    function showCopiedOverlay(element) {
+      const previousOverlay = document.querySelector('img.copied-overlay');
+      if (previousOverlay) previousOverlay.remove(); // Clear previous overlay
+
+      const overlay = document.createElement('img');
+      const overlayWidth = 100;
+      const overlayHeight = 59;
+
+      // Set attributes for the copied overlay SVG
+      overlay.setAttribute('src', 'copied-overlay.svg');
+      overlay.setAttribute('alt', 'copied-overlay.svg');
+      overlay.setAttribute('class', 'copied-overlay');
+      overlay.setAttribute('width', `${overlayWidth}px`);
+      overlay.setAttribute('height', `${overlayHeight}px`);
+
+      // Get the position and the dimensions of the copied frame
+      const frameRect = element.getBoundingClientRect();
+
+      // Align and center the copied overlay above copied frame
+      overlay.style.left = `${
+        frameRect.left + window.scrollX + frameRect.width / 2 - overlayWidth / 2
+      }px`;
+      overlay.style.top = `${
+        frameRect.top + window.scrollY - overlayHeight + 12
+      }px`;
+
+      document.body.appendChild(overlay);
+
+      // Remove the overlay after a 2sec delay
+      showCopiedOverlayTimeout = setTimeout(() => {
+        overlay.style.opacity = 0;
+        setTimeout(() => overlay.remove(), 500);
+      }, 2000);
+
+      clearTimeout(showCopiedOverlay);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (!e.repeat) captureKeyboard(e.key); // Capture pressed key
+    });
+
+    /**
+     * Adds keyboard controls to speed up copying, pasting, and clearing
+     * the generated frames based on user key inputs.
+     *
+     * - 'C' or 'c': Copies the latest generated frame to the clipboard.
+     * - 'D' or 'd': Clears the output of generated frames.
+     * - 'Enter': Submits the input window and auto-copies the new frame.
+     * - 'Escape': Clears the input window if it contains content.
+     *
+     * @param {string} pressedKey - The key pressed by the user to trigger the action.
+     * @returns {void}
+     */
+    function captureKeyboard(pressedKey) {
+      const inputWindow = document.querySelector('input.frame-window');
+      const windowHasContent = inputWindow.value !== '';
+      const output = document.querySelector('div.frame-gen-output');
+      const currentlyFocused = document.activeElement;
+
+      switch (pressedKey) {
+        case 'c':
+        case 'C': // Copy latest frame to clipboard
+          if (inputWindow !== currentlyFocused)
+            copyElementContent(output.lastChild); // Manual copy
+          break;
+        case 'd':
+        case 'D': // Clear output
+          if (inputWindow !== currentlyFocused) clearOutput();
+          break;
+        case 'Enter': // Submit input window
+          printOutput();
+          copyElementContent(output.lastChild); // Redundant auto-copy on frame gen
+          break;
+        case 'Escape': // Clear input window
+          if (windowHasContent) clearWindow();
+          break;
+      }
+    }
+  </script>
+</html>
