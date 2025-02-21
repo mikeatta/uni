@@ -1,8 +1,0 @@
-# Google API Credentials
-#
-credentials.json
-token.json
-
-# Node modules folder
-#
-/node_modules
