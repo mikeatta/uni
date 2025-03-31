@@ -1,0 +1,25 @@
+services:
+  fastapi:
+    image: fastapi-service:latest
+    container_name: fastapi-service
+    ports:
+      - 8000:8000
+    networks:
+      - lab_network
+    depends_on:
+     - redis
+    
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+     - lab_network
+    volumes:
+     - redis_data:/data
+    
+networks:
+  lab_network:
+    driver: bridge
+
+volumes:
+  redis_data:
