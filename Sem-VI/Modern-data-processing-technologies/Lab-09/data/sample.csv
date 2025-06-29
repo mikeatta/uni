@@ -1,0 +1,11 @@
+OrderID,Product,Category,Price,Quantity,SaleDate
+1,Laptop,Electronics,1200,1,2023-01-15
+2,Mouse,Electronics,25,2,2023-01-16
+3,Keyboard,Electronics,75,1,2023-01-17
+4,Desk,Furniture,150,1,2023-01-18
+5,Chair,Furniture,80,2,2023-01-19
+6,Monitor,Electronics,300,1,2023-01-20
+7,Webcam,Electronics,50,1,2023-01-21
+8,Desk Lamp,Furniture,30,3,2023-01-22
+9,SSD,Electronics,120,1,2023-01-23
+10,Office Chair,Furniture,200,1,2023-01-24
